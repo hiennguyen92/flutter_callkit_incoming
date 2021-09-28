@@ -11,4 +11,9 @@ class FlutterCallkitIncoming {
     final String? version = await _channel.invokeMethod('getPlatformVersion');
     return version;
   }
+  
+  static Future showCallkitIncoming() async {
+    await _channel.invokeMethod("showCallkitIncoming", "hihi");
+  }
+  
 }

@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="base_margin">10dp</dimen>
+    <dimen name="size_avatar">64dp</dimen>
+    <dimen name="size_button">72dp</dimen>
 </resources>

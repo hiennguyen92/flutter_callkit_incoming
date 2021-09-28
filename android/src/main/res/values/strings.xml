@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="text_accept">Accept</string>
+    <string name="text_decline">Decline</string>
 </resources>

@@ -9,9 +9,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ff00ff"
         tools:ignore="ContentDescription" />
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +34,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_name"
+                    android:id="@+id/tvNameCaller"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:autoSizeMaxTextSize="24sp"
@@ -55,7 +53,7 @@
                     tools:text="Caller name" />
 
                 <TextView
-                    android:id="@+id/tv_number"
+                    android:id="@+id/tvNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -67,23 +65,21 @@
 
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/iv_avatar"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="@dimen/size_avatar"
+                android:layout_height="@dimen/size_avatar"
                 android:src="@android:drawable/ic_menu_zoom"
-                android:visibility="gone"
-                tools:ignore="ContentDescription"
-                tools:visibility="visible" />
+                app:civ_border_color="#80ffffff"
+                app:civ_border_width="1dp" />
+
 
         </LinearLayout>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
 
         <LinearLayout
@@ -102,20 +98,20 @@
 
                 <ImageView
                     android:id="@+id/ivDeclineCall"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
+                    android:layout_width="@dimen/size_button"
+                    android:layout_height="@dimen/size_button"
                     android:background="@drawable/bg_button_decline"
-                    android:padding="16dp"
-                    android:src="@android:drawable/ic_secure"
+                    android:padding="15dp"
+                    android:src="@drawable/ic_decline"
                     tools:ignore="ContentDescription" />
 
                 <TextView
                     android:id="@+id/tvDecline"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/base_margin"
                     android:gravity="center"
-                    android:text="Decline"
+                    android:text="@string/text_decline"
                     android:textColor="@color/action_text"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -133,20 +129,20 @@
 
                 <ImageView
                     android:id="@+id/ivAcceptCall"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
+                    android:layout_width="@dimen/size_button"
+                    android:layout_height="@dimen/size_button"
                     android:background="@drawable/bg_button_accept"
-                    android:padding="16dp"
-                    android:src="@android:drawable/ic_secure"
+                    android:padding="15dp"
+                    android:src="@drawable/ic_accept"
                     tools:ignore="ContentDescription" />
 
                 <TextView
                     android:id="@+id/tvAccept"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/base_margin"
                     android:gravity="center"
-                    android:text="Accept"
+                    android:text="@string/text_accept"
                     android:textColor="@color/action_text"
                     android:textSize="14sp" />
 
@@ -155,6 +151,5 @@
         </LinearLayout>
 
     </LinearLayout>
-
 
 </RelativeLayout>

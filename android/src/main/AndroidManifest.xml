@@ -1,3 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.hiennv.flutter_callkit_incoming">
+    package="com.hiennv.flutter_callkit_incoming">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
+    <application>
+
+        <activity
+            android:name="com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity"
+            android:theme="@style/Theme.AppCompat"
+            android:screenOrientation="portrait"
+            android:showOnLockScreen="true">
+            <intent-filter>
+                <action android:name="com.hiennv.flutter_callkit_incoming.ACTION_CALLKIT_INCOMING" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name="com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+    </application>
 </manifest>
