@@ -8,7 +8,7 @@
 
         <activity
             android:name="com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity"
-            android:theme="@style/Theme.AppCompat"
+            android:theme="@style/CallkitIncomingTheme"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true">
             <intent-filter>

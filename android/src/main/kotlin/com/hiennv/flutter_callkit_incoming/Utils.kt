@@ -1,0 +1,51 @@
+package com.hiennv.flutter_callkit_incoming
+
+import android.app.ActivityManager
+import android.content.Context
+import android.content.res.Resources
+
+class Utils {
+
+    companion object {
+
+        @JvmStatic
+        fun dpToPx(dp: Float): Float {
+            return dp * Resources.getSystem().displayMetrics.density
+        }
+
+        @JvmStatic
+        fun pxToDp(px: Float): Float {
+            return px / Resources.getSystem().displayMetrics.density
+        }
+
+        @JvmStatic
+        fun getScreenWidth(): Int {
+            return Resources.getSystem().displayMetrics.widthPixels
+        }
+
+        @JvmStatic
+        fun getScreenHeight(): Int {
+            return Resources.getSystem().displayMetrics.heightPixels
+        }
+
+        fun getNavigationBarHeight(context: Context): Int {
+            val resources = context.resources
+            val id = resources.getIdentifier(
+                "navigation_bar_height", "dimen", "android"
+            )
+            return if (id > 0) {
+                resources.getDimensionPixelSize(id)
+            } else 0
+        }
+
+        fun getStatusBarHeight(context: Context): Int {
+            val resources = context.resources
+            val id: Int =
+                resources.getIdentifier("status_bar_height", "dimen", "android")
+            return if (id > 0) {
+                resources.getDimensionPixelSize(id)
+            } else 0
+        }
+
+    }
+}

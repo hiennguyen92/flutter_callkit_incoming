@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <ImageView
@@ -14,8 +14,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="64dp"
+        android:fitsSystemWindows="true"
+        android:layout_marginTop="@dimen/base_margin_x2"
+        android:layout_marginBottom="@dimen/base_margin_x6"
         android:orientation="vertical">
 
 
@@ -86,9 +87,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginStart="48dp"
-            android:layout_marginEnd="48dp"
-            android:layout_marginBottom="64dp"
+            android:layout_marginStart="@dimen/base_margin_x6"
+            android:layout_marginEnd="@dimen/base_margin_x6"
+            android:layout_marginBottom="0dp"
             android:orientation="horizontal">
 
             <LinearLayout
