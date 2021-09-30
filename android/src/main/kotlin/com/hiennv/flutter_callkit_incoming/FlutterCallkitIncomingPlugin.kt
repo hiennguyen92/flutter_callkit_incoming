@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.telephony.TelephonyManager
+import android.util.Log
 import androidx.annotation.NonNull
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
@@ -99,12 +100,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler {
         bundle.putInt(EXTRA_CALLKIT_TYPE, 1)
         when (call.method) {
             "showCallkitIncoming" -> {
-                context.startActivity(CallkitIncomingActivity.getIntent(bundle))
-//                if (isDeviceScreenLocked(context)) {
-//                    context.startActivity(CallkitIncomingActivity.start(bundle))
-//                } else {
-//                    //Show notification
-//                }
+                if (isDeviceScreenLocked(context)) {
+                    context.startActivity(CallkitIncomingActivity.getIntent(bundle))
+                } else {
+                    //Show notification
+                    Log.e("HELLO", "SHOW NOTIFICATION")
+                }
                 //send BroadcastReceiver
                 context.sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentIncoming(bundle))
             }
