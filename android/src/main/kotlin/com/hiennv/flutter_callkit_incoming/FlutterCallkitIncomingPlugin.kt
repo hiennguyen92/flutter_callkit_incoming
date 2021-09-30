@@ -10,13 +10,12 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.telephony.TelephonyManager
-import android.util.Log
 import androidx.annotation.NonNull
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity.Companion.EXTRA_CALLKIT_AVATAR
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity.Companion.EXTRA_CALLKIT_NAME_CALLER
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity.Companion.EXTRA_CALLKIT_NUMBER
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NUMBER
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -94,19 +93,20 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
 
         val bundle = Bundle()
-        bundle.putString(EXTRA_CALLKIT_NAME_CALLER, "Hello")
-        bundle.putString(EXTRA_CALLKIT_NUMBER, "Hihi")
+        bundle.putString(EXTRA_CALLKIT_NAME_CALLER, "Hello A")
+        bundle.putString(EXTRA_CALLKIT_NUMBER, "Callkit: 0123456789")
         bundle.putString(EXTRA_CALLKIT_AVATAR, "")
-        Log.d("XXX", call.method)
+        bundle.putInt(EXTRA_CALLKIT_TYPE, 1)
         when (call.method) {
             "showCallkitIncoming" -> {
-                if (isDeviceScreenLocked(context)) {
-                    context.startActivity(CallkitIncomingActivity.start(bundle))
-                } else {
-                    //Show notification
-                }
-                //send broadcast receiver
-                //activity.sendBroadcast()
+                context.startActivity(CallkitIncomingActivity.getIntent(bundle))
+//                if (isDeviceScreenLocked(context)) {
+//                    context.startActivity(CallkitIncomingActivity.start(bundle))
+//                } else {
+//                    //Show notification
+//                }
+                //send BroadcastReceiver
+                context.sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentIncoming(bundle))
             }
         }
 //    if (call.method == "getPlatformVersion") {

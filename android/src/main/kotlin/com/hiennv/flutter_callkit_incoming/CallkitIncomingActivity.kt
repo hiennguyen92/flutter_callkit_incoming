@@ -13,6 +13,13 @@ import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.ACTION_CALL_INCOMING
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_INCOMING_DATA
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NUMBER
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
+import com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
@@ -22,30 +29,15 @@ class CallkitIncomingActivity : Activity() {
 
     companion object {
 
-        private const val ACTION_CALLKIT_INCOMING =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALLKIT_INCOMING"
-        private const val ACTION_CALL_ACCEPT =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT"
-        private const val ACTION_CALL_DECLINE =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE"
-        private const val ACTION_CALL_ENDED =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED"
 
-
-        const val EXTRA_CALLKIT_INCOMING_DATA = "EXTRA_CALLKIT_INCOMING_DATA"
-        const val EXTRA_CALLKIT_ID = "EXTRA_CALLKIT_ID"
-        const val EXTRA_CALLKIT_NAME_CALLER = "EXTRA_CALLKIT_NAME_CALLER"
-        const val EXTRA_CALLKIT_NUMBER = "EXTRA_CALLKIT_NUMBER"
-        const val EXTRA_CALLKIT_TYPE = "EXTRA_CALLKIT_TYPE"
-        const val EXTRA_CALLKIT_AVATAR = "EXTRA_CALLKIT_AVATAR"
-
-
-
-        fun start(data: Bundle) = Intent(ACTION_CALLKIT_INCOMING).apply {
+        fun getIntent(data: Bundle) = Intent(ACTION_CALL_INCOMING).apply {
             putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            flags =
+                Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
         }
     }
+
+    private lateinit var llBackgroundAnimation: RippleRelativeLayout
 
     private lateinit var tvNameCaller: TextView
     private lateinit var tvNumber: TextView
@@ -71,7 +63,10 @@ class CallkitIncomingActivity : Activity() {
                         or WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
             )
         }
+
+
         transparentStatusAndNavigation()
+
         setContentView(R.layout.activity_callkit_incoming)
         initView()
         incomingData(intent)
@@ -121,12 +116,21 @@ class CallkitIncomingActivity : Activity() {
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {
             ivAvatar.visibility = View.VISIBLE
             Picasso.get().load(avatarUrl).into(ivAvatar)
-        } else {
-            ivAvatar.visibility = View.GONE
         }
+
+        val callType = data?.getInt(EXTRA_CALLKIT_TYPE, 0)
+        if(callType != 0){
+            ivAcceptCall.setImageResource(R.drawable.ic_video)
+        }
+
     }
 
     private fun initView() {
+        llBackgroundAnimation = findViewById(R.id.llBackgroundAnimation)
+        llBackgroundAnimation.layoutParams.height =
+            Utils.getScreenWidth() + Utils.getStatusBarHeight(this@CallkitIncomingActivity)
+        llBackgroundAnimation.startRippleAnimation()
+
         tvNameCaller = findViewById(R.id.tvNameCaller)
         tvNumber = findViewById(R.id.tvNumber)
         ivAvatar = findViewById(R.id.ivAvatar)
@@ -143,19 +147,36 @@ class CallkitIncomingActivity : Activity() {
         }
     }
 
-    fun animateAcceptCall() {
-        val shakeAnimation = AnimationUtils.loadAnimation(this@CallkitIncomingActivity, R.anim.shake_anim)
+    private fun animateAcceptCall() {
+        val shakeAnimation =
+            AnimationUtils.loadAnimation(this@CallkitIncomingActivity, R.anim.shake_anim)
         ivAcceptCall.animation = shakeAnimation
     }
 
 
     private fun onAcceptClick() {
-
+        val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
+        val intent = CallkitIncomingBroadcastReceiver.getIntentAccept(data)
+        sendBroadcast(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            finishAndRemoveTask()
+        }else{
+            finish()
+        }
     }
 
     private fun onDeclineClick() {
-
+        val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
+        val intent = CallkitIncomingBroadcastReceiver.getIntentDecline(data)
+        sendBroadcast(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            finishAndRemoveTask()
+        }else{
+            finish()
+        }
     }
+
+    override fun onBackPressed() {}
 
 
 }

@@ -6,5 +6,6 @@
     <color name="decline">#F44336</color>
     <color name="decline_ripple">#FB8D85</color>
 
-    <color name="action_text">#ADADAD</color>
+    <color name="action_text">#FFFFFF</color>
+    <color name="ripple_color">#80ffffff</color>
 </resources>
