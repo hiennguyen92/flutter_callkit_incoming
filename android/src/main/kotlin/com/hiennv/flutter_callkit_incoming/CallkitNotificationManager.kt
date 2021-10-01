@@ -119,10 +119,11 @@ class CallkitNotificationManager(private val context: Context) {
                 smallIcon = R.drawable.ic_accept
             }
         }
-        val notificationBuilder = NotificationCompat.Builder(context, "callkit_missed_channel_id")
+        notificationBuilder = NotificationCompat.Builder(context, "callkit_missed_channel_id")
         notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
         notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_NUMBER, ""))
         notificationBuilder.setSmallIcon(smallIcon)
+        Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, "")).into(targetLoadAvatar)
         notificationBuilder.priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             NotificationManager.IMPORTANCE_DEFAULT
         } else {
