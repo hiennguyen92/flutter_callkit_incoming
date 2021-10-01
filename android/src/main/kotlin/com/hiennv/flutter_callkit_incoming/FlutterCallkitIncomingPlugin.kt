@@ -1,6 +1,7 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.annotation.TargetApi
+import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ContentResolver
 import android.content.Context
@@ -10,7 +11,6 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.telephony.TelephonyManager
-import android.util.Log
 import androidx.annotation.NonNull
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
@@ -18,6 +18,8 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -25,11 +27,12 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
 /** FlutterCallkitIncomingPlugin */
-class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler {
+class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     companion object {
 
-        lateinit var context: Context
+        private const val EXTRA_INTERNAL_FROM = "EXTRA_INTERNAL_FROM"
+
         lateinit var channel: MethodChannel
         lateinit var events: EventChannel
 
@@ -76,19 +79,21 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler {
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
-    //private lateinit var context: Context
+    private lateinit var activity: Activity
+    private lateinit var context: Context
+
     //private lateinit var channel: MethodChannel
     //private lateinit var events: EventChannel
+    private lateinit var callkitNotificationManager: CallkitNotificationManager
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        context = flutterPluginBinding.applicationContext
+        this.context = flutterPluginBinding.applicationContext
+        this.callkitNotificationManager = CallkitNotificationManager(this.context)
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_callkit_incoming")
         channel.setMethodCallHandler(this)
         events =
             EventChannel(flutterPluginBinding.binaryMessenger, "flutter_callkit_incoming_events")
         events.setStreamHandler(eventHandler)
-
-
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -98,16 +103,20 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler {
         bundle.putString(EXTRA_CALLKIT_NUMBER, "Callkit: 0123456789")
         bundle.putString(EXTRA_CALLKIT_AVATAR, "")
         bundle.putInt(EXTRA_CALLKIT_TYPE, 1)
+
         when (call.method) {
             "showCallkitIncoming" -> {
-                if (isDeviceScreenLocked(context)) {
-                    context.startActivity(CallkitIncomingActivity.getIntent(bundle))
-                } else {
-                    //Show notification
-                    Log.e("HELLO", "SHOW NOTIFICATION")
-                }
+//                if (isDeviceScreenLocked(context)) {
+//                    bundle.putString(EXTRA_INTERNAL_FROM, "activity")
+//                    context.startActivity(CallkitIncomingActivity.getIntent(bundle))
+//                } else {
+//                    bundle.putString(EXTRA_INTERNAL_FROM, "notification")
+//                    callkitNotificationManager.showIncomingNotification(bundle)
+//                }
+                bundle.putString(EXTRA_INTERNAL_FROM, "notification")
+               callkitNotificationManager.showIncomingNotification(bundle)
                 //send BroadcastReceiver
-                context.sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentIncoming(bundle))
+                context.sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentIncoming(context, bundle))
             }
         }
 //    if (call.method == "getPlatformVersion") {
@@ -120,6 +129,20 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler {
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
     }
+
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
+    }
+
+    override fun onDetachedFromActivity() {}
 
 
     class EventStreamHandler : EventChannel.StreamHandler {
@@ -144,5 +167,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler {
             eventSink = null
         }
     }
+
 
 }

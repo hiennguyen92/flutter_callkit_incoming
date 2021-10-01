@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hiennv.flutter_callkit_incoming">
 
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
 
     <application>
@@ -21,7 +23,7 @@
         <receiver
             android:name="com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING" />
                 <action android:name="com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT" />

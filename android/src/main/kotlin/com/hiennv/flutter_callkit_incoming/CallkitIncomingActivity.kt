@@ -31,6 +31,7 @@ class CallkitIncomingActivity : Activity() {
 
 
         fun getIntent(data: Bundle) = Intent(ACTION_CALL_INCOMING).apply {
+            action = ACTION_CALL_INCOMING
             putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
             flags =
                 Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
@@ -156,7 +157,7 @@ class CallkitIncomingActivity : Activity() {
 
     private fun onAcceptClick() {
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
-        val intent = CallkitIncomingBroadcastReceiver.getIntentAccept(data)
+        val intent = CallkitIncomingBroadcastReceiver.getIntentAccept(this@CallkitIncomingActivity, data)
         sendBroadcast(intent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             finishAndRemoveTask()
@@ -167,7 +168,7 @@ class CallkitIncomingActivity : Activity() {
 
     private fun onDeclineClick() {
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
-        val intent = CallkitIncomingBroadcastReceiver.getIntentDecline(data)
+        val intent = CallkitIncomingBroadcastReceiver.getIntentDecline(this@CallkitIncomingActivity, data)
         sendBroadcast(intent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             finishAndRemoveTask()

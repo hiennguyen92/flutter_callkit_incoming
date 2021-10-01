@@ -29,45 +29,61 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKIT_TYPE = "EXTRA_CALLKIT_TYPE"
         const val EXTRA_CALLKIT_AVATAR = "EXTRA_CALLKIT_AVATAR"
 
-        fun getIntentIncoming(data: Bundle?) =
-            Intent(ACTION_CALL_INCOMING).apply {
+
+        fun getIntentIncoming(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = ACTION_CALL_INCOMING
                 putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
             }
 
-        fun getIntentAccept(data: Bundle?) =
-            Intent(ACTION_CALL_ACCEPT).apply {
+        fun getIntentAccept(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = ACTION_CALL_ACCEPT
                 putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
             }
 
-        fun getIntentDecline(data: Bundle?) =
-            Intent(ACTION_CALL_DECLINE).apply {
+        fun getIntentDecline(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = ACTION_CALL_DECLINE
                 putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
             }
 
+        fun getIntentTimeout(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = ACTION_CALL_TIMEOUT
+                putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
+            }
     }
 
 
     override fun onReceive(context: Context, intent: Intent) {
-        //build notification
+        val callkitNotificationManager = CallkitNotificationManager(context)
+        val callkitSoundPlayer = CallkitSoundPlayer.getInstance(context)
         //build ringtone
 
         val action = intent.action ?: return
         Log.e("onReceive", action)
         when (action) {
             ACTION_CALL_INCOMING -> {
-
+                callkitSoundPlayer.setDuration(20000L)
+                val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
+                callkitSoundPlayer.play(data)
             }
             ACTION_CALL_ACCEPT -> {
-
+                Utils.backToForeground(context)
+                callkitSoundPlayer.stop()
+                callkitNotificationManager.clearNotification(9696)
             }
             ACTION_CALL_DECLINE -> {
-
+                callkitSoundPlayer.stop()
+                callkitNotificationManager.clearNotification(9696)
             }
             ACTION_CALL_ENDED -> {
-
+                callkitSoundPlayer.stop()
             }
             ACTION_CALL_TIMEOUT -> {
-
+                callkitSoundPlayer.stop()
+                callkitNotificationManager.clearNotification(9696)
             }
         }
     }
