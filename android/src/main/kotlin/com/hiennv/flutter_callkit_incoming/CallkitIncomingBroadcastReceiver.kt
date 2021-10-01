@@ -23,11 +23,13 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
 
         const val EXTRA_CALLKIT_INCOMING_DATA = "EXTRA_CALLKIT_INCOMING_DATA"
+
         const val EXTRA_CALLKIT_ID = "EXTRA_CALLKIT_ID"
         const val EXTRA_CALLKIT_NAME_CALLER = "EXTRA_CALLKIT_NAME_CALLER"
         const val EXTRA_CALLKIT_NUMBER = "EXTRA_CALLKIT_NUMBER"
         const val EXTRA_CALLKIT_TYPE = "EXTRA_CALLKIT_TYPE"
         const val EXTRA_CALLKIT_AVATAR = "EXTRA_CALLKIT_AVATAR"
+        const val EXTRA_CALLKIT_DURATION = "EXTRA_CALLKIT_DURATION"
 
 
         fun getIntentIncoming(context: Context, data: Bundle?) =
@@ -62,28 +64,30 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         //build ringtone
 
         val action = intent.action ?: return
+        val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA) ?: return
         Log.e("onReceive", action)
         when (action) {
             ACTION_CALL_INCOMING -> {
-                callkitSoundPlayer.setDuration(20000L)
-                val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
+                val duration = data.getLong(EXTRA_CALLKIT_DURATION, 0L)
+                callkitSoundPlayer.setDuration(duration)
                 callkitSoundPlayer.play(data)
             }
             ACTION_CALL_ACCEPT -> {
                 Utils.backToForeground(context)
                 callkitSoundPlayer.stop()
-                callkitNotificationManager.clearNotification(9696)
+                callkitNotificationManager.clearIncomingNotification()
             }
             ACTION_CALL_DECLINE -> {
                 callkitSoundPlayer.stop()
-                callkitNotificationManager.clearNotification(9696)
+                callkitNotificationManager.clearIncomingNotification()
             }
             ACTION_CALL_ENDED -> {
                 callkitSoundPlayer.stop()
             }
             ACTION_CALL_TIMEOUT -> {
                 callkitSoundPlayer.stop()
-                callkitNotificationManager.clearNotification(9696)
+                callkitNotificationManager.clearIncomingNotification()
+                callkitNotificationManager.showMissCallNotification(data)
             }
         }
     }

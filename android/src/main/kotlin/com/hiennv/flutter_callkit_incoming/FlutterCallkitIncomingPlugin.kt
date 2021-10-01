@@ -13,6 +13,8 @@ import android.provider.Settings
 import android.telephony.TelephonyManager
 import androidx.annotation.NonNull
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ID
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NUMBER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
@@ -70,7 +72,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             val simState = telMgr.simState
             val keyguardManager =
                 context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            return keyguardManager.isDeviceSecure && simState != TelephonyManager.SIM_STATE_ABSENT
+            return keyguardManager.isDeviceLocked && keyguardManager.isDeviceSecure && simState != TelephonyManager.SIM_STATE_ABSENT
         }
 
     }
@@ -99,24 +101,30 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
 
         val bundle = Bundle()
-        bundle.putString(EXTRA_CALLKIT_NAME_CALLER, "Hello A")
-        bundle.putString(EXTRA_CALLKIT_NUMBER, "Callkit: 0123456789")
-        bundle.putString(EXTRA_CALLKIT_AVATAR, "")
-        bundle.putInt(EXTRA_CALLKIT_TYPE, 1)
+
+        call.argument<String>("id")?.let { bundle.putString(EXTRA_CALLKIT_ID, it) }
+        call.argument<String>("nameCaller")?.let { bundle.putString(EXTRA_CALLKIT_NAME_CALLER, it) }
+        call.argument<String>("number")?.let { bundle.putString(EXTRA_CALLKIT_NUMBER, it) }
+        call.argument<String>("avatar")?.let { bundle.putString(EXTRA_CALLKIT_AVATAR, it) }
+        call.argument<Int>("type")?.let { bundle.putInt(EXTRA_CALLKIT_TYPE, it) }
+        call.argument<Int>("duration")?.let { bundle.putLong(EXTRA_CALLKIT_DURATION, it.toLong()) }
 
         when (call.method) {
             "showCallkitIncoming" -> {
-//                if (isDeviceScreenLocked(context)) {
-//                    bundle.putString(EXTRA_INTERNAL_FROM, "activity")
-//                    context.startActivity(CallkitIncomingActivity.getIntent(bundle))
-//                } else {
-//                    bundle.putString(EXTRA_INTERNAL_FROM, "notification")
-//                    callkitNotificationManager.showIncomingNotification(bundle)
-//                }
-                bundle.putString(EXTRA_INTERNAL_FROM, "notification")
-               callkitNotificationManager.showIncomingNotification(bundle)
+                if (isDeviceScreenLocked(context)) {
+                    bundle.putString(EXTRA_INTERNAL_FROM, "activity")
+                    context.startActivity(CallkitIncomingActivity.getIntent(bundle))
+                } else {
+                    bundle.putString(EXTRA_INTERNAL_FROM, "notification")
+                    callkitNotificationManager.showIncomingNotification(bundle)
+                }
                 //send BroadcastReceiver
-                context.sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentIncoming(context, bundle))
+                context.sendBroadcast(
+                    CallkitIncomingBroadcastReceiver.getIntentIncoming(
+                        context,
+                        bundle
+                    )
+                )
             }
         }
 //    if (call.method == "getPlatformVersion") {

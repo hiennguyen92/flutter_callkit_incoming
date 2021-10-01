@@ -7,6 +7,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -15,6 +17,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.ACTION_CALL_INCOMING
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_INCOMING_DATA
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NUMBER
@@ -106,6 +109,7 @@ class CallkitIncomingActivity : Activity() {
         win.attributes = winParams
     }
 
+
     private fun incomingData(intent: Intent) {
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
         if (data == null) finish()
@@ -120,10 +124,25 @@ class CallkitIncomingActivity : Activity() {
         }
 
         val callType = data?.getInt(EXTRA_CALLKIT_TYPE, 0)
-        if(callType != 0){
+        if (callType != null) {
             ivAcceptCall.setImageResource(R.drawable.ic_video)
         }
+        val duration = data?.getLong(EXTRA_CALLKIT_DURATION, 0L)
+        if (duration != null) {
+            finishTimeout(duration)
+        }
+    }
 
+    private fun finishTimeout(timeOut: Long) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (!isFinishing) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    finishAndRemoveTask()
+                } else {
+                    finish()
+                }
+            }
+        }, timeOut)
     }
 
     private fun initView() {
@@ -157,22 +176,24 @@ class CallkitIncomingActivity : Activity() {
 
     private fun onAcceptClick() {
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
-        val intent = CallkitIncomingBroadcastReceiver.getIntentAccept(this@CallkitIncomingActivity, data)
+        val intent =
+            CallkitIncomingBroadcastReceiver.getIntentAccept(this@CallkitIncomingActivity, data)
         sendBroadcast(intent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             finishAndRemoveTask()
-        }else{
+        } else {
             finish()
         }
     }
 
     private fun onDeclineClick() {
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
-        val intent = CallkitIncomingBroadcastReceiver.getIntentDecline(this@CallkitIncomingActivity, data)
+        val intent =
+            CallkitIncomingBroadcastReceiver.getIntentDecline(this@CallkitIncomingActivity, data)
         sendBroadcast(intent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             finishAndRemoveTask()
-        }else{
+        } else {
             finish()
         }
     }
