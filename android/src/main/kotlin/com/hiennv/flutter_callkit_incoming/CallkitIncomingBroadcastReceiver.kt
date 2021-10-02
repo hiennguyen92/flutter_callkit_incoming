@@ -30,7 +30,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKIT_TYPE = "EXTRA_CALLKIT_TYPE"
         const val EXTRA_CALLKIT_AVATAR = "EXTRA_CALLKIT_AVATAR"
         const val EXTRA_CALLKIT_DURATION = "EXTRA_CALLKIT_DURATION"
-
+        const val EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION = "EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION"
+        const val EXTRA_CALLKIT_BACKGROUND_COLOR = "EXTRA_CALLKIT_BACKGROUND_COLOR"
+        const val EXTRA_CALLKIT_BACKGROUND = "EXTRA_CALLKIT_BACKGROUND"
+        const val EXTRA_CALLKIT_ACTION_COLOR = "EXTRA_CALLKIT_ACTION_COLOR"
 
         fun getIntentIncoming(context: Context, data: Bundle?) =
             Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
@@ -75,18 +78,18 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             ACTION_CALL_ACCEPT -> {
                 Utils.backToForeground(context)
                 callkitSoundPlayer.stop()
-                callkitNotificationManager.clearIncomingNotification()
+                callkitNotificationManager.clearIncomingNotification(data)
             }
             ACTION_CALL_DECLINE -> {
                 callkitSoundPlayer.stop()
-                callkitNotificationManager.clearIncomingNotification()
+                callkitNotificationManager.clearIncomingNotification(data)
             }
             ACTION_CALL_ENDED -> {
                 callkitSoundPlayer.stop()
             }
             ACTION_CALL_TIMEOUT -> {
                 callkitSoundPlayer.stop()
-                callkitNotificationManager.clearIncomingNotification()
+                callkitNotificationManager.clearIncomingNotification(data)
                 callkitNotificationManager.showMissCallNotification(data)
             }
         }
