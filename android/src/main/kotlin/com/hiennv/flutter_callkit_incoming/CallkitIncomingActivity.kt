@@ -17,6 +17,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.ACTION_CALL_INCOMING
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND_COLOR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_INCOMING_DATA
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
@@ -41,6 +43,7 @@ class CallkitIncomingActivity : Activity() {
         }
     }
 
+    private lateinit var ivBackground: ImageView
     private lateinit var llBackgroundAnimation: RippleRelativeLayout
 
     private lateinit var tvNameCaller: TextView
@@ -67,10 +70,7 @@ class CallkitIncomingActivity : Activity() {
                         or WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
             )
         }
-
-
         transparentStatusAndNavigation()
-
         setContentView(R.layout.activity_callkit_incoming)
         initView()
         incomingData(intent)
@@ -131,6 +131,15 @@ class CallkitIncomingActivity : Activity() {
         if (duration != null) {
             finishTimeout(duration)
         }
+        val backgroundColor = data?.getString(EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
+        try {
+            ivBackground.setBackgroundColor(Color.parseColor(backgroundColor))
+        } catch (error: Exception) {
+        }
+        val backgroundImage = data?.getString(EXTRA_CALLKIT_BACKGROUND, "")
+        if (backgroundImage != null && backgroundImage.isNotEmpty()) {
+            Picasso.get().load(backgroundImage).into(ivBackground)
+        }
     }
 
     private fun finishTimeout(timeOut: Long) {
@@ -146,6 +155,7 @@ class CallkitIncomingActivity : Activity() {
     }
 
     private fun initView() {
+        ivBackground = findViewById(R.id.ivBackground)
         llBackgroundAnimation = findViewById(R.id.llBackgroundAnimation)
         llBackgroundAnimation.layoutParams.height =
             Utils.getScreenWidth() + Utils.getStatusBarHeight(this@CallkitIncomingActivity)

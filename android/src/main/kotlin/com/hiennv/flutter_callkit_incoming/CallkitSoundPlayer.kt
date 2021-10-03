@@ -11,44 +11,40 @@ import android.os.Looper
 
 class CallkitSoundPlayer(private val context: Context) {
 
-    companion object {
-        private var callkitSoundPlayer: CallkitSoundPlayer? = null
-        fun getInstance(context: Context): CallkitSoundPlayer {
-            if(callkitSoundPlayer == null){
-                callkitSoundPlayer = CallkitSoundPlayer(context)
-            }
-            return callkitSoundPlayer!!
-        }
+    private var data: Bundle? = null
 
-    }
-
-
+    private val handler: Handler = Handler(Looper.getMainLooper())
 
     private var mediaPlayer: MediaPlayer? = null
     private var duration: Long = 0L
+
+    private var runnableTimeout = Runnable {
+        if (mediaPlayer?.isPlaying == true) {
+            val intent = CallkitIncomingBroadcastReceiver.getIntentTimeout(context, data)
+            context.sendBroadcast(intent)
+            stop()
+        }
+    }
 
     fun setDuration(duration: Long) {
         this.duration = duration
     }
 
+
     fun play(data: Bundle?) {
+        this.data = data
         if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
             stop()
         }
-        playSound(data)
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (mediaPlayer?.isPlaying == true) {
-                val intent = CallkitIncomingBroadcastReceiver.getIntentTimeout(context, data)
-                context.sendBroadcast(intent)
-                stop()
-            }
-        }, duration)
+        playSound()
+        handler.postDelayed(runnableTimeout, duration)
     }
 
     fun stop() {
         if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
             stopMusic()
         }
+        handler.removeCallbacks(runnableTimeout)
     }
 
     private fun stopMusic() {
@@ -58,8 +54,12 @@ class CallkitSoundPlayer(private val context: Context) {
         }
     }
 
-    private fun playSound(data: Bundle?) {
-        val uri = getRingtoneUri("ringtone_default")
+    private fun playSound() {
+        val sound = this.data?.getString(
+            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_SOUND,
+            "ringtone_default"
+        )
+        val uri = sound?.let { getRingtoneUri(it) }
         mediaPlayer = MediaPlayer.create(context, uri).apply {
             isLooping = true
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

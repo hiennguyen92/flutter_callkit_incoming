@@ -7,5 +7,5 @@
     <color name="decline_ripple">#FB8D85</color>
 
     <color name="action_text">#FFFFFF</color>
-    <color name="ripple_color">#80ffffff</color>
+    <color name="ripple_main_color">#80ffffff</color>
 </resources>

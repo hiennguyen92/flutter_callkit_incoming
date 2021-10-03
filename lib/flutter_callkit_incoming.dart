@@ -14,13 +14,17 @@ class FlutterCallkitIncoming {
   static Future showCallkitIncoming() async {
     await _channel.invokeMethod("showCallkitIncoming", <String, dynamic>{
       'id': 'id',
-      'nameCaller': 'Hello ABC',
-      'avatar': 'https://picsum.photos/seed/picsum/200/300',
+      'nameCaller': 'Hien Nguyen',
+      'avatar': 'https://i.pravatar.cc/100',
       'number': 'Callkit: 0123456789',
-      'type': 1,
+      'type': 0,
       'duration': 30000,
       'android': <String, dynamic>{
-        'sound': 'ringtone_default'
+        'isCustomNotification': true,
+        'sound': 'ringtone_default',
+        'backgroundColor': '#0955fa',
+        'background': 'https://i.pravatar.cc/500',
+        'actionColor': '#4CAF50'
       }
     });
   }

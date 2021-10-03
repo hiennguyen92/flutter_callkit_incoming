@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
@@ -31,6 +33,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKIT_AVATAR = "EXTRA_CALLKIT_AVATAR"
         const val EXTRA_CALLKIT_DURATION = "EXTRA_CALLKIT_DURATION"
         const val EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION = "EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION"
+        const val EXTRA_CALLKIT_SOUND = "EXTRA_CALLKIT_SOUND"
         const val EXTRA_CALLKIT_BACKGROUND_COLOR = "EXTRA_CALLKIT_BACKGROUND_COLOR"
         const val EXTRA_CALLKIT_BACKGROUND = "EXTRA_CALLKIT_BACKGROUND"
         const val EXTRA_CALLKIT_ACTION_COLOR = "EXTRA_CALLKIT_ACTION_COLOR"
@@ -63,35 +66,73 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val callkitNotificationManager = CallkitNotificationManager(context)
-        val callkitSoundPlayer = CallkitSoundPlayer.getInstance(context)
-        //build ringtone
+        val callkitSoundPlayer = CallkitSoundPlayer(context)
 
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA) ?: return
         Log.e("onReceive", action)
         when (action) {
             ACTION_CALL_INCOMING -> {
-                val duration = data.getLong(EXTRA_CALLKIT_DURATION, 0L)
-                callkitSoundPlayer.setDuration(duration)
-                callkitSoundPlayer.play(data)
+                try {
+                    sendEventFlutter(ACTION_CALL_INCOMING, data)
+                    val duration = data.getLong(EXTRA_CALLKIT_DURATION, 0L)
+                    callkitSoundPlayer.setDuration(duration)
+                    callkitSoundPlayer.play(data)
+                } catch (error: Exception) {
+                    error.printStackTrace()
+                }
             }
             ACTION_CALL_ACCEPT -> {
-                Utils.backToForeground(context)
-                callkitSoundPlayer.stop()
-                callkitNotificationManager.clearIncomingNotification(data)
+                try {
+                    sendEventFlutter(ACTION_CALL_ACCEPT, data)
+                    Utils.backToForeground(context)
+                    callkitSoundPlayer.stop()
+                    callkitNotificationManager.clearIncomingNotification(data)
+                } catch (error: Exception) {
+                    error.printStackTrace()
+                }
             }
             ACTION_CALL_DECLINE -> {
-                callkitSoundPlayer.stop()
-                callkitNotificationManager.clearIncomingNotification(data)
+                try {
+                    sendEventFlutter(ACTION_CALL_DECLINE, data)
+                    callkitSoundPlayer.stop()
+                    callkitNotificationManager.clearIncomingNotification(data)
+                } catch (error: Exception) {
+                    error.printStackTrace()
+                }
             }
             ACTION_CALL_ENDED -> {
-                callkitSoundPlayer.stop()
+                try {
+                    sendEventFlutter(ACTION_CALL_ENDED, data)
+                    callkitSoundPlayer.stop()
+                } catch (error: Exception) {
+                    error.printStackTrace()
+                }
             }
             ACTION_CALL_TIMEOUT -> {
-                callkitSoundPlayer.stop()
-                callkitNotificationManager.clearIncomingNotification(data)
-                callkitNotificationManager.showMissCallNotification(data)
+                try {
+                    sendEventFlutter(ACTION_CALL_TIMEOUT, data)
+                    callkitSoundPlayer.stop()
+                    callkitNotificationManager.clearIncomingNotification(data)
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        callkitNotificationManager.showMissCallNotification(data)
+                    }, 700L)
+                } catch (error: Exception) {
+                    error.printStackTrace()
+                }
             }
         }
+    }
+
+    private fun sendEventFlutter(event: String, data: Bundle) {
+        val forwardData = mapOf(
+            "id" to data.getString(EXTRA_CALLKIT_ID, ""),
+            "nameCaller" to data.getString(EXTRA_CALLKIT_NAME_CALLER, ""),
+            "avatar" to data.getString(EXTRA_CALLKIT_AVATAR, ""),
+            "number" to data.getString(EXTRA_CALLKIT_NUMBER, ""),
+            "type" to data.getInt(EXTRA_CALLKIT_TYPE, 0),
+            "duration" to data.getLong(EXTRA_CALLKIT_DURATION, 0L)
+        )
+        FlutterCallkitIncomingPlugin.eventHandler.send(event, forwardData)
     }
 }

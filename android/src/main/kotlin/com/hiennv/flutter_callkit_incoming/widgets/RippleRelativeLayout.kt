@@ -54,7 +54,7 @@ class RippleRelativeLayout : RelativeLayout {
             context.obtainStyledAttributes(attrs, R.styleable.ripple_relativeLayout)
         rippleColor = typedArray.getColor(
             R.styleable.ripple_relativeLayout_ripple_color,
-            resources.getColor(R.color.ripple_color)
+            resources.getColor(R.color.ripple_main_color)
         )
         rippleRadius = typedArray.getDimension(
             R.styleable.ripple_relativeLayout_ripple_radius,

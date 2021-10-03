@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -12,11 +13,16 @@ import android.os.Looper
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import androidx.annotation.NonNull
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ACTION_COLOR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND_COLOR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ID
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NUMBER
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_SOUND
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -27,6 +33,8 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import java.util.*
+import kotlin.collections.HashMap
 
 /** FlutterCallkitIncomingPlugin */
 class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -35,8 +43,8 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
         private const val EXTRA_INTERNAL_FROM = "EXTRA_INTERNAL_FROM"
 
-        lateinit var channel: MethodChannel
-        lateinit var events: EventChannel
+        //lateinit var channel: MethodChannel
+        //lateinit var events: EventChannel
 
         val eventHandler = EventStreamHandler()
 
@@ -84,8 +92,8 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     private lateinit var activity: Activity
     private lateinit var context: Context
 
-    //private lateinit var channel: MethodChannel
-    //private lateinit var events: EventChannel
+    private lateinit var channel: MethodChannel
+    private lateinit var events: EventChannel
     private lateinit var callkitNotificationManager: CallkitNotificationManager
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -108,6 +116,15 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         call.argument<String>("avatar")?.let { bundle.putString(EXTRA_CALLKIT_AVATAR, it) }
         call.argument<Int>("type")?.let { bundle.putInt(EXTRA_CALLKIT_TYPE, it) }
         call.argument<Int>("duration")?.let { bundle.putLong(EXTRA_CALLKIT_DURATION, it.toLong()) }
+        call.argument<HashMap<String, *>>("android")?.let {
+            bundle.putBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
+                it["isCustomNotification"] as Boolean
+            )
+            bundle.putString(EXTRA_CALLKIT_SOUND, it["sound"].toString())
+            bundle.putString(EXTRA_CALLKIT_BACKGROUND_COLOR, it["backgroundColor"].toString())
+            bundle.putString(EXTRA_CALLKIT_BACKGROUND, it["background"].toString())
+            bundle.putString(EXTRA_CALLKIT_ACTION_COLOR, it["actionColor"].toString())
+        }
 
         when (call.method) {
             "showCallkitIncoming" -> {
@@ -161,7 +178,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             eventSink = sink
         }
 
-        fun send(event: String, body: Map<String, Any?>) {
+        fun send(event: String, body: Map<String, *>) {
             val data = mapOf(
                 "event" to event,
                 "body" to body
@@ -171,7 +188,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             }
         }
 
-        override fun onCancel(p0: Any?) {
+        override fun onCancel(arguments: Any?) {
             eventSink = null
         }
     }

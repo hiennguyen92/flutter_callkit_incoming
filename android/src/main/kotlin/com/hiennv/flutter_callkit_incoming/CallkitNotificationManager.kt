@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
@@ -14,18 +13,24 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ImageSpan
+import android.view.View
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ACTION_COLOR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ID
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NUMBER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
+import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import java.lang.Exception
-import kotlin.properties.Delegates
 
 
 class CallkitNotificationManager(private val context: Context) {
@@ -35,12 +40,25 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
+    private var notificationViews: RemoteViews? = null
     private var notificationId: Int = 9696
 
 
-    private var targetLoadAvatar = object : Target {
+    private var targetLoadAvatarDefault = object : Target {
         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
             notificationBuilder.setLargeIcon(bitmap)
+            getNotificationManager().notify(notificationId, notificationBuilder.build())
+        }
+
+        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+
+        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+    }
+
+    private var targetLoadAvatarCustomize = object : Target {
+        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+            notificationViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
+            notificationViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
             getNotificationManager().notify(notificationId, notificationBuilder.build())
         }
 
@@ -81,30 +99,61 @@ class CallkitNotificationManager(private val context: Context) {
             }
         }
         notificationBuilder.setSmallIcon(smallIcon)
-        Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, "")).into(targetLoadAvatar)
+        val actionColor = data.getString(EXTRA_CALLKIT_ACTION_COLOR, "#4CAF50")
+        try {
+            notificationBuilder.color = Color.parseColor(actionColor)
+        } catch (error: Exception) {
+        }
+        notificationBuilder.setChannelId("callkit_incoming_channel_id")
         notificationBuilder.priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             NotificationManager.IMPORTANCE_HIGH
         } else {
             Notification.PRIORITY_MAX
         }
-        notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
-        notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_NUMBER, ""))
-        val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
-            R.drawable.ic_decline,
-            context.getString(R.string.text_decline),
-            getDeclinePendingIntent(notificationId, data)
-        ).build()
-        notificationBuilder.addAction(declineAction)
-        val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
-            R.drawable.ic_accept,
-            context.getString(R.string.text_accept),
-            getAcceptPendingIntent(notificationId, data)
-        ).build()
-        notificationBuilder.addAction(acceptAction)
-        notificationBuilder.color = Color.parseColor("#4CAF50")
-        notificationBuilder.setChannelId("callkit_incoming_channel_id")
+        val isCustomNotification = data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
+        if (isCustomNotification) {
+            notificationViews =
+                RemoteViews(context.packageName, R.layout.layout_custom_notification)
+            notificationViews?.setTextViewText(
+                R.id.tvNameCaller,
+                data.getString(EXTRA_CALLKIT_NAME_CALLER, "")
+            )
+            notificationViews?.setTextViewText(
+                R.id.tvNumber,
+                data.getString(EXTRA_CALLKIT_NUMBER, "")
+            )
+            notificationViews?.setOnClickPendingIntent(
+                R.id.llDecline,
+                getDeclinePendingIntent(notificationId, data)
+            )
+            notificationViews?.setOnClickPendingIntent(
+                R.id.llAccept,
+                getAcceptPendingIntent(notificationId, data)
+            )
+            Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
+                .transform(CircleTransform())
+                .into(targetLoadAvatarCustomize)
+            notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            notificationBuilder.setCustomContentView(notificationViews)
+        } else {
+            Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
+                .into(targetLoadAvatarDefault)
+            notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
+            notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_NUMBER, ""))
+            val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
+                R.drawable.ic_decline,
+                context.getString(R.string.text_decline),
+                getDeclinePendingIntent(notificationId, data)
+            ).build()
+            notificationBuilder.addAction(declineAction)
+            val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
+                R.drawable.ic_accept,
+                context.getString(R.string.text_accept),
+                getAcceptPendingIntent(notificationId, data)
+            ).build()
+            notificationBuilder.addAction(acceptAction)
+        }
         getNotificationManager().notify(notificationId, notificationBuilder.build())
-
     }
 
     fun showMissCallNotification(data: Bundle) {
@@ -113,17 +162,22 @@ class CallkitNotificationManager(private val context: Context) {
         val typeCall = data.getInt(EXTRA_CALLKIT_TYPE, -1)
         var smallIcon = context.applicationInfo.icon
         if (typeCall > 0) {
-            smallIcon = R.drawable.ic_video
+            smallIcon = R.drawable.ic_video_missed
         } else {
             if (smallIcon >= 0) {
-                smallIcon = R.drawable.ic_accept
+                smallIcon = R.drawable.ic_call_missed
             }
         }
         notificationBuilder = NotificationCompat.Builder(context, "callkit_missed_channel_id")
         notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
         notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_NUMBER, ""))
         notificationBuilder.setSmallIcon(smallIcon)
-        Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, "")).into(targetLoadAvatar)
+        val isCustomNotification = data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
+        if (isCustomNotification){
+            Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, "")).transform(CircleTransform()).into(targetLoadAvatarDefault)
+        }else {
+            Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, "")).into(targetLoadAvatarDefault)
+        }
         notificationBuilder.priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             NotificationManager.IMPORTANCE_DEFAULT
         } else {
@@ -131,12 +185,19 @@ class CallkitNotificationManager(private val context: Context) {
         }
         notificationBuilder.setSound(missedCallSound)
         notificationBuilder.setContentIntent(getActivityPendingIntent(notificationId, data))
+        val actionColor = data.getString(EXTRA_CALLKIT_ACTION_COLOR, "#4CAF50")
+        try {
+            notificationBuilder.color = Color.parseColor(actionColor)
+        } catch (error: Exception) {
+        }
+        notificationBuilder.setChannelId("callkit_missed_channel_id")
 
         getNotificationManager().notify(notificationId, notificationBuilder.build())
     }
 
 
-    fun clearIncomingNotification() {
+    fun clearIncomingNotification(data: Bundle) {
+        notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
     }
 
@@ -148,7 +209,12 @@ class CallkitNotificationManager(private val context: Context) {
                 "Incoming Call",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Call Notifications"
+                description = ""
+                vibrationPattern =
+                    longArrayOf(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000)
+                lightColor = Color.RED
+                enableLights(true)
+                enableVibration(true)
             }
             getNotificationManager().createNotificationChannel(channelCall)
 
@@ -159,11 +225,12 @@ class CallkitNotificationManager(private val context: Context) {
             val channelMissedCall = NotificationChannel(
                 "callkit_missed_channel_id",
                 "Missed Call",
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "Call Notifications"
-                setSound(sound, attributes)
+                description = ""
                 vibrationPattern = longArrayOf(0, 1000)
+                lightColor = Color.RED
+                enableLights(true)
                 enableVibration(true)
             }
             getNotificationManager().createNotificationChannel(channelMissedCall)
