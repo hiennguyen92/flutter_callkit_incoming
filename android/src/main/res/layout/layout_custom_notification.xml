@@ -68,8 +68,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/base_margin"
                 android:src="@drawable/ic_decline"
-                android:tint="@color/decline"
-                app:tint="@color/decline"
+                android:tint="@android:color/white"
+                app:tint="@android:color/white"
                 tools:ignore="UseAppTint" />
 
             <TextView
@@ -79,7 +79,7 @@
                 android:gravity="center"
                 android:text="@string/text_decline"
                 android:textAllCaps="false"
-                android:textColor="@color/decline" />
+                android:textColor="@android:color/white" />
 
         </LinearLayout>
 

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import org.json.JSONObject
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
@@ -32,6 +33,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKIT_TYPE = "EXTRA_CALLKIT_TYPE"
         const val EXTRA_CALLKIT_AVATAR = "EXTRA_CALLKIT_AVATAR"
         const val EXTRA_CALLKIT_DURATION = "EXTRA_CALLKIT_DURATION"
+        const val EXTRA_CALLKIT_EXTRA = "EXTRA_CALLKIT_EXTRA"
         const val EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION = "EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION"
         const val EXTRA_CALLKIT_SOUND = "EXTRA_CALLKIT_SOUND"
         const val EXTRA_CALLKIT_BACKGROUND_COLOR = "EXTRA_CALLKIT_BACKGROUND_COLOR"
@@ -131,8 +133,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "avatar" to data.getString(EXTRA_CALLKIT_AVATAR, ""),
             "number" to data.getString(EXTRA_CALLKIT_NUMBER, ""),
             "type" to data.getInt(EXTRA_CALLKIT_TYPE, 0),
-            "duration" to data.getLong(EXTRA_CALLKIT_DURATION, 0L)
+            "duration" to data.getLong(EXTRA_CALLKIT_DURATION, 0L),
+            "extra" to JSONObject(data.getString(EXTRA_CALLKIT_EXTRA, "{}"))
         )
-        FlutterCallkitIncomingPlugin.eventHandler.send(event, forwardData)
+        FlutterCallkitIncomingPlugin.sendEvent(event, forwardData)
     }
 }

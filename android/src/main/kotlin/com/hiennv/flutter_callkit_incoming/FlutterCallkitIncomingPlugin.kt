@@ -18,6 +18,7 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND_COLOR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_EXTRA
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ID
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
@@ -33,6 +34,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import org.json.JSONObject
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -43,10 +45,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
         private const val EXTRA_INTERNAL_FROM = "EXTRA_INTERNAL_FROM"
 
-        //lateinit var channel: MethodChannel
-        //lateinit var events: EventChannel
 
-        val eventHandler = EventStreamHandler()
+        private val eventHandler = EventCallbackHandler()
+
+        fun sendEvent(event: String, body: Map<String, Any>) {
+            eventHandler.send(event, body)
+        }
 
 
         fun isDeviceScreenLocked(context: Context): Boolean {
@@ -108,47 +112,51 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
 
-        val bundle = Bundle()
-
-        call.argument<String>("id")?.let { bundle.putString(EXTRA_CALLKIT_ID, it) }
-        call.argument<String>("nameCaller")?.let { bundle.putString(EXTRA_CALLKIT_NAME_CALLER, it) }
-        call.argument<String>("number")?.let { bundle.putString(EXTRA_CALLKIT_NUMBER, it) }
-        call.argument<String>("avatar")?.let { bundle.putString(EXTRA_CALLKIT_AVATAR, it) }
-        call.argument<Int>("type")?.let { bundle.putInt(EXTRA_CALLKIT_TYPE, it) }
-        call.argument<Int>("duration")?.let { bundle.putLong(EXTRA_CALLKIT_DURATION, it.toLong()) }
-        call.argument<HashMap<String, *>>("android")?.let {
-            bundle.putBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
-                it["isCustomNotification"] as Boolean
-            )
-            bundle.putString(EXTRA_CALLKIT_SOUND, it["sound"].toString())
-            bundle.putString(EXTRA_CALLKIT_BACKGROUND_COLOR, it["backgroundColor"].toString())
-            bundle.putString(EXTRA_CALLKIT_BACKGROUND, it["background"].toString())
-            bundle.putString(EXTRA_CALLKIT_ACTION_COLOR, it["actionColor"].toString())
-        }
-
-        when (call.method) {
-            "showCallkitIncoming" -> {
-                if (isDeviceScreenLocked(context)) {
-                    bundle.putString(EXTRA_INTERNAL_FROM, "activity")
-                    context.startActivity(CallkitIncomingActivity.getIntent(bundle))
-                } else {
-                    bundle.putString(EXTRA_INTERNAL_FROM, "notification")
-                    callkitNotificationManager.showIncomingNotification(bundle)
-                }
-                //send BroadcastReceiver
-                context.sendBroadcast(
-                    CallkitIncomingBroadcastReceiver.getIntentIncoming(
-                        context,
-                        bundle
-                    )
+        try {
+            val bundle = Bundle()
+            call.argument<String>("id")?.let { bundle.putString(EXTRA_CALLKIT_ID, it) }
+            call.argument<String>("nameCaller")
+                ?.let { bundle.putString(EXTRA_CALLKIT_NAME_CALLER, it) }
+            call.argument<String>("number")?.let { bundle.putString(EXTRA_CALLKIT_NUMBER, it) }
+            call.argument<String>("avatar")?.let { bundle.putString(EXTRA_CALLKIT_AVATAR, it) }
+            call.argument<Int>("type")?.let { bundle.putInt(EXTRA_CALLKIT_TYPE, it) }
+            call.argument<Int>("duration")
+                ?.let { bundle.putLong(EXTRA_CALLKIT_DURATION, it.toLong()) }
+            call.argument<Map<String, Any>>("extra")
+                ?.let { bundle.putString(EXTRA_CALLKIT_EXTRA, JSONObject(it).toString()) }
+            call.argument<Map<String, Any>>("android")?.let {
+                bundle.putBoolean(
+                    EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
+                    it["isCustomNotification"] as Boolean
                 )
+                bundle.putString(EXTRA_CALLKIT_SOUND, it["sound"].toString())
+                bundle.putString(EXTRA_CALLKIT_BACKGROUND_COLOR, it["backgroundColor"].toString())
+                bundle.putString(EXTRA_CALLKIT_BACKGROUND, it["background"].toString())
+                bundle.putString(EXTRA_CALLKIT_ACTION_COLOR, it["actionColor"].toString())
             }
+
+            when (call.method) {
+                "showCallkitIncoming" -> {
+                    if (isDeviceScreenLocked(context)) {
+                        bundle.putString(EXTRA_INTERNAL_FROM, "activity")
+                        context.startActivity(CallkitIncomingActivity.getIntent(bundle))
+                    } else {
+                        bundle.putString(EXTRA_INTERNAL_FROM, "notification")
+                        callkitNotificationManager.showIncomingNotification(bundle)
+                    }
+                    //send BroadcastReceiver
+                    context.sendBroadcast(
+                        CallkitIncomingBroadcastReceiver.getIntentIncoming(
+                            context,
+                            bundle
+                        )
+                    )
+                }
+            }
+            result.success("OK")
+        }catch (error: Exception){
+            result.error("error", error.message, "")
         }
-//    if (call.method == "getPlatformVersion") {
-//      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-//    } else {
-//      result.notImplemented()
-//    }
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
@@ -170,7 +178,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onDetachedFromActivity() {}
 
 
-    class EventStreamHandler : EventChannel.StreamHandler {
+    class EventCallbackHandler : EventChannel.StreamHandler {
 
         private var eventSink: EventChannel.EventSink? = null
 
@@ -178,7 +186,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             eventSink = sink
         }
 
-        fun send(event: String, body: Map<String, *>) {
+        fun send(event: String, body: Map<String, Any>) {
             val data = mapOf(
                 "event" to event,
                 "body" to body

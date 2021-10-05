@@ -19,6 +19,9 @@ class FlutterCallkitIncoming {
       'number': 'Callkit: 0123456789',
       'type': 0,
       'duration': 30000,
+      'extra': <String, dynamic>{
+        'userId': '1234abcd'
+      },
       'android': <String, dynamic>{
         'isCustomNotification': true,
         'sound': 'ringtone_default',
