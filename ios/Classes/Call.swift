@@ -96,7 +96,6 @@ class Call: NSObject {
     
     func startCall(withAudioSession audioSession: AVAudioSession ,completion :((_ success : Bool)->Void)?){
         startCallCompletion = completion
-        setUproom()
         hasStartedConnecting = true
     }
     
@@ -104,7 +103,6 @@ class Call: NSObject {
     
     func ansCall(withAudioSession audioSession: AVAudioSession ,completion :((_ success : Bool)->Void)?){
         answCallCompletion = completion
-        setUproom()
         hasStartedConnecting = true
     }
     
@@ -116,8 +114,42 @@ class Call: NSObject {
         
     }
     
-    private func setUproom(){
-        NotificationCenter.default.post(name: NSNotification.Name("startCallTriger"), object: nil)
+    
+}
+
+class Data {
+    let uuid: String
+    let nameCaller: String
+    let number: String?
+    let avatar: String?
+    let type: Int
+    let duration: Int
+    
+    //iOS
+    let handleType: String?
+    let supportsDTMF: Bool
+    let supportsHolding: Bool
+    let supportsGrouping: Bool
+    let supportsUngrouping: Bool
+    
+    
+    init(args: [String: Any?]) {
+        self.uuid = args["id"] as? String ?? ""
+        self.nameCaller = args["nameCaller"] as? String ?? ""
+        self.number = args["number"] as? String ?? ""
+        self.avatar = args["avatar"] as? String ?? ""
+        self.type = args["type"] as? Int ?? 0
+        self.duration = args["duration"] as? Int ?? 30000
+        
+        self.handleType = args["handleType"] as? String ?? ""
+        self.supportsDTMF = args["supportsDTMF"] as? Bool ?? false
+        self.supportsHolding = args["supportsHolding"] as? Bool ?? false
+        self.supportsGrouping = args["supportsGrouping"] as? Bool ?? false
+        self.supportsUngrouping = args["supportsUngrouping"] as? Bool ?? false
+    }
+    
+    func toJSON() -> [String: Any?] {
+        return [:]
     }
     
 }
