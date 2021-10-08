@@ -32,7 +32,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
   public static func register(with registrar: FlutterPluginRegistrar) {
     let instance = SwiftFlutterCallkitIncomingPlugin()
     instance.channel = FlutterMethodChannel(name: "flutter_callkit_incoming", binaryMessenger: registrar.messenger())
-    instance.eventChannel = FlutterEventChannel(name: "flutter_incoming_call_events", binaryMessenger: registrar.messenger())
+    instance.eventChannel = FlutterEventChannel(name: "flutter_callkit_incoming_events", binaryMessenger: registrar.messenger())
     instance.callManager = CallManager()
     instance.eventCallbackHandler = EventCallbackHandler()
     instance.eventChannel?.setStreamHandler(instance.eventCallbackHandler as? FlutterStreamHandler & NSObjectProtocol)
