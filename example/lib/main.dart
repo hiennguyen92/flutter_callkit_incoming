@@ -20,6 +20,10 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPlatformState();
+
+    FlutterCallkitIncoming.onEvent.listen((event) {
+      print(event);
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -57,7 +61,9 @@ class _MyAppState extends State<MyApp> {
                 color: Colors.white,
               ),
               onPressed: () async {
-                await FlutterCallkitIncoming.showCallkitIncoming();
+                await Future.delayed(const Duration(seconds: 5), () async {
+                  await FlutterCallkitIncoming.showCallkitIncoming();
+                });
               },
             )
           ],

@@ -60,6 +60,7 @@ class CallManager: NSObject {
     }
     
     
+    static let callsChangedNotification = Notification.Name("CallsChangedNotification")
     var callsChangedHandler: (() -> Void)?
     
     func callWithUUID(uuid: UUID) -> Call?{
@@ -72,22 +73,28 @@ class CallManager: NSObject {
         call.stateDidChange = { [weak self] in
             guard let strongSelf = self else { return }
             strongSelf.callsChangedHandler?()
+            strongSelf.postCallNotification()
         }
         callsChangedHandler?()
+        postCallNotification()
     }
     
     func removeCall(_ call: Call){
         guard let idx = calls.firstIndex(where: { $0 === call }) else { return }
         calls.remove(at: idx)
         callsChangedHandler?()
+        postCallNotification()
     }
     
     func removeAllCalls() {
         calls.removeAll()
         callsChangedHandler?()
+        postCallNotification()
     }
     
-    
+    private func postCallNotification(){
+        NotificationCenter.default.post(name: type(of: self).callsChangedNotification, object: self)
+    }
     
     
 }

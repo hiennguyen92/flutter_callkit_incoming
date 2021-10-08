@@ -18,12 +18,15 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private var eventChannel: FlutterEventChannel? = nil
     private var callManager: CallManager? = nil
     
+    private var eventCallbackHandler: EventCallbackHandler?
     private var sharedProvider: CXProvider? = nil
     
     private var outgoingCall : Call?
     private var answerCall : Call?
     
-    
+    private func sendEvent(_ event: String, _ body: [String : Any]) {
+        eventCallbackHandler?.send(event, body)
+    }
     
     
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -31,6 +34,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     instance.channel = FlutterMethodChannel(name: "flutter_callkit_incoming", binaryMessenger: registrar.messenger())
     instance.eventChannel = FlutterEventChannel(name: "flutter_incoming_call_events", binaryMessenger: registrar.messenger())
     instance.callManager = CallManager()
+    instance.eventCallbackHandler = EventCallbackHandler()
+    instance.eventChannel?.setStreamHandler(instance.eventCallbackHandler as? FlutterStreamHandler & NSObjectProtocol)
     registrar.addMethodCallDelegate(instance, channel: instance.channel!)
   }
 
@@ -56,10 +61,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
         print("showCallkitIncoming")
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(data.duration)) {
-            self.callEndTimeout(data)
-        }
-        
+        self.endCallNotExist(data)
         
         var handle: CXHandle?
         handle = CXHandle(type: self.getHandleType(data.handleType), value: data.number ?? "")
@@ -70,7 +72,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         callUpdate.supportsHolding = data.supportsHolding
         callUpdate.supportsGrouping = data.supportsGrouping
         callUpdate.supportsUngrouping = data.supportsUngrouping
-        callUpdate.hasVideo = data.type > 0 ? true : false
+        callUpdate.hasVideo = true//data.type > 0 ? true : false
         callUpdate.localizedCallerName = data.nameCaller
         
         initCallkitProvider()
@@ -78,11 +80,12 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         let uuid = UUID(uuidString: data.uuid)
         
         self.sharedProvider?.reportNewIncomingCall(with: uuid!, update: callUpdate) { error in
-            //print("reportNewIncomingCall \(String(describing: error))")
+            print("reportNewIncomingCall \(String(describing: error))")
             if(error == nil) {
                 let call = Call(uuid: uuid!)
                 call.handle = data.number ?? ""
                 self.callManager?.addCall(call)
+                self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_INCOMING, [:])
             }
         }
         
@@ -112,10 +115,22 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
     }
     
+    
+    func endCallNotExist(_ data: Data) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(data.duration)) {
+            let call = self.callManager?.callWithUUID(uuid: UUID(uuidString: data.uuid)!)
+            if (call != nil) {
+                self.callEndTimeout(data)
+            }
+        }
+    }
+
+    
+    
     func callEndTimeout(_ data: Data) {
-        self.endCall(data.uuid, 2)
+        self.endCall(data.uuid, 3)
             
-        //sendEvent(SwiftFlutterIncomingCallPlugin.EVENT_CALL_MISSED, callData.toMap())
+        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TIMEOUT, [:])
     }
     
     func getHandleType(_ handleType: String?) -> CXHandle.HandleType {
@@ -143,6 +158,22 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         let configuration = CXProviderConfiguration(localizedName: "Hello XXX")
         configuration.supportsVideo = true
         
+        configuration.supportedHandleTypes = [
+                    CXHandle.HandleType.generic,
+                    CXHandle.HandleType.emailAddress,
+                    CXHandle.HandleType.phoneNumber
+                ]
+        if #available(iOS 11.0, *) {
+            configuration.includesCallsInRecents = true
+        }
+        
+        if let image = UIImage(named: "AppIcon40x40") {
+            configuration.iconTemplateImageData = image.pngData()
+        } else {
+            print("Unable to load flutter_incoming_call icon AppIcon40x40.");
+        }
+        
+        
         return configuration
     }
     
@@ -154,6 +185,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         userInfo[AVAudioSessionInterruptionTypeKey] = intrepEndeRaw
         NotificationCenter.default.post(name: AVAudioSession.interruptionNotification, object: self, userInfo: userInfo)
     }
+
     func configurAudioSession(){
         let session = AVAudioSession.sharedInstance()
         do{
@@ -170,7 +202,13 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     
+    
+    
+    
+    
+    
     public func providerDidReset(_ provider: CXProvider) {
+        print("providerDidReset")
         if(self.callManager == nil){ return }
         for call in self.callManager!.calls{
             call.endCall()
@@ -179,7 +217,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
 
     public func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
-
+        print("CXStartCallAction")
         let call = Call(uuid: action.callUUID, isOutGoing: true)
         call.handle = action.handle.value
         configurAudioSession()
@@ -194,6 +232,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
+        print("CXAnswerCallAction")
         guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else{
             action.fail()
             return
@@ -204,16 +243,19 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
+        print("CXEndCallAction")
         guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else {
             action.fail()
             return
         }
         call.endCall()
+        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, [:])
         action.fulfill()
         self.callManager?.removeCall(call)
     }
     
     public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
+        print("CXSetHeldCallAction")
         guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else {
             action.fail()
             return
@@ -224,6 +266,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, perform action: CXSetMutedCallAction) {
+        print("CXSetMutedCallAction")
         guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else {
             action.fail()
             return
@@ -234,6 +277,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func provider(_ provider: CXProvider, timedOutPerforming action: CXAction) {
         print("Timed out Action")
+        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TIMEOUT, [:])
     }
     
     public func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) {
@@ -277,4 +321,27 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     
+}
+
+class EventCallbackHandler: FlutterStreamHandler {
+    
+    private var eventSink: FlutterEventSink?
+    
+    public func send(_ event: String, _ body: [String: Any]) {
+        let data: [String : Any] = [
+            "event": event,
+            "body": body
+        ]
+        eventSink?(data)
+    }
+    
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        self.eventSink = events
+        return nil
+    }
+    
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        self.eventSink = nil
+        return nil
+    }
 }

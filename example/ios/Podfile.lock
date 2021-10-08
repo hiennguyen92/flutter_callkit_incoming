@@ -15,7 +15,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  flutter_callkit_incoming: b6e23305fb22c312c801e140d6f19e6f5f7b452b
+  flutter_callkit_incoming: d577a8ddc61393286a316f795f721590c880da60
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
