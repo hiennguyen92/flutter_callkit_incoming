@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 
 void main() {
@@ -14,6 +15,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  var uuid = Uuid();
+  var currentUuid;
   String _platformVersion = 'Unknown';
 
   @override
@@ -57,13 +60,59 @@ class _MyAppState extends State<MyApp> {
           actions: <Widget>[
             IconButton(
               icon: Icon(
-                Icons.settings,
+                Icons.call,
                 color: Colors.white,
               ),
               onPressed: () async {
                 await Future.delayed(const Duration(seconds: 5), () async {
-                  await FlutterCallkitIncoming.showCallkitIncoming();
+                  this.currentUuid = uuid.v4();
+                  var params = <String, dynamic>{
+                    'id': currentUuid,
+                    'nameCaller': 'Hien Nguyen',
+                    'avatar': 'https://i.pravatar.cc/100',
+                    'number': 'Callkit: 0123456789',
+                    'type': 0,
+                    'duration': 30000,
+                    'extra': <String, dynamic>{
+                      'userId': '1234abcd'
+                    },
+                    'android': <String, dynamic>{
+                      'isCustomNotification': true,
+                      'sound': 'ringtone_default',
+                      'backgroundColor': '#0955fa',
+                      'background': 'https://i.pravatar.cc/500',
+                      'actionColor': '#4CAF50'
+                    }
+                  };
+                  await FlutterCallkitIncoming.showCallkitIncoming(params);
                 });
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.call_end,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                var params = <String, dynamic>{
+                  'id': this.currentUuid,
+                  'nameCaller': 'Hien Nguyen',
+                  'avatar': 'https://i.pravatar.cc/100',
+                  'number': 'Callkit: 0123456789',
+                  'type': 0,
+                  'duration': 30000,
+                  'extra': <String, dynamic>{
+                    'userId': '1234abcd'
+                  },
+                  'android': <String, dynamic>{
+                    'isCustomNotification': true,
+                    'sound': 'ringtone_default',
+                    'backgroundColor': '#0955fa',
+                    'background': 'https://i.pravatar.cc/500',
+                    'actionColor': '#4CAF50'
+                  }
+                };
+                await FlutterCallkitIncoming.endCall(params);
               },
             )
           ],

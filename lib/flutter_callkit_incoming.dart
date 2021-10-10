@@ -15,25 +15,16 @@ class FlutterCallkitIncoming {
     return version;
   }
 
-  static Future showCallkitIncoming() async {
-    await _channel.invokeMethod("showCallkitIncoming", <String, dynamic>{
-      'id': '5b8b5a49-ca42-4637-a7e6-6208f192df61',
-      'nameCaller': 'Hien Nguyen',
-      'avatar': 'https://i.pravatar.cc/100',
-      'number': 'Callkit: 0123456789',
-      'type': 0,
-      'duration': 30000,
-      'extra': <String, dynamic>{
-        'userId': '1234abcd'
-      },
-      'android': <String, dynamic>{
-        'isCustomNotification': true,
-        'sound': 'ringtone_default',
-        'backgroundColor': '#0955fa',
-        'background': 'https://i.pravatar.cc/500',
-        'actionColor': '#4CAF50'
-      }
-    });
+  static Future showCallkitIncoming(dynamic params) async {
+    await _channel.invokeMethod("showCallkitIncoming", params);
+  }
+
+  static Future endCall(dynamic params) async {
+    await _channel.invokeMethod("endCall", params);
+  }
+
+  static Future endAllCalls(dynamic params) async {
+    await _channel.invokeMethod("endAllCalls", params);
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {
