@@ -15,40 +15,31 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var uuid = Uuid();
-  var currentUuid;
-  String _platformVersion = 'Unknown';
+  var _uuid = Uuid();
+  var _currentUuid;
+  var textEvents = "";
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-
-    FlutterCallkitIncoming.onEvent.listen((event) {
-      print(event);
-    });
+    listenerEvent();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
+  Future<void> listenerEvent() async {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion = await FlutterCallkitIncoming.platformVersion ??
-          'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      FlutterCallkitIncoming.onEvent.listen((event) {
+        print(event);
+        if (!mounted) return;
+        setState(() {
+          textEvents += "${event.toString()}\n";
+        });
+      });
+    } on Exception {
+
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
@@ -65,12 +56,13 @@ class _MyAppState extends State<MyApp> {
               ),
               onPressed: () async {
                 await Future.delayed(const Duration(seconds: 5), () async {
-                  this.currentUuid = uuid.v4();
+                  this._currentUuid = _uuid.v4();
                   var params = <String, dynamic>{
-                    'id': currentUuid,
+                    'id': _currentUuid,
                     'nameCaller': 'Hien Nguyen',
+                    'appName': 'Callkit',
                     'avatar': 'https://i.pravatar.cc/100',
-                    'number': 'Callkit: 0123456789',
+                    'handle': 'Callkit: 0123456789',
                     'type': 0,
                     'duration': 30000,
                     'extra': <String, dynamic>{
@@ -82,6 +74,22 @@ class _MyAppState extends State<MyApp> {
                       'backgroundColor': '#0955fa',
                       'background': 'https://i.pravatar.cc/500',
                       'actionColor': '#4CAF50'
+                    },
+                    'ios': <String, dynamic>{
+                      'iconName': 'AppIcon40x40',
+                      'handleType': '',
+                      'supportsVideo': true,
+                      'maximumCallGroups': 2,
+                      'maximumCallsPerCallGroup': 1,
+                      'audioSessionMode': 'default',
+                      'audioSessionActive': true,
+                      'audioSessionPreferredSampleRate': 44100.0,
+                      'audioSessionPreferredIOBufferDuration': 0.005,
+                      'supportsDTMF': true,
+                      'supportsHolding': true,
+                      'supportsGrouping': true,
+                      'supportsUngrouping': true,
+                      'ringtonePath': ''
                     }
                   };
                   await FlutterCallkitIncoming.showCallkitIncoming(params);
@@ -95,22 +103,7 @@ class _MyAppState extends State<MyApp> {
               ),
               onPressed: () async {
                 var params = <String, dynamic>{
-                  'id': this.currentUuid,
-                  'nameCaller': 'Hien Nguyen',
-                  'avatar': 'https://i.pravatar.cc/100',
-                  'number': 'Callkit: 0123456789',
-                  'type': 0,
-                  'duration': 30000,
-                  'extra': <String, dynamic>{
-                    'userId': '1234abcd'
-                  },
-                  'android': <String, dynamic>{
-                    'isCustomNotification': true,
-                    'sound': 'ringtone_default',
-                    'backgroundColor': '#0955fa',
-                    'background': 'https://i.pravatar.cc/500',
-                    'actionColor': '#4CAF50'
-                  }
+                  'id': this._currentUuid
                 };
                 await FlutterCallkitIncoming.endCall(params);
               },
@@ -118,7 +111,7 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Text('$textEvents'),
         ),
       ),
     );

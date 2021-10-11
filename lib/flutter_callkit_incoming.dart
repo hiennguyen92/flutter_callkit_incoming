@@ -5,7 +5,8 @@ import 'package:flutter/services.dart';
 class FlutterCallkitIncoming {
   static const MethodChannel _channel =
       const MethodChannel('flutter_callkit_incoming');
-  static const EventChannel _eventChannel = const EventChannel('flutter_callkit_incoming_events');
+  static const EventChannel _eventChannel =
+      const EventChannel('flutter_callkit_incoming_events');
 
   static Stream<CallEvent?> get onEvent =>
       _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
@@ -28,16 +29,26 @@ class FlutterCallkitIncoming {
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {
-    if(data is Map){
-      final event = data['event'];
-      final body = Map<String, dynamic>.from(data['body']);
+    var event = "";
+    dynamic body = {};
+    if (data is Map) {
+      event = data['event'];
+      body = Map<String, dynamic>.from(data['body']);
       print('event: ${event.toString()}');
       print('body: ${body.toString()}');
     }
-    return null;
+    return CallEvent(event, body);
   }
 }
 
 class CallEvent {
+  late String event;
+  late dynamic body;
 
+  CallEvent(this.event, this.body);
+
+  @override
+  String toString() {
+    return "{ event: ${event.toString()}, body: ${body.toString()} }";
+  }
 }

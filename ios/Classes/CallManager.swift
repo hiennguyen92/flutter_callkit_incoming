@@ -18,21 +18,31 @@ class CallManager: NSObject {
     
     func startCall(handle: String, isVideo: Bool = false) {
         let handle = CXHandle(type: .phoneNumber, value: handle)
-        let startCall = CXStartCallAction(call: UUID(), handle: handle)
+        let startCallAction = CXStartCallAction(call: UUID(), handle: handle)
         
-        startCall.isVideo = isVideo
+        startCallAction.isVideo = isVideo
         let callTransaction = CXTransaction()
-        callTransaction.addAction(startCall)
+        callTransaction.addAction(startCallAction)
         //requestCall
         requestCall(callTransaction, action: "startCall")
     }
     
     func endCall(call: Call) {
-        let endCall = CXEndCallAction(call: call.uuid)
+        let endCallAction = CXEndCallAction(call: call.uuid)
         let callTransaction = CXTransaction()
-        callTransaction.addAction(endCall)
+        callTransaction.addAction(endCallAction)
         //requestCall
         requestCall(callTransaction, action: "endCall")
+    }
+    
+    func endCallAlls() {
+        let calls = callController.callObserver.calls
+        for call in calls {
+            let endCallAction = CXEndCallAction(call: call.uuid)
+            let callTransaction = CXTransaction()
+            callTransaction.addAction(endCallAction)
+            requestCall(callTransaction, action: "endCallAlls")
+        }
     }
     
     func setHold(call: Call, onHold: Bool) {
@@ -51,7 +61,7 @@ class CallManager: NSObject {
             }else {
                 if(action == "startCall"){
                     //push notification for Start Call
-                }else if(action == "endCall"){
+                }else if(action == "endCall" || action == "endCallAlls"){
                     //push notification for End Call
                 }
                 print("Requested transaction successfully: \(action)")
