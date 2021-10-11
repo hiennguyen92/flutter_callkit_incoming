@@ -16,11 +16,12 @@ class CallManager: NSObject {
     
     
     
-    func startCall(handle: String, isVideo: Bool = false) {
-        let handle = CXHandle(type: .phoneNumber, value: handle)
-        let startCallAction = CXStartCallAction(call: UUID(), handle: handle)
+    func startCall(_ data: Data) {
+        let handle = CXHandle(type: self.getHandleType(data.handleType), value: data.handle)
+        let uuid = UUID(uuidString: data.uuid)
+        let startCallAction = CXStartCallAction(call: uuid!, handle: handle)
         
-        startCallAction.isVideo = isVideo
+        startCallAction.isVideo = data.type > 0
         let callTransaction = CXTransaction()
         callTransaction.addAction(startCallAction)
         //requestCall
@@ -67,6 +68,20 @@ class CallManager: NSObject {
                 print("Requested transaction successfully: \(action)")
             }
         }
+    }
+    
+    private func getHandleType(_ handleType: String?) -> CXHandle.HandleType {
+        var typeDefault = CXHandle.HandleType.generic
+        switch handleType {
+        case "number":
+            typeDefault = CXHandle.HandleType.phoneNumber
+            break
+        case "email":
+            typeDefault = CXHandle.HandleType.emailAddress
+        default:
+            typeDefault = CXHandle.HandleType.generic
+        }
+        return typeDefault
     }
     
     

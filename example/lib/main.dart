@@ -107,6 +107,23 @@ class _MyAppState extends State<MyApp> {
                 };
                 await FlutterCallkitIncoming.endCall(params);
               },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.call_made,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                var params = <String, dynamic>{
+                  'id': this._uuid.v4(),
+                  'handle': '0123456789',
+                  'type': 0,
+                  'ios': <String, dynamic>{
+                    'handleType': 'number'
+                  }
+                };//number/email
+                await FlutterCallkitIncoming.startCall(params);
+              },
             )
           ],
         ),

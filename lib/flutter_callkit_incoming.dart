@@ -20,6 +20,10 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("showCallkitIncoming", params);
   }
 
+  static Future startCall(dynamic params) async {
+    await _channel.invokeMethod("startCall", params);
+  }
+
   static Future endCall(dynamic params) async {
     await _channel.invokeMethod("endCall", params);
   }

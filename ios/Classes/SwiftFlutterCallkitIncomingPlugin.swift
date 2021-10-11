@@ -61,6 +61,18 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         result("OK")
         break
+    case "startCall":
+        guard let args = call.arguments else {
+            result("OK")
+            return
+        }
+        if let getArgs = args as? [String: Any] {
+            let data = Data(args: getArgs)
+            self.callManager?.startCall(data)
+            self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_START, data.toJSON())
+        }
+        result("OK")
+        break
     case "endCall":
         guard let args = call.arguments else {
             result("OK")
