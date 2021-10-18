@@ -37,9 +37,7 @@ class _MyAppState extends State<MyApp> {
           textEvents += "${event.toString()}\n";
         });
       });
-    } on Exception {
-
-    }
+    } on Exception {}
   }
 
   @override
@@ -65,9 +63,7 @@ class _MyAppState extends State<MyApp> {
                     'handle': 'Callkit: 0123456789',
                     'type': 0,
                     'duration': 30000,
-                    'extra': <String, dynamic>{
-                      'userId': '1234abcd'
-                    },
+                    'extra': <String, dynamic>{'userId': '1234abcd'},
                     'android': <String, dynamic>{
                       'isCustomNotification': true,
                       'sound': 'ringtone_default',
@@ -89,7 +85,7 @@ class _MyAppState extends State<MyApp> {
                       'supportsHolding': true,
                       'supportsGrouping': true,
                       'supportsUngrouping': true,
-                      'ringtonePath': ''
+                      'ringtonePath': 'Ringtone.caf'
                     }
                   };
                   await FlutterCallkitIncoming.showCallkitIncoming(params);
@@ -102,9 +98,7 @@ class _MyAppState extends State<MyApp> {
                 color: Colors.white,
               ),
               onPressed: () async {
-                var params = <String, dynamic>{
-                  'id': this._currentUuid
-                };
+                var params = <String, dynamic>{'id': this._currentUuid};
                 await FlutterCallkitIncoming.endCall(params);
               },
             ),
@@ -114,21 +108,29 @@ class _MyAppState extends State<MyApp> {
                 color: Colors.white,
               ),
               onPressed: () async {
+                this._currentUuid = _uuid.v4();
                 var params = <String, dynamic>{
-                  'id': this._uuid.v4(),
+                  'id': this._currentUuid,
                   'handle': '0123456789',
-                  'type': 0,
-                  'ios': <String, dynamic>{
-                    'handleType': 'number'
-                  }
-                };//number/email
+                  'type': 1,
+                  'ios': <String, dynamic>{'handleType': 'number'}
+                }; //number/email
                 await FlutterCallkitIncoming.startCall(params);
               },
             )
           ],
         ),
-        body: Center(
-          child: Text('$textEvents'),
+        body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.maxHeight,
+                ),
+                child: Text('$textEvents'),
+              ),
+            );
+          },
         ),
       ),
     );

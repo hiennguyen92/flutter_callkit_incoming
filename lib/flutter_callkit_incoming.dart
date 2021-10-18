@@ -38,8 +38,6 @@ class FlutterCallkitIncoming {
     if (data is Map) {
       event = data['event'];
       body = Map<String, dynamic>.from(data['body']);
-      print('event: ${event.toString()}');
-      print('body: ${body.toString()}');
     }
     return CallEvent(event, body);
   }
