@@ -11,11 +11,6 @@ class FlutterCallkitIncoming {
   static Stream<CallEvent?> get onEvent =>
       _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
 
-  static Future<String?> get platformVersion async {
-    final String? version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
-
   static Future showCallkitIncoming(dynamic params) async {
     await _channel.invokeMethod("showCallkitIncoming", params);
   }
