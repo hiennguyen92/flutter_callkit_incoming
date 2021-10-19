@@ -66,7 +66,7 @@ class _MyAppState extends State<MyApp> {
                     'extra': <String, dynamic>{'userId': '1234abcd'},
                     'android': <String, dynamic>{
                       'isCustomNotification': true,
-                      'sound': 'ringtone_default',
+                      'ringtonePath': 'ringtone_default',
                       'backgroundColor': '#0955fa',
                       'background': 'https://i.pravatar.cc/500',
                       'actionColor': '#4CAF50'

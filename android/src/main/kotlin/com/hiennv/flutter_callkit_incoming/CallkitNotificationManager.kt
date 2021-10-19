@@ -23,10 +23,10 @@ import androidx.core.app.NotificationManagerCompat
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ACTION_COLOR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_HANDLE
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ID
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NUMBER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
 import com.squareup.picasso.Picasso
@@ -120,7 +120,7 @@ class CallkitNotificationManager(private val context: Context) {
             )
             notificationViews?.setTextViewText(
                 R.id.tvNumber,
-                data.getString(EXTRA_CALLKIT_NUMBER, "")
+                data.getString(EXTRA_CALLKIT_HANDLE, "")
             )
             notificationViews?.setOnClickPendingIntent(
                 R.id.llDecline,
@@ -139,7 +139,7 @@ class CallkitNotificationManager(private val context: Context) {
             Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
                 .into(targetLoadAvatarDefault)
             notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
-            notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_NUMBER, ""))
+            notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_HANDLE, ""))
             val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                 R.drawable.ic_decline,
                 context.getString(R.string.text_decline),
@@ -170,7 +170,7 @@ class CallkitNotificationManager(private val context: Context) {
         }
         notificationBuilder = NotificationCompat.Builder(context, "callkit_missed_channel_id")
         notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
-        notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_NUMBER, ""))
+        notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_HANDLE, ""))
         notificationBuilder.setSmallIcon(smallIcon)
         val isCustomNotification = data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
         if (isCustomNotification){

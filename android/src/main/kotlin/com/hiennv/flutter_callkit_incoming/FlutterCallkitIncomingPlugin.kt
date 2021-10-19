@@ -5,26 +5,12 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ContentResolver
 import android.content.Context
-import android.graphics.Color
 import android.os.Build
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import androidx.annotation.NonNull
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ACTION_COLOR
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND_COLOR
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_EXTRA
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ID
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NUMBER
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_SOUND
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -34,17 +20,11 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import org.json.JSONObject
-import java.util.*
-import kotlin.collections.HashMap
 
 /** FlutterCallkitIncomingPlugin */
 class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     companion object {
-
-        private const val EXTRA_INTERNAL_FROM = "EXTRA_INTERNAL_FROM"
-
 
         private val eventHandler = EventCallbackHandler()
 
@@ -113,48 +93,57 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
 
         try {
-            val bundle = Bundle()
-            call.argument<String>("id")?.let { bundle.putString(EXTRA_CALLKIT_ID, it) }
-            call.argument<String>("nameCaller")
-                ?.let { bundle.putString(EXTRA_CALLKIT_NAME_CALLER, it) }
-            call.argument<String>("number")?.let { bundle.putString(EXTRA_CALLKIT_NUMBER, it) }
-            call.argument<String>("avatar")?.let { bundle.putString(EXTRA_CALLKIT_AVATAR, it) }
-            call.argument<Int>("type")?.let { bundle.putInt(EXTRA_CALLKIT_TYPE, it) }
-            call.argument<Int>("duration")
-                ?.let { bundle.putLong(EXTRA_CALLKIT_DURATION, it.toLong()) }
-            call.argument<Map<String, Any>>("extra")
-                ?.let { bundle.putString(EXTRA_CALLKIT_EXTRA, JSONObject(it).toString()) }
-            call.argument<Map<String, Any>>("android")?.let {
-                bundle.putBoolean(
-                    EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
-                    it["isCustomNotification"] as Boolean
-                )
-                bundle.putString(EXTRA_CALLKIT_SOUND, it["sound"].toString())
-                bundle.putString(EXTRA_CALLKIT_BACKGROUND_COLOR, it["backgroundColor"].toString())
-                bundle.putString(EXTRA_CALLKIT_BACKGROUND, it["background"].toString())
-                bundle.putString(EXTRA_CALLKIT_ACTION_COLOR, it["actionColor"].toString())
-            }
-
             when (call.method) {
                 "showCallkitIncoming" -> {
+                    val data = Data(call.arguments())
                     if (isDeviceScreenLocked(context)) {
-                        bundle.putString(EXTRA_INTERNAL_FROM, "activity")
-                        context.startActivity(CallkitIncomingActivity.getIntent(bundle))
+                        data.from = "activity"
+                        context.startActivity(CallkitIncomingActivity.getIntent(data.toBundle()))
                     } else {
-                        bundle.putString(EXTRA_INTERNAL_FROM, "notification")
-                        callkitNotificationManager.showIncomingNotification(bundle)
+                        data.from = "notification"
+                        callkitNotificationManager.showIncomingNotification(data.toBundle())
                     }
                     //send BroadcastReceiver
                     context.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentIncoming(
                             context,
-                            bundle
+                            data.toBundle()
                         )
                     )
+                    result.success("OK")
+                }
+                "startCall" -> {
+                    val data = Data(call.arguments())
+                    context.sendBroadcast(
+                        CallkitIncomingBroadcastReceiver.getIntentStart(
+                            context,
+                            data.toBundle()
+                        )
+                    )
+                    result.success("OK")
+                }
+                "endCall" -> {
+                    val data = Data(call.arguments())
+                    context.sendBroadcast(
+                        CallkitIncomingBroadcastReceiver.getIntentEnded(
+                            context,
+                            data.toBundle()
+                        )
+                    )
+                    result.success("OK")
+                }
+                "endAllCalls" -> {
+                    val data = Data(call.arguments())
+                    context.sendBroadcast(
+                        CallkitIncomingBroadcastReceiver.getIntentEnded(
+                            context,
+                            data.toBundle()
+                        )
+                    )
+                    result.success("OK")
                 }
             }
-            result.success("OK")
-        }catch (error: Exception){
+        } catch (error: Exception) {
             result.error("error", error.message, "")
         }
     }

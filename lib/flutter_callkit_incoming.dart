@@ -28,8 +28,8 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("endCall", params);
   }
 
-  static Future endAllCalls(dynamic params) async {
-    await _channel.invokeMethod("endAllCalls", params);
+  static Future endAllCalls() async {
+    await _channel.invokeMethod("endAllCalls");
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {

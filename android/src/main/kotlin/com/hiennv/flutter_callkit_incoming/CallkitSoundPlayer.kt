@@ -2,6 +2,7 @@ package com.hiennv.flutter_callkit_incoming
 
 import android.content.Context
 import android.media.AudioAttributes
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
@@ -33,7 +34,7 @@ class CallkitSoundPlayer(private val context: Context) {
 
     fun play(data: Bundle?) {
         this.data = data
-        if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
+        if (mediaPlayer?.isPlaying == true) {
             stop()
         }
         playSound()
@@ -41,7 +42,7 @@ class CallkitSoundPlayer(private val context: Context) {
     }
 
     fun stop() {
-        if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
+        if (mediaPlayer?.isPlaying == true) {
             stopMusic()
         }
         handler.removeCallbacks(runnableTimeout)
@@ -56,7 +57,7 @@ class CallkitSoundPlayer(private val context: Context) {
 
     private fun playSound() {
         val sound = this.data?.getString(
-            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_SOUND,
+            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_RINGTONE_PATH,
             "ringtone_default"
         )
         val uri = sound?.let { getRingtoneUri(it) }
@@ -68,6 +69,8 @@ class CallkitSoundPlayer(private val context: Context) {
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                     .build()
                 setAudioAttributes(attribution)
+            } else {
+                setAudioStreamType(AudioManager.STREAM_NOTIFICATION)
             }
             start()
         }
