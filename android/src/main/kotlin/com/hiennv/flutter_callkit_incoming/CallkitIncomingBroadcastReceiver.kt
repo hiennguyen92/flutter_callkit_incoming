@@ -6,8 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import org.json.JSONObject
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
@@ -82,10 +80,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
     }
 
 
-    override fun onReceive(context: Context, intent: Intent) {
-        val callkitNotificationManager = CallkitNotificationManager(context)
-        val callkitSoundPlayer = CallkitSoundPlayer(context)
 
+    override fun onReceive(context: Context, intent: Intent) {
+        val callkitSoundPlayer = CallkitSoundPlayer.getInstance(context.applicationContext)
+        val callkitNotificationManager = CallkitNotificationManager(context)
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA) ?: return
         when (action) {

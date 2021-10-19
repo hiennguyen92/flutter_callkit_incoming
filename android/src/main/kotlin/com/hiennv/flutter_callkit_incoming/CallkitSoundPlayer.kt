@@ -1,5 +1,6 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -11,6 +12,24 @@ import android.os.Handler
 import android.os.Looper
 
 class CallkitSoundPlayer(private val context: Context) {
+
+    companion object {
+
+        //Using Application Context
+        @SuppressLint("StaticFieldLeak")
+        private var callkitSoundPlayer: CallkitSoundPlayer? = null
+
+        fun getInstance(context: Context): CallkitSoundPlayer {
+            if(callkitSoundPlayer == null) {
+                callkitSoundPlayer = CallkitSoundPlayer(context)
+            }
+            return callkitSoundPlayer!!
+        }
+
+
+    }
+
+
 
     private var data: Bundle? = null
 
@@ -46,6 +65,7 @@ class CallkitSoundPlayer(private val context: Context) {
             stopMusic()
         }
         handler.removeCallbacks(runnableTimeout)
+        mediaPlayer = null
     }
 
     private fun stopMusic() {

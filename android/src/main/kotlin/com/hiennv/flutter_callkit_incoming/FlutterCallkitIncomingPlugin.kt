@@ -1,5 +1,6 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.KeyguardManager
@@ -25,6 +26,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     companion object {
+
 
         private val eventHandler = EventCallbackHandler()
 
@@ -75,14 +77,13 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     /// when the Flutter Engine is detached from the Activity
     private lateinit var activity: Activity
     private lateinit var context: Context
-
+    private lateinit var callkitNotificationManager: CallkitNotificationManager
     private lateinit var channel: MethodChannel
     private lateinit var events: EventChannel
-    private lateinit var callkitNotificationManager: CallkitNotificationManager
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         this.context = flutterPluginBinding.applicationContext
-        this.callkitNotificationManager = CallkitNotificationManager(this.context)
+        callkitNotificationManager = CallkitNotificationManager(this.context)
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_callkit_incoming")
         channel.setMethodCallHandler(this)
         events =
@@ -91,8 +92,8 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-
         try {
+            callkitNotificationManager = CallkitNotificationManager(this.context)
             when (call.method) {
                 "showCallkitIncoming" -> {
                     val data = Data(call.arguments())
