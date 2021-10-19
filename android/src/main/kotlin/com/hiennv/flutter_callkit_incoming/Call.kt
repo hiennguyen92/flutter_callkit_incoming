@@ -28,11 +28,11 @@ data class Data(val args: Map<String, Any?>) {
     init {
         val android: HashMap<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         if (android != null) {
-            isCustomNotification = (args["isCustomNotification"] as? Boolean) ?: false
-            ringtonePath = (args["ringtonePath"] as? String) ?: "ringtone_default"
-            backgroundColor = (args["backgroundColor"] as? String) ?: "#0955fa"
-            backgroundUrl = (args["backgroundUrl"] as? String) ?: ""
-            actionColor = (args["actionColor"] as? String) ?: "#4CAF50"
+            isCustomNotification = (android["isCustomNotification"] as? Boolean) ?: false
+            ringtonePath = (android["ringtonePath"] as? String) ?: "ringtone_default"
+            backgroundColor = (android["backgroundColor"] as? String) ?: "#0955fa"
+            backgroundUrl = (android["backgroundUrl"] as? String) ?: ""
+            actionColor = (android["actionColor"] as? String) ?: "#4CAF50"
         } else {
             isCustomNotification = false
             ringtonePath = "ringtone_default"

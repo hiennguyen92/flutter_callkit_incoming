@@ -88,7 +88,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA) ?: return
-        Log.e("onReceive", action)
         when (action) {
             ACTION_CALL_INCOMING -> {
                 try {

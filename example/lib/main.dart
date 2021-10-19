@@ -53,17 +53,17 @@ class _MyAppState extends State<MyApp> {
                 color: Colors.white,
               ),
               onPressed: () async {
-                await Future.delayed(const Duration(seconds: 5), () async {
+                await Future.delayed(const Duration(seconds: 7), () async {
                   this._currentUuid = _uuid.v4();
                   var params = <String, dynamic>{
                     'id': _currentUuid,
                     'nameCaller': 'Hien Nguyen',
                     'appName': 'Callkit',
                     'avatar': 'https://i.pravatar.cc/100',
-                    'handle': 'Callkit: 0123456789',
+                    'handle': '0123456789',
                     'type': 0,
                     'duration': 30000,
-                    'extra': <String, dynamic>{'userId': '1234abcd'},
+                    'extra': <String, dynamic>{'userId': '1a2b3c4d'},
                     'android': <String, dynamic>{
                       'isCustomNotification': true,
                       'ringtonePath': 'ringtone_default',
@@ -111,8 +111,10 @@ class _MyAppState extends State<MyApp> {
                 this._currentUuid = _uuid.v4();
                 var params = <String, dynamic>{
                   'id': this._currentUuid,
+                  'nameCaller': 'Hien Nguyen',
                   'handle': '0123456789',
                   'type': 1,
+                  'extra': <String, dynamic>{'userId': '1a2b3c4d'},
                   'ios': <String, dynamic>{'handleType': 'number'}
                 }; //number/email
                 await FlutterCallkitIncoming.startCall(params);
