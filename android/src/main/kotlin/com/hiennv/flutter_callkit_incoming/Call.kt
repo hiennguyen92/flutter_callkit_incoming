@@ -13,7 +13,7 @@ data class Data(val args: Map<String, Any?>) {
     var appName: String = (args["appName"] as? String) ?: ""
     var handle: String = (args["handle"] as? String) ?: ""
     var avatar: String = (args["avatar"] as? String) ?: ""
-    var type: Int = (args["avatar"] as? Int) ?: 0
+    var type: Int = (args["type"] as? Int) ?: 0
     var duration: Long = (args["duration"] as? Long) ?: 30000L
     var extra: HashMap<String, Any?> =
         (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>

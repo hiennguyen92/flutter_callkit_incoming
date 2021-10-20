@@ -37,6 +37,7 @@ class CallkitNotificationManager(private val context: Context) {
 
     companion object {
 
+        const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
     }
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
@@ -69,9 +70,9 @@ class CallkitNotificationManager(private val context: Context) {
 
 
     fun showIncomingNotification(data: Bundle) {
+        data.putLong(EXTRA_TIME_START_CALL, System.currentTimeMillis())
 
         notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
-
         createNotificationChanel()
 
         notificationBuilder = NotificationCompat.Builder(context, "callkit_incoming_channel_id")

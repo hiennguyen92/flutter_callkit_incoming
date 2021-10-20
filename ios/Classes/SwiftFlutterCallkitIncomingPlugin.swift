@@ -216,7 +216,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 print("Unable to load icon \(data.iconName).");
             }
         }
-        if data.ringtonePath.isEmpty {
+        if !data.ringtonePath.isEmpty {
             configuration.ringtoneSound = data.ringtonePath
         }
         return configuration

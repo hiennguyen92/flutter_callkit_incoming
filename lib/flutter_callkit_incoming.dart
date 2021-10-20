@@ -39,13 +39,26 @@ class FlutterCallkitIncoming {
 }
 
 class CallEvent {
-  late String event;
+
+  static const String ACTION_CALL_INCOMING = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING";
+  static const String ACTION_CALL_START = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_START";
+  static const String ACTION_CALL_ACCEPT = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT";
+  static const String ACTION_CALL_DECLINE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE";
+  static const String ACTION_CALL_ENDED = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED";
+  static const String ACTION_CALL_TIMEOUT = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT";
+  static const String ACTION_CALL_TOGGLE_HOLD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD";
+  static const String ACTION_CALL_TOGGLE_MUTE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE";
+  static const String ACTION_CALL_TOGGLE_DMTF = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_DMTF";
+  static const String ACTION_CALL_TOGGLE_GROUP = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP";
+  static const String ACTION_CALL_TOGGLE_AUDIO_SESSION = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION";
+
+  late String name;
   late dynamic body;
 
-  CallEvent(this.event, this.body);
+  CallEvent(this.name, this.body);
 
   @override
   String toString() {
-    return "{ event: ${event.toString()}, body: ${body.toString()} }";
+    return "{ event: ${name.toString()}, body: ${body.toString()} }";
   }
 }

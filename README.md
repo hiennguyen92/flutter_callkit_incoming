@@ -1,15 +1,251 @@
-# flutter_callkit_incoming
+# Flutter Callkit Incoming
 
-Flutter Callkit Incoming
+A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Callkit for iOS).
 
-## Getting Started
+## :star: Features
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+* Show an incoming call
+* Start an outgoing call
+* Custom UI Android/Callkit for iOS
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+  <br>
 
+## 🚀&nbsp; Installation
+
+1. Install Packages
+
+  * Run this command:
+    ```console
+    flutter pub add flutter_callkit_incoming
+    ```
+  * Add pubspec.yaml:
+    ```console
+        dependencies:
+          flutter_callkit_incoming: ^1.0.0
+    ```
+2. Configure Project
+  * Android
+     * None(No setup needed)
+  * iOS
+     * None(No setup needed)
+
+3. Usage
+  * Import
+    ```console
+    import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+    ``` 
+  * Received an incoming call
+    ```dart
+      this._currentUuid = _uuid.v4();
+      var params = <String, dynamic>{
+        'id': _currentUuid,
+        'nameCaller': 'Hien Nguyen',
+        'appName': 'Callkit',
+        'avatar': 'https://i.pravatar.cc/100',
+        'handle': '0123456789',
+        'type': 0,
+        'duration': 30000,
+        'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+        'android': <String, dynamic>{
+          'isCustomNotification': true,
+          'ringtonePath': 'ringtone_default',
+          'backgroundColor': '#0955fa',
+          'backgroundUrl': 'https://i.pravatar.cc/500',
+          'actionColor': '#4CAF50'
+        },
+        'ios': <String, dynamic>{
+          'iconName': 'AppIcon40x40',
+          'handleType': 'generic',
+          'supportsVideo': true,
+          'maximumCallGroups': 2,
+          'maximumCallsPerCallGroup': 1,
+          'audioSessionMode': 'default',
+          'audioSessionActive': true,
+          'audioSessionPreferredSampleRate': 44100.0,
+          'audioSessionPreferredIOBufferDuration': 0.005,
+          'supportsDTMF': true,
+          'supportsHolding': true,
+          'supportsGrouping': false,
+          'supportsUngrouping': false,
+          'ringtonePath': 'Ringtone.caf'
+        }
+      };
+      await FlutterCallkitIncoming.showCallkitIncoming(params);
+    ```
+
+  * Started an outgoing call
+    ```dart
+      this._currentUuid = _uuid.v4();
+      var params = <String, dynamic>{
+        'id': this._currentUuid,
+        'nameCaller': 'Hien Nguyen',
+        'handle': '0123456789',
+        'type': 1,
+        'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+        'ios': <String, dynamic>{'handleType': 'generic'}
+      };
+      await FlutterCallkitIncoming.startCall(params);
+    ```
+
+  * Ended an incoming/outgoing call
+    ```dart
+      var params = <String, dynamic>{'id': this._currentUuid};
+      await FlutterCallkitIncoming.endCall(params);
+    ```
+
+  * Ended all calls
+    ```dart
+      await FlutterCallkitIncoming.endAllCalls();
+    ```
+
+  * Listen events
+    ```dart
+      FlutterCallkitIncoming.onEvent.listen((event) {
+        switch (event!.name) {
+          case CallEvent.ACTION_CALL_INCOMING:
+            // TODO: received an incoming call
+            break;
+          case CallEvent.ACTION_CALL_START:
+            // TODO: started an outgoing call
+            // TODO: show screen calling in Flutter
+            break;
+          case CallEvent.ACTION_CALL_ACCEPT:
+            // TODO: accepted an incoming call
+            // TODO: show screen calling in Flutter
+            break;
+          case CallEvent.ACTION_CALL_DECLINE:
+            // TODO: declined an incoming call
+            break;
+          case CallEvent.ACTION_CALL_ENDED:
+            // TODO: ended an incoming/outgoing call
+            break;
+          case CallEvent.ACTION_CALL_TIMEOUT:
+            // TODO: missed an incoming call
+            break;
+          case CallEvent.ACTION_CALL_TOGGLE_HOLD:
+            // TODO: only iOS
+            break;
+          case CallEvent.ACTION_CALL_TOGGLE_MUTE:
+            // TODO: only iOS
+            break;
+          case CallEvent.ACTION_CALL_TOGGLE_DMTF:
+            // TODO: only iOS
+            break;
+          case CallEvent.ACTION_CALL_TOGGLE_GROUP:
+            // TODO: only iOS
+            break;
+          case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+            // TODO: only iOS
+            break;
+        }
+      });
+    ```  
+
+4. Properties
+
+
+    | Prop        | Description                                                             | Default     |
+    | ----------- | ----------------------------------------------------------------------- | ----------- |
+    | **`id`**    | UUID identifier for each call. UUID should be unique for every call and when the call is  ended, the same UUID for that call to be used. suggest using https://pub.dev/packages/uuid  | Required        |
+    | **`nameCaller`**| Caller's name.                                                   | _None_      |
+    | **`appName`** | App's name. using for display inside Callkit(iOS).                  |   App Name   |
+    | **`avatar`** | Avatar's URL used for display for Android.                             |    _None_   |
+    | **`handle`** | Phone number/Email/Any.                                               |    _None_     |
+    | **`type`** |  0 - Audio Call, 1 - Video Call                                         |    `0`    |
+    | **`duration`** | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed.                                                                               |    `30000`    |
+    | **`extra`** | Any data added to the event when received.                             |    `{}`    |
+    | **`android`** | Android data needed to customize UI.                                 |    Below    |
+    | **`ios`** | iOS data needed.                                                        |    Below    |
+
+
+
+* Android
+
+    | Prop        | Description                                                             | Default     |
+    | ----------- | ----------------------------------------------------------------------- | ----------- |
+    | **`isCustomNotification`**    | Using custom notifications.                           | `false`     |
+    | **`ringtonePath`**| File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`  |`ringtone_default`|
+    | **`backgroundColor`** | Incoming call screen background color.                        |   `#0955fa`   |
+    | **`backgroundUrl`** | Using image background for Incoming call screen.             |    _None_   |
+    | **`actionColor`** | Color used in button/text on notification.                     |    `#4CAF50`     |
+
+* iOS
+
+    | Prop        | Description                                                             | Default     |
+    | ----------- | ----------------------------------------------------------------------- | ----------- |
+    | **`iconName`**    | App's Icon. using for display inside Callkit(iOS) | `false`     |
+    | **`handleType`**| Type handle call `generic`, `number`, `email`                   | `generic`   |
+    | **`supportsVideo`** |                                                             |   `true`   |
+    | **`maximumCallGroups`** |                                                          |    `2`   |
+    | **`maximumCallsPerCallGroup`** |                                                   |    `1`     |
+    | **`audioSessionMode`** |                                                           |    _None_    |
+    | **`audioSessionActive`** |                                                        |    `true`     |
+    | **`audioSessionPreferredSampleRate`** |                                            |    `44100.0`     |
+    | **`audioSessionPreferredIOBufferDuration`** |                                      |    `0.005`     |
+    | **`supportsDTMF`** |                                                               |    `true`     |
+    | **`supportsHolding`** |                                                           |    `true`     |
+  | **`supportsGrouping`** |                                                             |    `true`     |
+  | **`supportsUngrouping`** |                                                         |    `true`     |
+  | **`ringtonePath`** | Add file to root project xcode  `/ios/Runner/Ringtone.caf`  and Copy Bundle Resources(Build Phases)  |    `Ringtone.caf`     |
+
+
+5. Source code
+
+    ```
+    please checkout repo github
+    https://github.com/hiennguyen92/flutter_callkit_incoming
+    ```
+  * <a href='https://github.com/hiennguyen92/flutter_callkit_incoming'>https://github.com/hiennguyen92/flutter_callkit_incoming</a>
+
+    <br>
+## :bulb: Demo
+
+1. Demo Illustration: 
+2. Image
+<table>
+  <tr>
+    <td>iOS(Lockscreen)</td>
+    <td>iOS(full screen)</td>
+    <td>iOS(Alert)</td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image1.png" width="220">
+    </td>
+    <td>
+      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image2.png" width="220">
+    </td>
+    <td>
+      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image3.png" width="220">
+    </td>
+  </tr>
+  <tr>
+    <td>Android(Lockscreen) - Audio</td>
+    <td>Android(Alert) - Audio</td>
+    <td>Android(Lockscreen) - Video</td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image4.jpg" width="220">
+    </td>
+    <td>
+      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image5.jpg" width="220">
+    </td>
+    <td>
+      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image6.jpg" width="220">
+    </td>
+  </tr>
+  <tr>
+    <td>Android(Alert) - Video</td>
+    <td>isCustomNotification: false</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image7.jpg" width="220">
+    </td>
+    <td>
+      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image8.jpg" width="220">
+    </td>
+  </tr>
+ </table>

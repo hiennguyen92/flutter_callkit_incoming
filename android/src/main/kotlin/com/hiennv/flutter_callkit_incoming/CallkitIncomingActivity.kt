@@ -27,6 +27,7 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlin.math.abs
 
 
 class CallkitIncomingActivity : Activity() {
@@ -123,14 +124,15 @@ class CallkitIncomingActivity : Activity() {
             Picasso.get().load(avatarUrl).into(ivAvatar)
         }
 
-        val callType = data?.getInt(EXTRA_CALLKIT_TYPE, 0)
-        if (callType != null) {
+        val callType = data?.getInt(EXTRA_CALLKIT_TYPE, 0) ?: 0
+        if (callType > 0) {
             ivAcceptCall.setImageResource(R.drawable.ic_video)
         }
-        val duration = data?.getLong(EXTRA_CALLKIT_DURATION, 0L)
-        if (duration != null) {
-            finishTimeout(duration)
-        }
+        val duration = data?.getLong(EXTRA_CALLKIT_DURATION, 0L) ?: 0L
+
+
+        finishTimeout(data, duration)
+
         val backgroundColor = data?.getString(EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
         try {
             ivBackground.setBackgroundColor(Color.parseColor(backgroundColor))
@@ -142,7 +144,13 @@ class CallkitIncomingActivity : Activity() {
         }
     }
 
-    private fun finishTimeout(timeOut: Long) {
+    private fun finishTimeout(data: Bundle?, duration: Long) {
+        val currentSystemTime = System.currentTimeMillis()
+        val timeStartCall =
+            data?.getLong(CallkitNotificationManager.EXTRA_TIME_START_CALL, currentSystemTime)
+                ?: currentSystemTime
+
+        val timeOut = duration - abs(currentSystemTime - timeStartCall)
         Handler(Looper.getMainLooper()).postDelayed({
             if (!isFinishing) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
