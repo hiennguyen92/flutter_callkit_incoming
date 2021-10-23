@@ -151,7 +151,6 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 
 4. Properties
 
-
     | Prop            | Description                                                             | Default     |
     | --------------- | ----------------------------------------------------------------------- | ----------- |
     |  **`id`**       | UUID identifier for each call. UUID should be unique for every call and when the call is  ended, the same UUID for that call to be used. suggest using <a href='https://pub.dev/packages/uuid'>uuid</a>    | Required    |
@@ -165,8 +164,8 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     |  **`android`**  | Android data needed to customize UI.                                    |    Below    |
     |    **`ios`**    | iOS data needed.                                                        |    Below    |
 
-
-
+    <br>
+    
 * Android
 
     | Prop                        | Description                                                             | Default          |
@@ -177,6 +176,8 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     |      **`backgroundUrl`**    | Using image background for Incoming call screen.                        |       _None_     |
     |      **`actionColor`**      | Color used in button/text on notification.                              |    `#4CAF50`     |
 
+    <br>
+    
 * iOS
 
     | Prop                                      | Description                                                             | Default     |
