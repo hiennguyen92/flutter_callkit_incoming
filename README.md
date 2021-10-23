@@ -27,7 +27,15 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
   * Android
      * None(No setup needed)
   * iOS
-     * None(No setup needed)
+     * Info.plist
+      ```
+      <key>UIBackgroundModes</key>
+      <array>
+          <string>processing</string>
+          <string>remote-notification</string>
+          <string>voip</string>
+      </array>
+      ```
 
 3. Usage
   * Import
