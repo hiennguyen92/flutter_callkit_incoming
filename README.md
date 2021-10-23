@@ -21,7 +21,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
   * Add pubspec.yaml:
     ```console
         dependencies:
-          flutter_callkit_incoming: ^1.0.0
+          flutter_callkit_incoming: ^1.0.0+2
     ```
 2. Configure Project
   * Android
