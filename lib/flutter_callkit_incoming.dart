@@ -2,27 +2,57 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+/// Instance to use library functions.
+/// * showCallkitIncoming(dynamic)
+/// * startCall(dynamic)
+/// * endCall(dynamic)
+/// * endAllCalls()
+///
 class FlutterCallkitIncoming {
   static const MethodChannel _channel =
       const MethodChannel('flutter_callkit_incoming');
   static const EventChannel _eventChannel =
       const EventChannel('flutter_callkit_incoming_events');
 
+  /// Listen to event callback from [FlutterCallkitIncoming].
+  ///
+  /// FlutterCallkitIncoming.onEvent.listen((event) {
+  /// CallEvent.ACTION_CALL_INCOMING - Received an incoming call
+  /// CallEvent.ACTION_CALL_START - Started an outgoing call
+  /// CallEvent.ACTION_CALL_ACCEPT - Accepted an incoming call
+  /// CallEvent.ACTION_CALL_DECLINE - Declined an incoming call
+  /// CallEvent.ACTION_CALL_ENDED - Ended an incoming/outgoing call
+  /// CallEvent.ACTION_CALL_TIMEOUT - Missed an incoming call
+  /// CallEvent.ACTION_CALL_TOGGLE_HOLD - only iOS
+  /// CallEvent.ACTION_CALL_TOGGLE_MUTE - only iOS
+  /// CallEvent.ACTION_CALL_TOGGLE_DMTF - only iOS
+  /// CallEvent.ACTION_CALL_TOGGLE_GROUP - only iOS
+  /// CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION - only iOS
+  /// }
   static Stream<CallEvent?> get onEvent =>
       _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
 
+  /// Show Callkit Incoming.
+  /// On iOS, using Callkit. On Android, using a custom UI.
   static Future showCallkitIncoming(dynamic params) async {
     await _channel.invokeMethod("showCallkitIncoming", params);
   }
 
+  /// Start an Outgoing call.
+  /// On iOS, using Callkit(create a history into the Phone app).
+  /// On Android, Nothing(only callback event listener).
   static Future startCall(dynamic params) async {
     await _channel.invokeMethod("startCall", params);
   }
 
+  /// End an Incoming/Outgoing call.
+  /// On iOS, using Callkit(update a history into the Phone app).
+  /// On Android, Nothing(only callback event listener).
   static Future endCall(dynamic params) async {
     await _channel.invokeMethod("endCall", params);
   }
 
+  /// End all calls.
   static Future endAllCalls() async {
     await _channel.invokeMethod("endAllCalls");
   }
@@ -39,18 +69,28 @@ class FlutterCallkitIncoming {
 }
 
 class CallEvent {
-
-  static const String ACTION_CALL_INCOMING = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING";
-  static const String ACTION_CALL_START = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_START";
-  static const String ACTION_CALL_ACCEPT = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT";
-  static const String ACTION_CALL_DECLINE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE";
-  static const String ACTION_CALL_ENDED = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED";
-  static const String ACTION_CALL_TIMEOUT = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT";
-  static const String ACTION_CALL_TOGGLE_HOLD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD";
-  static const String ACTION_CALL_TOGGLE_MUTE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE";
-  static const String ACTION_CALL_TOGGLE_DMTF = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_DMTF";
-  static const String ACTION_CALL_TOGGLE_GROUP = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP";
-  static const String ACTION_CALL_TOGGLE_AUDIO_SESSION = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION";
+  static const String ACTION_CALL_INCOMING =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING";
+  static const String ACTION_CALL_START =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_START";
+  static const String ACTION_CALL_ACCEPT =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT";
+  static const String ACTION_CALL_DECLINE =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE";
+  static const String ACTION_CALL_ENDED =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED";
+  static const String ACTION_CALL_TIMEOUT =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT";
+  static const String ACTION_CALL_TOGGLE_HOLD =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD";
+  static const String ACTION_CALL_TOGGLE_MUTE =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE";
+  static const String ACTION_CALL_TOGGLE_DMTF =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_DMTF";
+  static const String ACTION_CALL_TOGGLE_GROUP =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP";
+  static const String ACTION_CALL_TOGGLE_AUDIO_SESSION =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION";
 
   late String name;
   late dynamic body;

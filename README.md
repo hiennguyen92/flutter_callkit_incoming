@@ -144,49 +144,49 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 4. Properties
 
 
-    | Prop        | Description                                                             | Default     |
-    | ----------- | ----------------------------------------------------------------------- | ----------- |
-    | **`id`**    | UUID identifier for each call. UUID should be unique for every call and when the call is  ended, the same UUID for that call to be used. suggest using https://pub.dev/packages/uuid  | Required        |
-    | **`nameCaller`**| Caller's name.                                                   | _None_      |
-    | **`appName`** | App's name. using for display inside Callkit(iOS).                  |   App Name   |
-    | **`avatar`** | Avatar's URL used for display for Android.                             |    _None_   |
-    | **`handle`** | Phone number/Email/Any.                                               |    _None_     |
-    | **`type`** |  0 - Audio Call, 1 - Video Call                                         |    `0`    |
-    | **`duration`** | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed.                                                                               |    `30000`    |
-    | **`extra`** | Any data added to the event when received.                             |    `{}`    |
-    | **`android`** | Android data needed to customize UI.                                 |    Below    |
-    | **`ios`** | iOS data needed.                                                        |    Below    |
+    | Prop            | Description                                                             | Default     |
+    | --------------- | ----------------------------------------------------------------------- | ----------- |
+    |  **`id`**       | UUID identifier for each call. UUID should be unique for every call and when the call is  ended, the same UUID for that call to be used. suggest using <a href='https://pub.dev/packages/uuid'>uuid</a>    | Required    |
+    | **`nameCaller`**| Caller's name.                                                          | _None_      |
+    | **`appName`**   | App's name. using for display inside Callkit(iOS).                      |   App Name  |
+    | **`avatar`**    | Avatar's URL used for display for Android.                              |    _None_   |
+    | **`handle`**    | Phone number/Email/Any.                                                 |    _None_   |
+    |   **`type`**    |  0 - Audio Call, 1 - Video Call                                         |     `0`     |
+    | **`duration`**  | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed.                                                                                     |    `30000`  |
+    |   **`extra`**   | Any data added to the event when received.                              |     `{}`    |
+    |  **`android`**  | Android data needed to customize UI.                                    |    Below    |
+    |    **`ios`**    | iOS data needed.                                                        |    Below    |
 
 
 
 * Android
 
-    | Prop        | Description                                                             | Default     |
-    | ----------- | ----------------------------------------------------------------------- | ----------- |
-    | **`isCustomNotification`**    | Using custom notifications.                           | `false`     |
-    | **`ringtonePath`**| File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`  |`ringtone_default`|
-    | **`backgroundColor`** | Incoming call screen background color.                        |   `#0955fa`   |
-    | **`backgroundUrl`** | Using image background for Incoming call screen.             |    _None_   |
-    | **`actionColor`** | Color used in button/text on notification.                     |    `#4CAF50`     |
+    | Prop                        | Description                                                             | Default          |
+    | --------------------------- | ----------------------------------------------------------------------- | ---------------- |
+    | **`isCustomNotification`**  | Using custom notifications.                                             | `false`          |
+    |      **`ringtonePath`**     | File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`                                                                                                    |`ringtone_default`|
+    |     **`backgroundColor`**   | Incoming call screen background color.                                  |     `#0955fa`    |
+    |      **`backgroundUrl`**    | Using image background for Incoming call screen.                        |       _None_     |
+    |      **`actionColor`**      | Color used in button/text on notification.                              |    `#4CAF50`     |
 
 * iOS
 
-    | Prop        | Description                                                             | Default     |
-    | ----------- | ----------------------------------------------------------------------- | ----------- |
-    | **`iconName`**    | App's Icon. using for display inside Callkit(iOS) | `false`     |
-    | **`handleType`**| Type handle call `generic`, `number`, `email`                   | `generic`   |
-    | **`supportsVideo`** |                                                             |   `true`   |
-    | **`maximumCallGroups`** |                                                          |    `2`   |
-    | **`maximumCallsPerCallGroup`** |                                                   |    `1`     |
-    | **`audioSessionMode`** |                                                           |    _None_    |
-    | **`audioSessionActive`** |                                                        |    `true`     |
-    | **`audioSessionPreferredSampleRate`** |                                            |    `44100.0`     |
-    | **`audioSessionPreferredIOBufferDuration`** |                                      |    `0.005`     |
-    | **`supportsDTMF`** |                                                               |    `true`     |
-    | **`supportsHolding`** |                                                           |    `true`     |
-  | **`supportsGrouping`** |                                                             |    `true`     |
-  | **`supportsUngrouping`** |                                                         |    `true`     |
-  | **`ringtonePath`** | Add file to root project xcode  `/ios/Runner/Ringtone.caf`  and Copy Bundle Resources(Build Phases)  |    `Ringtone.caf`     |
+    | Prop                                      | Description                                                             | Default     |
+    | ----------------------------------------- | ----------------------------------------------------------------------- | ----------- |
+    |               **`iconName`**              | App's Icon. using for display inside Callkit(iOS)                       | `false`     |
+    |              **`handleType`**             | Type handle call `generic`, `number`, `email`                           | `generic`   |
+    |             **`supportsVideo`**           |                                                                         |   `true`    |
+    |          **`maximumCallGroups`**          |                                                                         |     `2`     |
+    |       **`maximumCallsPerCallGroup`**      |                                                                         |     `1`     |
+    |           **`audioSessionMode`**          |                                                                         |   _None_    |
+    |        **`audioSessionActive`**           |                                                                         |    `true`   |
+    |   **`audioSessionPreferredSampleRate`**   |                                                                         |  `44100.0`  |
+    |**`audioSessionPreferredIOBufferDuration`**|                                                                         |  `0.005`    |
+    |            **`supportsDTMF`**             |                                                                         |    `true`   |
+    |            **`supportsHolding`**          |                                                                         |    `true`   |
+    |          **`supportsGrouping`**           |                                                                         |    `true`   |
+    |         **`supportsUngrouping`**          |                                                                         |   `true`    |
+    |           **`ringtonePath`**              | Add file to root project xcode  `/ios/Runner/Ringtone.caf`  and Copy Bundle Resources(Build Phases)                                                                                                               |`Ringtone.caf`|
 
 
 5. Source code
