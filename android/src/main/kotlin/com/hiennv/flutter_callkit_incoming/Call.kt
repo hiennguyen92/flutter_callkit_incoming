@@ -20,6 +20,7 @@ data class Data(val args: Map<String, Any?>) {
     var from: String = ""
 
     var isCustomNotification: Boolean = false
+    var isShowLogo: Boolean = false
     var ringtonePath: String
     var backgroundColor: String
     var backgroundUrl: String
@@ -29,12 +30,14 @@ data class Data(val args: Map<String, Any?>) {
         val android: HashMap<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         if (android != null) {
             isCustomNotification = (android["isCustomNotification"] as? Boolean) ?: false
+            isShowLogo = (android["isShowLogo"] as? Boolean) ?: false
             ringtonePath = (android["ringtonePath"] as? String) ?: "ringtone_default"
             backgroundColor = (android["backgroundColor"] as? String) ?: "#0955fa"
             backgroundUrl = (android["backgroundUrl"] as? String) ?: ""
             actionColor = (android["actionColor"] as? String) ?: "#4CAF50"
         } else {
             isCustomNotification = false
+            isShowLogo = false
             ringtonePath = "ringtone_default"
             backgroundColor = "#0955fa"
             backgroundUrl = ""
@@ -55,6 +58,10 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putBoolean(
             CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
             isCustomNotification
+        )
+        bundle.putBoolean(
+            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
+            isShowLogo
         )
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_RINGTONE_PATH, ringtonePath)
         bundle.putString(
@@ -91,6 +98,10 @@ data class Data(val args: Map<String, Any?>) {
 
             data.isCustomNotification = bundle.getBoolean(
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
+                false
+            )
+            data.isShowLogo = bundle.getBoolean(
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
                 false
             )
             data.ringtonePath = bundle.getString(

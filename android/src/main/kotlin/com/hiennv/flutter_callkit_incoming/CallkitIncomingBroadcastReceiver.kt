@@ -22,6 +22,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED"
         const val ACTION_CALL_TIMEOUT =
             "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT"
+        const val ACTION_CALL_CALLBACK =
+            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK"
 
 
         const val EXTRA_CALLKIT_INCOMING_DATA = "EXTRA_CALLKIT_INCOMING_DATA"
@@ -35,6 +37,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKIT_DURATION = "EXTRA_CALLKIT_DURATION"
         const val EXTRA_CALLKIT_EXTRA = "EXTRA_CALLKIT_EXTRA"
         const val EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION = "EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION"
+        const val EXTRA_CALLKIT_IS_SHOW_LOGO = "EXTRA_CALLKIT_IS_SHOW_LOGO"
         const val EXTRA_CALLKIT_RINGTONE_PATH = "EXTRA_CALLKIT_RINGTONE_PATH"
         const val EXTRA_CALLKIT_BACKGROUND_COLOR = "EXTRA_CALLKIT_BACKGROUND_COLOR"
         const val EXTRA_CALLKIT_BACKGROUND_URL = "EXTRA_CALLKIT_BACKGROUND_URL"
@@ -75,6 +78,12 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         fun getIntentTimeout(context: Context, data: Bundle?) =
             Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
                 action = ACTION_CALL_TIMEOUT
+                putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
+            }
+
+        fun getIntentCallback(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = ACTION_CALL_CALLBACK
                 putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
             }
     }
@@ -135,10 +144,18 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 try {
                     sendEventFlutter(ACTION_CALL_TIMEOUT, data)
                     callkitSoundPlayer.stop()
-                    callkitNotificationManager.clearIncomingNotification(data)
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        callkitNotificationManager.showMissCallNotification(data)
-                    }, 700L)
+                    callkitNotificationManager.showMissCallNotification(data)
+                } catch (error: Exception) {
+                    error.printStackTrace()
+                }
+            }
+            ACTION_CALL_CALLBACK -> {
+                try {
+                    sendEventFlutter(ACTION_CALL_CALLBACK, data)
+                    Utils.backToForeground(context)
+                    callkitNotificationManager.clearMissCallNotification(data)
+                    val closeNotificationPanel = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+                    context.sendBroadcast(closeNotificationPanel)
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }

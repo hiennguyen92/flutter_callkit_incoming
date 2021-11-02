@@ -1,16 +1,9 @@
 package com.hiennv.flutter_callkit_incoming
 
-import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.app.Activity
-import android.app.KeyguardManager
-import android.content.ContentResolver
 import android.content.Context
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.provider.Settings
-import android.telephony.TelephonyManager
 import androidx.annotation.NonNull
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -32,41 +25,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
         fun sendEvent(event: String, body: Map<String, Any>) {
             eventHandler.send(event, body)
-        }
-
-
-        fun isDeviceScreenLocked(context: Context): Boolean {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                isDeviceLocked(context)
-            } else {
-                isPatternSet(context) || isPassOrPinSet(context)
-            }
-        }
-
-        private fun isPatternSet(context: Context): Boolean {
-            val cr: ContentResolver = context.contentResolver
-            return try {
-                val lockPatternEnable: Int =
-                    Settings.Secure.getInt(cr, Settings.Secure.LOCK_PATTERN_ENABLED)
-                lockPatternEnable == 1
-            } catch (e: Settings.SettingNotFoundException) {
-                false
-            }
-        }
-
-        private fun isPassOrPinSet(context: Context): Boolean {
-            val keyguardManager =
-                context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            return keyguardManager.isKeyguardSecure
-        }
-
-        @TargetApi(Build.VERSION_CODES.M)
-        private fun isDeviceLocked(context: Context): Boolean {
-            val telMgr = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            val simState = telMgr.simState
-            val keyguardManager =
-                context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            return keyguardManager.isDeviceLocked && keyguardManager.isDeviceSecure && simState != TelephonyManager.SIM_STATE_ABSENT
         }
 
     }
@@ -97,13 +55,8 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             when (call.method) {
                 "showCallkitIncoming" -> {
                     val data = Data(call.arguments())
-                    if (isDeviceScreenLocked(context)) {
-                        data.from = "activity"
-                        context.startActivity(CallkitIncomingActivity.getIntent(data.toBundle()))
-                    } else {
-                        data.from = "notification"
-                        callkitNotificationManager.showIncomingNotification(data.toBundle())
-                    }
+                    data.from = "notification"
+                    callkitNotificationManager.showIncomingNotification(data.toBundle())
                     //send BroadcastReceiver
                     context.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentIncoming(

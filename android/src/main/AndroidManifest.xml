@@ -13,6 +13,7 @@
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true"
+            android:launchMode="singleInstance"
             android:theme="@style/CallkitIncomingTheme">
             <intent-filter>
                 <action android:name="com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING" />

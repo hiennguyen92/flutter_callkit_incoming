@@ -25,7 +25,16 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     ```
 2. Configure Project
   * Android
-     * None(No setup needed)
+     * AndroidManifest.xml
+     ```
+      <manifest...>
+          ...
+          <!-- 
+              Using for load image from internet
+          -->
+          <uses-permission android:name="android.permission.INTERNET"/>
+      </manifest>
+     ```
   * iOS
      * Info.plist
       ```
@@ -56,6 +65,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
         'android': <String, dynamic>{
           'isCustomNotification': true,
+          'isShowLogo': false,
           'ringtonePath': 'ringtone_default',
           'backgroundColor': '#0955fa',
           'backgroundUrl': 'https://i.pravatar.cc/500',
@@ -156,7 +166,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     |  **`id`**       | UUID identifier for each call. UUID should be unique for every call and when the call is  ended, the same UUID for that call to be used. suggest using <a href='https://pub.dev/packages/uuid'>uuid</a>    | Required    |
     | **`nameCaller`**| Caller's name.                                                          | _None_      |
     | **`appName`**   | App's name. using for display inside Callkit(iOS).                      |   App Name  |
-    | **`avatar`**    | Avatar's URL used for display for Android.                              |    _None_   |
+    | **`avatar`**    | Avatar's URL used for display for Android. `/android/src/main/res/drawable-xxxhdpi/ic_default_avatar.png`                             |    _None_   |
     | **`handle`**    | Phone number/Email/Any.                                                 |    _None_   |
     |   **`type`**    |  0 - Audio Call, 1 - Video Call                                         |     `0`     |
     | **`duration`**  | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed.                                                                                     |    `30000`  |
@@ -171,6 +181,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     | Prop                        | Description                                                             | Default          |
     | --------------------------- | ----------------------------------------------------------------------- | ---------------- |
     | **`isCustomNotification`**  | Using custom notifications.                                             | `false`          |
+    |       **`isShowLogo`**      | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png` | `false`          |
     |      **`ringtonePath`**     | File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`                                                                                                    |`ringtone_default`|
     |     **`backgroundColor`**   | Incoming call screen background color.                                  |     `#0955fa`    |
     |      **`backgroundUrl`**    | Using image background for Incoming call screen.                        |       _None_     |

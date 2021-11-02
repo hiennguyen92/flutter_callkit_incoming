@@ -32,19 +32,24 @@
 
             <ImageView
                 android:id="@+id/ivLogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/base_margin_x2_5"
                 android:layout_above="@id/ivAvatar"
                 android:layout_centerHorizontal="true"
+                android:adjustViewBounds="true"
+                android:visibility="invisible"
+                android:scaleType="fitCenter"
                 android:layout_marginBottom="@dimen/base_margin_x5"
+                android:src="@drawable/ic_logo"
                 tools:ignore="ContentDescription" />
+
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/ivAvatar"
                 android:layout_width="@dimen/size_avatar"
                 android:layout_height="@dimen/size_avatar"
                 android:layout_centerInParent="true"
-                android:src="@drawable/ic_avatar"
+                android:src="@drawable/ic_default_avatar"
                 app:civ_border_color="#80ffffff"
                 app:civ_border_width="1dp" />
 

@@ -23,6 +23,7 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_INCOMING_DATA
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_HANDLE
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_SHOW_LOGO
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 import com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
 import com.squareup.picasso.Picasso
@@ -49,6 +50,7 @@ class CallkitIncomingActivity : Activity() {
 
     private lateinit var tvNameCaller: TextView
     private lateinit var tvNumber: TextView
+    private lateinit var ivLogo: ImageView
     private lateinit var ivAvatar: CircleImageView
 
     private lateinit var ivAcceptCall: ImageView
@@ -118,10 +120,17 @@ class CallkitIncomingActivity : Activity() {
         tvNameCaller.text = data?.getString(EXTRA_CALLKIT_NAME_CALLER, "")
         tvNumber.text = data?.getString(EXTRA_CALLKIT_HANDLE, "")
 
+        val isShowLogo = data?.getBoolean(EXTRA_CALLKIT_IS_SHOW_LOGO, false)
+        ivLogo.visibility = if(isShowLogo == true) View.VISIBLE else View.INVISIBLE
+
         val avatarUrl = data?.getString(EXTRA_CALLKIT_AVATAR, "")
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {
             ivAvatar.visibility = View.VISIBLE
-            Picasso.get().load(avatarUrl).into(ivAvatar)
+            Picasso.get()
+                .load(avatarUrl)
+                .placeholder(R.drawable.ic_default_avatar)
+                .error(R.drawable.ic_default_avatar)
+                .into(ivAvatar)
         }
 
         val callType = data?.getInt(EXTRA_CALLKIT_TYPE, 0) ?: 0
@@ -140,7 +149,11 @@ class CallkitIncomingActivity : Activity() {
         }
         val backgroundUrl = data?.getString(EXTRA_CALLKIT_BACKGROUND_URL, "")
         if (backgroundUrl != null && backgroundUrl.isNotEmpty()) {
-            Picasso.get().load(backgroundUrl).into(ivBackground)
+            Picasso.get()
+                .load(backgroundUrl)
+                .placeholder(R.drawable.transparent)
+                .error(R.drawable.transparent)
+                .into(ivBackground)
         }
     }
 
@@ -171,6 +184,7 @@ class CallkitIncomingActivity : Activity() {
 
         tvNameCaller = findViewById(R.id.tvNameCaller)
         tvNumber = findViewById(R.id.tvNumber)
+        ivLogo = findViewById(R.id.ivLogo)
         ivAvatar = findViewById(R.id.ivAvatar)
 
         ivAcceptCall = findViewById(R.id.ivAcceptCall)

@@ -1,3 +1,9 @@
+## 1.0.0+3
+
+* Update README.md.
+* Add props android `isShowLogo`.
+* Fixed some bugs.
+
 ## 1.0.0+2
 
 * Update README.md.

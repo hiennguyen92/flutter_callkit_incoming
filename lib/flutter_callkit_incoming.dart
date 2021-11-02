@@ -23,6 +23,7 @@ class FlutterCallkitIncoming {
   /// CallEvent.ACTION_CALL_DECLINE - Declined an incoming call
   /// CallEvent.ACTION_CALL_ENDED - Ended an incoming/outgoing call
   /// CallEvent.ACTION_CALL_TIMEOUT - Missed an incoming call
+  /// CallEvent.ACTION_CALL_CALLBACK - only Android (click action `Call back` from missed call notification)
   /// CallEvent.ACTION_CALL_TOGGLE_HOLD - only iOS
   /// CallEvent.ACTION_CALL_TOGGLE_MUTE - only iOS
   /// CallEvent.ACTION_CALL_TOGGLE_DMTF - only iOS
@@ -81,6 +82,8 @@ class CallEvent {
       "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED";
   static const String ACTION_CALL_TIMEOUT =
       "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT";
+  static const String ACTION_CALL_CALLBACK =
+      "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK";
   static const String ACTION_CALL_TOGGLE_HOLD =
       "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD";
   static const String ACTION_CALL_TOGGLE_MUTE =

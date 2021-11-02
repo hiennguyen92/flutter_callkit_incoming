@@ -52,6 +52,9 @@ class _MyAppState extends State<MyApp> {
           case CallEvent.ACTION_CALL_TIMEOUT:
             // TODO: missed an incoming call
             break;
+          case CallEvent.ACTION_CALL_CALLBACK:
+            // TODO: only Android - click action `Call back` from missed call notification
+            break;
           case CallEvent.ACTION_CALL_TOGGLE_HOLD:
             // TODO: only iOS
             break;
@@ -128,7 +131,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> makeFakeCallInComing() async {
-    await Future.delayed(const Duration(seconds: 5), () async {
+    await Future.delayed(const Duration(seconds: 7), () async {
       this._currentUuid = _uuid.v4();
       var params = <String, dynamic>{
         'id': _currentUuid,
@@ -140,7 +143,8 @@ class _MyAppState extends State<MyApp> {
         'duration': 30000,
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
         'android': <String, dynamic>{
-          'isCustomNotification': false,
+          'isCustomNotification': true,
+          'isShowLogo': false,
           'ringtonePath': 'ringtone_default',
           'backgroundColor': '#0955fa',
           'background': 'https://i.pravatar.cc/500',
