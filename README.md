@@ -140,6 +140,9 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
           case CallEvent.ACTION_CALL_TIMEOUT:
             // TODO: missed an incoming call
             break;
+          case CallEvent.ACTION_CALL_CALLBACK:
+            // TODO: only Android - click action `Call back` from missed call notification
+            break;
           case CallEvent.ACTION_CALL_TOGGLE_HOLD:
             // TODO: only iOS
             break;
