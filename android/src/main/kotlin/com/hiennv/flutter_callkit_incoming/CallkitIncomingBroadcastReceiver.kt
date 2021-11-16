@@ -151,9 +151,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
             ACTION_CALL_CALLBACK -> {
                 try {
+                    callkitNotificationManager.clearMissCallNotification(data)
                     sendEventFlutter(ACTION_CALL_CALLBACK, data)
                     Utils.backToForeground(context)
-                    callkitNotificationManager.clearMissCallNotification(data)
                     val closeNotificationPanel = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
                     context.sendBroadcast(closeNotificationPanel)
                 } catch (error: Exception) {

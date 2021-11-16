@@ -46,6 +46,17 @@ class CallManager: NSObject {
         }
     }
     
+    func activeCalls() -> [[String: String]] {
+        let calls = callController.callObserver.calls
+        var json = [[String: String]]()
+        for call in calls {
+            let item: [String: String] = ["id": call.uuid.uuidString]
+            json.append(item)
+        }
+        return json
+    }
+    
+    
     func setHold(call: Call, onHold: Bool) {
         let handleCall = CXSetHeldCallAction(call: call.uuid, onHold: onHold)
         let callTransaction = CXTransaction()

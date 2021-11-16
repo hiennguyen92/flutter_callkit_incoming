@@ -111,6 +111,15 @@ class _MyAppState extends State<MyApp> {
               onPressed: () async {
                 this.startOutGoingCall();
               },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.call_merge,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                this.activeCalls();
+              },
             )
           ],
         ),
@@ -139,7 +148,7 @@ class _MyAppState extends State<MyApp> {
         'appName': 'Callkit',
         'avatar': 'https://i.pravatar.cc/100',
         'handle': '0123456789',
-        'type': 1,
+        'type': 0,
         'duration': 30000,
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
         'android': <String, dynamic>{
@@ -187,5 +196,10 @@ class _MyAppState extends State<MyApp> {
       'ios': <String, dynamic>{'handleType': 'number'}
     }; //number/email
     await FlutterCallkitIncoming.startCall(params);
+  }
+
+  Future<void> activeCalls() async {
+    var calls = await FlutterCallkitIncoming.activeCalls();
+    print(calls);
   }
 }

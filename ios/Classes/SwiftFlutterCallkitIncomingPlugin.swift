@@ -83,6 +83,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         result("OK")
         break
+    case "activeCalls":
+        result(self.callManager?.activeCalls())
+        break;
     case "endAllCalls":
         self.callManager?.endCallAlls()
         result("OK")
@@ -113,8 +116,10 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         
         let uuid = UUID(uuidString: data.uuid)
         
+        configurAudioSession()
         self.sharedProvider?.reportNewIncomingCall(with: uuid!, update: callUpdate) { error in
             if(error == nil) {
+                self.configurAudioSession()
                 let call = Call(uuid: uuid!)
                 call.handle = data.handle
                 self.callManager?.addCall(call)
@@ -349,7 +354,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         call.isOnHold = action.isOnHold
         call.isMuted = action.isOnHold
         self.callManager?.setHold(call: call, onHold: action.isOnHold)
-        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_HOLD, [ "uuid": action.callUUID, "isOnHold": action.isOnHold ])
+        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_HOLD, [ "id": action.callUUID.uuidString, "isOnHold": action.isOnHold ])
         action.fulfill()
     }
     
@@ -359,7 +364,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             return
         }
         call.isMuted = action.isMuted
-        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_MUTE, [ "uuid": action.callUUID, "isMuted": action.isMuted ])
+        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_MUTE, [ "id": action.callUUID.uuidString, "isMuted": action.isMuted ])
         action.fulfill()
     }
     
@@ -369,7 +374,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             return
         }
         //call.isMuted = action.isMuted
-        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_GROUP, [ "uuid": action.callUUID, "callUUIDToGroupWith" : action.callUUIDToGroupWith])
+        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_GROUP, [ "id": action.callUUID.uuidString, "callUUIDToGroupWith" : action.callUUIDToGroupWith?.uuidString])
         action.fulfill()
     }
 
@@ -379,7 +384,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             return
         }
         //call.isMuted = action.isMuted
-        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_DMTF, [ "uuid": action.callUUID, "digits": action.digits, "type": action.type ])
+        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_DMTF, [ "id": action.callUUID.uuidString, "digits": action.digits, "type": action.type ])
         action.fulfill()
     }
     

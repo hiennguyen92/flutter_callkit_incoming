@@ -160,6 +160,7 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     fun showMissCallNotification(data: Bundle) {
+        notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         createNotificationChanel()
         val missedCallSound: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val typeCall = data.getInt(EXTRA_CALLKIT_TYPE, -1)
@@ -222,6 +223,12 @@ class CallkitNotificationManager(private val context: Context) {
     fun clearMissCallNotification(data: Bundle) {
         notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
+        Handler(Looper.getMainLooper()).postDelayed({
+            try {
+                getNotificationManager().cancel(notificationId)
+            } catch (error: Exception) {
+            }
+        }, 1000)
     }
 
     private fun createNotificationChanel() {
@@ -286,7 +293,7 @@ class CallkitNotificationManager(private val context: Context) {
             context,
             id,
             acceptIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_CANCEL_CURRENT
         )
     }
 

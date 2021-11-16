@@ -21,7 +21,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
   * Add pubspec.yaml:
     ```console
         dependencies:
-          flutter_callkit_incoming: ^1.0.0+2
+          flutter_callkit_incoming: any
     ```
 2. Configure Project
   * Android
@@ -114,6 +114,15 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
   * Ended all calls
     ```dart
       await FlutterCallkitIncoming.endAllCalls();
+    ```
+
+  * Get active calls. iOS: return active calls from Callkit, Android: only return last call
+    ```dart
+      await FlutterCallkitIncoming.activeCalls();
+    ```
+    Output
+    ```json
+    [{"id": "8BAA2B26-47AD-42C1-9197-1D75F662DF78"}]
     ```
 
   * Listen events
@@ -219,6 +228,12 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     https://github.com/hiennguyen92/flutter_callkit_incoming
     ```
   * <a href='https://github.com/hiennguyen92/flutter_callkit_incoming'>https://github.com/hiennguyen92/flutter_callkit_incoming</a>
+
+    <br>
+
+6. Todo
+  * Add `WakeLock` (background tasks) for Android
+  * Switch using `service` for Android
 
     <br>
 ## :bulb: Demo
