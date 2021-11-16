@@ -8,7 +8,7 @@ on: push
 
 jobs:
   build:
-    name: Build APK
+    name: Build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -18,5 +18,6 @@ jobs:
     - uses: subosito/flutter-action@v1
       with:
         channel: 'stable'
+    - run: cd example
     - run: flutter pub get
-    - run: flutter test
+    - run: flutter build apk --debug
