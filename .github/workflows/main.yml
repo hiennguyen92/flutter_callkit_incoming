@@ -7,8 +7,8 @@ on: push
 
 
 jobs:
-  build:
-    name: Build
+  build_android:
+    name: Build Flutter (Android)
     runs-on: ubuntu-latest
     env: 
       working-directory: ./example
@@ -23,7 +23,25 @@ jobs:
     - name: Dependencies
       run: flutter pub get
       working-directory: ${{env.working-directory}}
-    - name: Build
+    - name: Build APK
       working-directory: ${{env.working-directory}}
       run: flutter build apk --debug
-
+  build_ios:
+    name: Build Flutter (iOS)
+    runs-on: macOS-latest
+    env: 
+      working-directory: ./example
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '12.x'
+    - uses: subosito/flutter-action@v1
+      with:
+          channel: 'stable'
+    - name: Dependencies
+      run: flutter pub get
+      working-directory: ${{env.working-directory}}
+    - name: Build IPA
+      working-directory: ${{env.working-directory}}
+      run: flutter build ios --release --no-codesign
