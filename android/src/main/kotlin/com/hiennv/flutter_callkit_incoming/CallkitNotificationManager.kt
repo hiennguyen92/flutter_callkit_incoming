@@ -216,6 +216,7 @@ class CallkitNotificationManager(private val context: Context) {
 
 
     fun clearIncomingNotification(data: Bundle) {
+        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded())
         notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
     }

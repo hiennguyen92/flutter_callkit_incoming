@@ -2,8 +2,10 @@ package com.hiennv.flutter_callkit_incoming
 
 import android.app.Activity
 import android.app.KeyguardManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -33,9 +35,10 @@ import kotlin.math.abs
 
 class CallkitIncomingActivity : Activity() {
 
-
     companion object {
 
+        const val ACTION_ENDED_CALL_INCOMING =
+            "com.hiennv.flutter_callkit_incoming.ACTION_ENDED_CALL_INCOMING"
 
         fun getIntent(data: Bundle) = Intent(ACTION_CALL_INCOMING).apply {
             action = ACTION_CALL_INCOMING
@@ -43,7 +46,25 @@ class CallkitIncomingActivity : Activity() {
             flags =
                 Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
         }
+
+        fun getIntentEnded() =
+            Intent(ACTION_ENDED_CALL_INCOMING)
+
     }
+
+    inner class EndedCallkitIncomingBroadcastReceiver : BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (!isFinishing) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    finishAndRemoveTask()
+                } else {
+                    finish()
+                }
+            }
+        }
+    }
+
+    private var endedCallkitIncomingBroadcastReceiver = EndedCallkitIncomingBroadcastReceiver()
 
     private lateinit var ivBackground: ImageView
     private lateinit var llBackgroundAnimation: RippleRelativeLayout
@@ -77,6 +98,7 @@ class CallkitIncomingActivity : Activity() {
         setContentView(R.layout.activity_callkit_incoming)
         initView()
         incomingData(intent)
+        registerReceiver(endedCallkitIncomingBroadcastReceiver, IntentFilter(ACTION_ENDED_CALL_INCOMING))
     }
 
     private fun transparentStatusAndNavigation() {
@@ -228,6 +250,11 @@ class CallkitIncomingActivity : Activity() {
         } else {
             finish()
         }
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(endedCallkitIncomingBroadcastReceiver)
+        super.onDestroy()
     }
 
     override fun onBackPressed() {}
