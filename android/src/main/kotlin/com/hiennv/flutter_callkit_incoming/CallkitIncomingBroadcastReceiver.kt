@@ -136,6 +136,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 try {
                     sendEventFlutter(ACTION_CALL_ENDED, data)
                     callkitSoundPlayer.stop()
+                    callkitNotificationManager.clearIncomingNotification(data)
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }
