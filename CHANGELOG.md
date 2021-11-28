@@ -1,3 +1,10 @@
+## 1.0.0+5
+
+* Fixed endCall
+* Bugs Targeting Android 12 (Android).
+* Bugs `audio session` (iOS)
+* Fixed some bugs.
+
 ## 1.0.0+4
 
 * Update README.md.
