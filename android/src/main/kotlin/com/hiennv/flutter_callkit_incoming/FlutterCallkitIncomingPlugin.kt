@@ -40,7 +40,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     private lateinit var callkitNotificationManager: CallkitNotificationManager
     private lateinit var channel: MethodChannel
     private lateinit var events: EventChannel
-    private var data: Data? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         this.context = flutterPluginBinding.applicationContext
@@ -57,24 +56,25 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             callkitNotificationManager = CallkitNotificationManager(this.context)
             when (call.method) {
                 "showCallkitIncoming" -> {
-                    data = Data(call.arguments())
-                    data!!.from = "notification"
-                    callkitNotificationManager.showIncomingNotification(data!!.toBundle())
+                    val data = Data(call.arguments())
+                    data.from = "notification"
+                    callkitNotificationManager.showIncomingNotification(data.toBundle())
                     //send BroadcastReceiver
                     context.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentIncoming(
                             context,
-                            data!!.toBundle()
+                            data.toBundle()
                         )
                     )
+                    putMap(this.context, "ACTIVE_CALLS", call.arguments())
                     result.success("OK")
                 }
                 "startCall" -> {
-                    data = Data(call.arguments())
+                    val data = Data(call.arguments())
                     context.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentStart(
                             context,
-                            data!!.toBundle()
+                            data.toBundle()
                         )
                     )
                     result.success("OK")
@@ -101,11 +101,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 }
                 "activeCalls" -> {
                     val json = JSONArray()
-                    if(data != null) {
-                        val item = JSONObject()
-                        item.put("id", data?.uuid)
-                        json.put(item)
-                    }
+                    ///TODO: Error
+//                    if(data != null) {
+//                        val item = JSONObject()
+//                        item.put("id", data?.uuid)
+//                        json.put(item)
+//                    }
                     result.success(json.toString())
                 }
             }
