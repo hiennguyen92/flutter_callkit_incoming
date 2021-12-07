@@ -8,7 +8,7 @@ class Call {
 @Suppress("UNCHECKED_CAST")
 data class Data(val args: Map<String, Any?>) {
 
-    var uuid: String = (args["id"] as? String) ?: ""
+    var id: String = (args["id"] as? String) ?: ""
     var nameCaller: String = (args["nameCaller"] as? String) ?: ""
     var appName: String = (args["appName"] as? String) ?: ""
     var handle: String = (args["handle"] as? String) ?: ""
@@ -45,10 +45,20 @@ data class Data(val args: Map<String, Any?>) {
         }
     }
 
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if(other == null) return false
+        val e: Data = other as Data
+        return this.id == e.id
+    }
+
 
     fun toBundle(): Bundle {
         val bundle = Bundle()
-        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ID, uuid)
+        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ID, id)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_NAME_CALLER, nameCaller)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HANDLE, handle)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_AVATAR, avatar)
@@ -81,7 +91,7 @@ data class Data(val args: Map<String, Any?>) {
 
         fun fromBundle(bundle: Bundle): Data {
             val data = Data(emptyMap())
-            data.uuid = bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ID, "")
+            data.id = bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ID, "")
             data.nameCaller =
                 bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_NAME_CALLER, "")
             data.appName =

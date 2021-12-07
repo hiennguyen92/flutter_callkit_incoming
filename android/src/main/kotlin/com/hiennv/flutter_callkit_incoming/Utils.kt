@@ -1,14 +1,20 @@
 package com.hiennv.flutter_callkit_incoming
 
-import android.app.Activity
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import com.google.gson.Gson
 
 class Utils {
 
     companion object {
+
+        private var gson: Gson? = null
+
+        fun getGsonInstance(): Gson {
+            if(gson == null) gson = Gson()
+            return gson!!
+        }
 
         @JvmStatic
         fun dpToPx(dp: Float): Float {

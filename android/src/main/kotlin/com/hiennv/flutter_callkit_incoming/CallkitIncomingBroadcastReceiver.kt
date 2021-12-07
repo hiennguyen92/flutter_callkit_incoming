@@ -109,16 +109,18 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             ACTION_CALL_START -> {
                 try {
                     sendEventFlutter(ACTION_CALL_START, data)
+                    addCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }
             }
             ACTION_CALL_ACCEPT -> {
                 try {
-                    sendEventFlutter(ACTION_CALL_ACCEPT, data)
                     Utils.backToForeground(context)
+                    sendEventFlutter(ACTION_CALL_ACCEPT, data)
                     callkitSoundPlayer.stop()
                     callkitNotificationManager.clearIncomingNotification(data)
+                    addCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }
@@ -128,6 +130,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     sendEventFlutter(ACTION_CALL_DECLINE, data)
                     callkitSoundPlayer.stop()
                     callkitNotificationManager.clearIncomingNotification(data)
+                    removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }
@@ -137,6 +140,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     sendEventFlutter(ACTION_CALL_ENDED, data)
                     callkitSoundPlayer.stop()
                     callkitNotificationManager.clearIncomingNotification(data)
+                    removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }
@@ -146,6 +150,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     sendEventFlutter(ACTION_CALL_TIMEOUT, data)
                     callkitSoundPlayer.stop()
                     callkitNotificationManager.showMissCallNotification(data)
+                    removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }

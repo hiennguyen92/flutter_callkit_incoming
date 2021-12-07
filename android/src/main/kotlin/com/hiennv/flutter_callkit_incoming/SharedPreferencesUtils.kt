@@ -2,8 +2,7 @@ package com.hiennv.flutter_callkit_incoming
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.text.TextUtils
-import org.json.JSONArray
+import com.google.gson.reflect.TypeToken
 
 
 private const val CALLKIT_PREFERENCES_FILE_NAME = "flutter_callkit_incoming"
@@ -15,74 +14,35 @@ private fun initInstance(context: Context) {
     editor = prefs?.edit()
 }
 
-fun addCall(context: Context?, value: Map<String, *>) {
-    var mapData = getMap(context, "DATA_CALLS")?.toMutableMap()
-    if (mapData != null) {
-        var activeCalls = mapData["ACTIVE_CALLS"] as JSONArray?
-        if(activeCalls != null) {
-            activeCalls.put(value)
-        }else {
-            activeCalls = JSONArray()
-            activeCalls.put(value)
-            mapData["ACTIVE_CALLS"] = activeCalls
-        }
-        putMap(context, "DATA_CALLS", mapData)
-    }else {
-        val activeCalls = JSONArray()
-        activeCalls.put(value)
-        mapData = mutableMapOf()
-        mapData["ACTIVE_CALLS"] = activeCalls
-        putMap(context, "DATA_CALLS", mapData)
-    }
+
+fun addCall(context: Context?, data: Data) {
+    val json = getString(context, "ACTIVE_CALLS", "[]")
+    val arrayData: ArrayList<Data> = Utils.getGsonInstance()
+        .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
+    arrayData.add(data)
+    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().toJson(arrayData))
 }
 
-fun removeCall(context: Context?, value: Map<String, *>) {
-    var mapData = getMap(context, "DATA_CALLS")?.toMutableMap()
-    if (mapData != null) {
-        var activeCalls = mapData["ACTIVE_CALLS"] as JSONArray?
-        if(activeCalls != null) {
-
-            for (i in 0 until activeCalls.length()) {
-                val item = activeCalls.getJSONObject(i)
-                if(item["id"] == value["id"]){
-
-                }
-            }
-
-
-            activeCalls.put(value)
-        }else {
-            activeCalls = JSONArray()
-            activeCalls.put(value)
-            mapData["ACTIVE_CALLS"] = activeCalls
-        }
-        putMap(context, "DATA_CALLS", mapData)
-    }else {
-        val activeCalls = JSONArray()
-        activeCalls.put(value)
-        mapData = mutableMapOf()
-        mapData["ACTIVE_CALLS"] = activeCalls
-        putMap(context, "DATA_CALLS", mapData)
-    }
+fun removeCall(context: Context?, data: Data) {
+    val json = getString(context, "ACTIVE_CALLS", "[]")
+    val arrayData: ArrayList<Data> = Utils.getGsonInstance()
+        .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
+    arrayData.remove(data)
+    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().toJson(arrayData))
 }
 
-
-fun putMap(context: Context?, key: String, value: Map<String, *>) {
-    if (context == null) return
-    try {
-        putString(context, key, mapToJsonString(value))
-    } catch (e: Exception) {
-        // ignore
-    }
+fun removeAllCalls(context: Context?) {
+    putString(context, "ACTIVE_CALLS", "[]")
+    remove(context, "ACTIVE_CALLS")
 }
 
-fun getMap(context: Context?, key: String): Map<String, *>? {
-    val map: String? = getString(context, key)
-
-    if (TextUtils.isEmpty(map)) return null
-
-    return getMapFromJsonString(map!!)
+fun getActiveCalls(context: Context?): String {
+    val json = getString(context, "ACTIVE_CALLS", "[]")
+    val arrayData: ArrayList<Data> = Utils.getGsonInstance()
+        .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
+    return Utils.getGsonInstance().toJson(arrayData)
 }
+
 
 fun putString(context: Context?, key: String, value: String?) {
     if (context == null) return
@@ -91,10 +51,10 @@ fun putString(context: Context?, key: String, value: String?) {
     editor?.commit()
 }
 
-fun getString(context: Context?, key: String): String? {
+fun getString(context: Context?, key: String, defaultValue: String = ""): String? {
     if (context == null) return null
     initInstance(context)
-    return prefs?.getString(key, "")
+    return prefs?.getString(key, defaultValue)
 }
 
 fun remove(context: Context?, key: String) {

@@ -14,8 +14,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import org.json.JSONArray
-import org.json.JSONObject
 
 /** FlutterCallkitIncomingPlugin */
 class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -66,7 +64,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             data.toBundle()
                         )
                     )
-                    putMap(this.context, "ACTIVE_CALLS", call.arguments())
                     result.success("OK")
                 }
                 "startCall" -> {
@@ -97,17 +94,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             data.toBundle()
                         )
                     )
+                    removeAllCalls(context)
                     result.success("OK")
                 }
                 "activeCalls" -> {
-                    val json = JSONArray()
-                    ///TODO: Error
-//                    if(data != null) {
-//                        val item = JSONObject()
-//                        item.put("id", data?.uuid)
-//                        json.put(item)
-//                    }
-                    result.success(json.toString())
+                    result.success(getActiveCalls(context))
                 }
             }
         } catch (error: Exception) {
