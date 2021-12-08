@@ -3,7 +3,10 @@
 name: CI
 
 # Controls when the workflow will run
-on: push
+on:
+  push:
+    branches:
+      - master
 
 
 jobs:
