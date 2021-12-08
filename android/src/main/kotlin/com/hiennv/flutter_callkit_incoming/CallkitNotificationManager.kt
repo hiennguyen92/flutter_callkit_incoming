@@ -29,8 +29,10 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
+import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import okhttp3.OkHttpClient
 
 
 class CallkitNotificationManager(private val context: Context) {
@@ -131,7 +133,8 @@ class CallkitNotificationManager(private val context: Context) {
                 R.id.llAccept,
                 getAcceptPendingIntent(notificationId, data)
             )
-            Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
+            val headers = data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            getPicassoInstance(context, headers).load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
                 .transform(CircleTransform())
                 .into(targetLoadAvatarCustomize)
             notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
@@ -139,7 +142,8 @@ class CallkitNotificationManager(private val context: Context) {
             notificationBuilder.setCustomBigContentView(notificationViews)
             notificationBuilder.setCustomHeadsUpContentView(notificationViews)
         } else {
-            Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
+            val headers = data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            getPicassoInstance(context, headers).load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
                 .into(targetLoadAvatarDefault)
             notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
             notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_HANDLE, ""))
@@ -179,10 +183,14 @@ class CallkitNotificationManager(private val context: Context) {
         notificationBuilder.setSmallIcon(smallIcon)
         val isCustomNotification = data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
         if (isCustomNotification) {
-            Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
+            val headers = data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+
+            getPicassoInstance(context, headers).load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
                 .transform(CircleTransform()).into(targetLoadAvatarDefault)
         } else {
-            Picasso.get().load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
+            val headers = data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+
+            getPicassoInstance(context, headers).load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
                 .into(targetLoadAvatarDefault)
         }
         notificationBuilder.priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -311,6 +319,22 @@ class CallkitNotificationManager(private val context: Context) {
 
     private fun getNotificationManager(): NotificationManagerCompat {
         return NotificationManagerCompat.from(context)
+    }
+
+
+    private fun getPicassoInstance(context: Context, headers: HashMap<String, Any?>): Picasso {
+        val client = OkHttpClient.Builder()
+            .addNetworkInterceptor { chain ->
+                val newRequestBuilder: okhttp3.Request.Builder = chain.request().newBuilder()
+                for ((key, value) in headers) {
+                    newRequestBuilder.addHeader(key, value.toString())
+                }
+                chain.proceed(newRequestBuilder.build())
+            }
+            .build()
+        return Picasso.Builder(context)
+            .downloader(OkHttp3Downloader(client))
+            .build()
     }
 
 

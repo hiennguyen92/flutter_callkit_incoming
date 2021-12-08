@@ -17,6 +17,8 @@ data class Data(val args: Map<String, Any?>) {
     var duration: Long = (args["duration"] as? Long) ?: 30000L
     var extra: HashMap<String, Any?> =
         (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
+    var headers: HashMap<String, Any?> =
+        (args["headers"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
     var from: String = ""
 
     var isCustomNotification: Boolean = false
@@ -65,6 +67,7 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putInt(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TYPE, type)
         bundle.putLong(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION, duration)
         bundle.putSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA, extra)
+        bundle.putSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS, headers)
         bundle.putBoolean(
             CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
             isCustomNotification
@@ -105,6 +108,8 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getLong(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION, 30000L)
             data.extra =
                 bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>
+            data.headers =
+                bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
             data.isCustomNotification = bundle.getBoolean(
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,

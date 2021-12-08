@@ -25,12 +25,15 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_INCOMING_DATA
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_HANDLE
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_HEADERS
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_SHOW_LOGO
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 import com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlin.math.abs
+import okhttp3.OkHttpClient
+import com.squareup.picasso.OkHttp3Downloader
 
 
 class CallkitIncomingActivity : Activity() {
@@ -52,7 +55,7 @@ class CallkitIncomingActivity : Activity() {
 
     }
 
-    inner class EndedCallkitIncomingBroadcastReceiver : BroadcastReceiver(){
+    inner class EndedCallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (!isFinishing) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -98,7 +101,10 @@ class CallkitIncomingActivity : Activity() {
         setContentView(R.layout.activity_callkit_incoming)
         initView()
         incomingData(intent)
-        registerReceiver(endedCallkitIncomingBroadcastReceiver, IntentFilter(ACTION_ENDED_CALL_INCOMING))
+        registerReceiver(
+            endedCallkitIncomingBroadcastReceiver,
+            IntentFilter(ACTION_ENDED_CALL_INCOMING)
+        )
     }
 
     private fun transparentStatusAndNavigation() {
@@ -143,12 +149,13 @@ class CallkitIncomingActivity : Activity() {
         tvNumber.text = data?.getString(EXTRA_CALLKIT_HANDLE, "")
 
         val isShowLogo = data?.getBoolean(EXTRA_CALLKIT_IS_SHOW_LOGO, false)
-        ivLogo.visibility = if(isShowLogo == true) View.VISIBLE else View.INVISIBLE
+        ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
 
         val avatarUrl = data?.getString(EXTRA_CALLKIT_AVATAR, "")
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {
             ivAvatar.visibility = View.VISIBLE
-            Picasso.get()
+            val headers = data.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            getPicassoInstance(this@CallkitIncomingActivity, headers)
                 .load(avatarUrl)
                 .placeholder(R.drawable.ic_default_avatar)
                 .error(R.drawable.ic_default_avatar)
@@ -171,7 +178,8 @@ class CallkitIncomingActivity : Activity() {
         }
         val backgroundUrl = data?.getString(EXTRA_CALLKIT_BACKGROUND_URL, "")
         if (backgroundUrl != null && backgroundUrl.isNotEmpty()) {
-            Picasso.get()
+            val headers = data.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            getPicassoInstance(this@CallkitIncomingActivity, headers)
                 .load(backgroundUrl)
                 .placeholder(R.drawable.transparent)
                 .error(R.drawable.transparent)
@@ -250,6 +258,21 @@ class CallkitIncomingActivity : Activity() {
         } else {
             finish()
         }
+    }
+
+    private fun getPicassoInstance(context: Context, headers: HashMap<String, Any?>): Picasso {
+        val client = OkHttpClient.Builder()
+            .addNetworkInterceptor { chain ->
+                val newRequestBuilder: okhttp3.Request.Builder = chain.request().newBuilder()
+                for ((key, value) in headers) {
+                    newRequestBuilder.addHeader(key, value.toString())
+                }
+                chain.proceed(newRequestBuilder.build())
+            }
+            .build()
+        return Picasso.Builder(context)
+            .downloader(OkHttp3Downloader(client))
+            .build()
     }
 
     override fun onDestroy() {
