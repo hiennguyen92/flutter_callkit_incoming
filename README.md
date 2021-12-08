@@ -63,6 +63,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         'type': 0,
         'duration': 30000,
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+        'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
         'android': <String, dynamic>{
           'isCustomNotification': true,
           'isShowLogo': false,
@@ -183,6 +184,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     |   **`type`**    |  0 - Audio Call, 1 - Video Call                                         |     `0`     |
     | **`duration`**  | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed.                                                                                     |    `30000`  |
     |   **`extra`**   | Any data added to the event when received.                              |     `{}`    |
+    |   **`headers`** | Any data for custom header avatar/background image.                     |     `{}`    |
     |  **`android`**  | Android data needed to customize UI.                                    |    Below    |
     |    **`ios`**    | iOS data needed.                                                        |    Below    |
 

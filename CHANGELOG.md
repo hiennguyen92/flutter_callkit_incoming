@@ -1,3 +1,7 @@
+## 1.0.0+7
+
+* Add custom `headers` using for avatar/background image (only for Android)
+
 ## 1.0.0+6
 
 * Fixed func `activeCalls()` Get active calls

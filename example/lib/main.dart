@@ -151,6 +151,7 @@ class _MyAppState extends State<MyApp> {
         'type': 0,
         'duration': 30000,
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+        'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
         'android': <String, dynamic>{
           'isCustomNotification': true,
           'isShowLogo': false,
