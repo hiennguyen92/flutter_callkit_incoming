@@ -122,7 +122,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     ```
     Output
     ```json
-    [{"id": "8BAA2B26-47AD-42C1-9197-1D75F662DF78"}]
+    [{"id": "8BAA2B26-47AD-42C1-9197-1D75F662DF78", ...}]
     ```
 
   * Listen events

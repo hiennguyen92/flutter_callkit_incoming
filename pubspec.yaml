@@ -1,6 +1,6 @@
 name: flutter_callkit_incoming
 description: Flutter Callkit Incoming to show callkit screen in your Flutter app.
-version: 1.0.0+5
+version: 1.0.0+6
 homepage: https://github.com/hiennguyen92/flutter_callkit_incoming
 
 environment:

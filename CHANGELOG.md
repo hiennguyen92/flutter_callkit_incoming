@@ -1,3 +1,7 @@
+## 1.0.0+6
+
+* Fixed func `activeCalls()` Get active calls
+
 ## 1.0.0+5
 
 * Fixed endCall
