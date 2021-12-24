@@ -117,7 +117,7 @@ class Call: NSObject {
     
 }
 
-class Data {
+public class Data {
     let uuid: String
     let nameCaller: String
     let appName: String
@@ -145,7 +145,7 @@ class Data {
     let audioSessionPreferredIOBufferDuration: Double
     
     
-    init(args: [String: Any?]) {
+    public init(args: [String: Any?]) {
         self.uuid = args["id"] as? String ?? ""
         self.nameCaller = args["nameCaller"] as? String ?? ""
         self.appName = args["appName"] as? String ?? "Callkit"

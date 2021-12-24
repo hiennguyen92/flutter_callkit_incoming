@@ -20,6 +20,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     static let ACTION_CALL_TOGGLE_GROUP = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP"
     static let ACTION_CALL_TOGGLE_AUDIO_SESSION = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION"
     
+    public static var sharedInstance: SwiftFlutterCallkitIncomingPlugin? = nil
     
     private var channel: FlutterMethodChannel? = nil
     private var eventChannel: FlutterEventChannel? = nil
@@ -37,67 +38,74 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
     }
     
-    
-  public static func register(with registrar: FlutterPluginRegistrar) {
-    let instance = SwiftFlutterCallkitIncomingPlugin()
-    instance.channel = FlutterMethodChannel(name: "flutter_callkit_incoming", binaryMessenger: registrar.messenger())
-    instance.eventChannel = FlutterEventChannel(name: "flutter_callkit_incoming_events", binaryMessenger: registrar.messenger())
-    instance.callManager = CallManager()
-    instance.eventCallbackHandler = EventCallbackHandler()
-    instance.eventChannel?.setStreamHandler(instance.eventCallbackHandler as? FlutterStreamHandler & NSObjectProtocol)
-    registrar.addMethodCallDelegate(instance, channel: instance.channel!)
-  }
-
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    switch call.method {
-    case "showCallkitIncoming":
-        guard let args = call.arguments else {
-            result("OK")
-            return
+    public static func sharePluginWithRegister(with registrar: FlutterPluginRegistrar) -> SwiftFlutterCallkitIncomingPlugin {
+        if(sharedInstance == nil){
+            sharedInstance = SwiftFlutterCallkitIncomingPlugin()
         }
-        if let getArgs = args as? [String: Any] {
-            self.data = Data(args: getArgs)
-            showCallkitIncoming(self.data!, fromPushKit: false)
-        }
-        result("OK")
-        break
-    case "startCall":
-        guard let args = call.arguments else {
-            result("OK")
-            return
-        }
-        if let getArgs = args as? [String: Any] {
-            self.data = Data(args: getArgs)
-            self.startCall(self.data!)
-        }
-        result("OK")
-        break
-    case "endCall":
-        guard let args = call.arguments else {
-            result("OK")
-            return
-        }
-        if let getArgs = args as? [String: Any] {
-            self.data = Data(args: getArgs)
-            self.endCall(self.data!)
-        }
-        result("OK")
-        break
-    case "activeCalls":
-        result(self.callManager?.activeCalls())
-        break;
-    case "endAllCalls":
-        self.callManager?.endCallAlls()
-        result("OK")
-        break
-    default:
-        result(FlutterMethodNotImplemented)
+        sharedInstance!.channel = FlutterMethodChannel(name: "flutter_callkit_incoming", binaryMessenger: registrar.messenger())
+        sharedInstance!.eventChannel = FlutterEventChannel(name: "flutter_callkit_incoming_events", binaryMessenger: registrar.messenger())
+        sharedInstance!.callManager = CallManager()
+        sharedInstance!.eventCallbackHandler = EventCallbackHandler()
+        sharedInstance!.eventChannel?.setStreamHandler(sharedInstance!.eventCallbackHandler as? FlutterStreamHandler & NSObjectProtocol)
+        return sharedInstance!
     }
-  }
     
     
-    func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
-
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        let instance = sharePluginWithRegister(with: registrar)
+        registrar.addMethodCallDelegate(instance, channel: instance.channel!)
+    }
+    
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        switch call.method {
+        case "showCallkitIncoming":
+            guard let args = call.arguments else {
+                result("OK")
+                return
+            }
+            if let getArgs = args as? [String: Any] {
+                self.data = Data(args: getArgs)
+                showCallkitIncoming(self.data!, fromPushKit: false)
+            }
+            result("OK")
+            break
+        case "startCall":
+            guard let args = call.arguments else {
+                result("OK")
+                return
+            }
+            if let getArgs = args as? [String: Any] {
+                self.data = Data(args: getArgs)
+                self.startCall(self.data!)
+            }
+            result("OK")
+            break
+        case "endCall":
+            guard let args = call.arguments else {
+                result("OK")
+                return
+            }
+            if let getArgs = args as? [String: Any] {
+                self.data = Data(args: getArgs)
+                self.endCall(self.data!)
+            }
+            result("OK")
+            break
+        case "activeCalls":
+            result(self.callManager?.activeCalls())
+            break;
+        case "endAllCalls":
+            self.callManager?.endCallAlls()
+            result("OK")
+            break
+        default:
+            result(FlutterMethodNotImplemented)
+        }
+    }
+    
+    
+    public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
+        
         self.endCallNotExist(data)
         
         var handle: CXHandle?
@@ -127,20 +135,20 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             }
         }
     }
-
     
-    func startCall(_ data: Data) {
+    
+    public func startCall(_ data: Data) {
         initCallkitProvider(data)
         self.callManager?.startCall(data)
     }
     
-    func endCall(_ data: Data) {
+    public func endCall(_ data: Data) {
         let call = Call(uuid: UUID(uuidString: data.uuid)!)
         self.callManager?.endCall(call: call)
     }
     
     
-    func saveEndCall(_ uuid: String, _ reason: Int) {
+    public func saveEndCall(_ uuid: String, _ reason: Int) {
         switch reason {
         case 1:
             self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.failed)
@@ -171,7 +179,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             }
         }
     }
-
+    
     
     
     func callEndTimeout(_ data: Data) {
@@ -207,10 +215,10 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         configuration.maximumCallsPerCallGroup = data.maximumCallsPerCallGroup
         
         configuration.supportedHandleTypes = [
-                    CXHandle.HandleType.generic,
-                    CXHandle.HandleType.emailAddress,
-                    CXHandle.HandleType.phoneNumber
-                ]
+            CXHandle.HandleType.generic,
+            CXHandle.HandleType.emailAddress,
+            CXHandle.HandleType.phoneNumber
+        ]
         if #available(iOS 11.0, *) {
             configuration.includesCallsInRecents = data.includesCallsInRecents
         }
@@ -236,7 +244,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         userInfo[AVAudioSessionInterruptionOptionKey] = AVAudioSession.InterruptionOptions.shouldResume.rawValue
         NotificationCenter.default.post(name: AVAudioSession.interruptionNotification, object: self, userInfo: userInfo)
     }
-
+    
     func configurAudioSession(){
         let session = AVAudioSession.sharedInstance()
         do{
@@ -300,7 +308,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         self.callManager?.removeAllCalls()
     }
-
+    
     public func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
         let call = Call(uuid: action.callUUID, isOutGoing: true)
         call.handle = action.handle.value
@@ -374,7 +382,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_GROUP, [ "id": action.callUUID.uuidString, "callUUIDToGroupWith" : action.callUUIDToGroupWith?.uuidString])
         action.fulfill()
     }
-
+    
     public func provider(_ provider: CXProvider, perform action: CXPlayDTMFCallAction) {
         guard (self.callManager?.callWithUUID(uuid: action.callUUID)) != nil else {
             action.fail()
