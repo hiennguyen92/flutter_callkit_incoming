@@ -1,3 +1,7 @@
+## 1.0.0+8
+
+* Share func call from native(iOS)
+
 ## 1.0.0+7
 
 * Add custom `headers` using for avatar/background image (only for Android)
