@@ -282,7 +282,7 @@ class CallkitNotificationManager(private val context: Context) {
             context,
             id,
             acceptIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
     }
 
@@ -292,7 +292,7 @@ class CallkitNotificationManager(private val context: Context) {
             context,
             id,
             declineIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
     }
 
@@ -308,13 +308,13 @@ class CallkitNotificationManager(private val context: Context) {
 
     private fun getActivityPendingIntent(id: Int, data: Bundle): PendingIntent {
         val intent = CallkitIncomingActivity.getIntent(data)
-        return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun getAppPendingIntent(id: Int, data: Bundle): PendingIntent {
         val intent: Intent? = context.packageManager.getLaunchIntentForPackage(context.packageName)
         intent?.putExtra(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_INCOMING_DATA, data)
-        return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun getNotificationManager(): NotificationManagerCompat {
