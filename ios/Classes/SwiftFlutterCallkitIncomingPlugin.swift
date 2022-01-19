@@ -20,6 +20,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     static let ACTION_CALL_TOGGLE_GROUP = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP"
     static let ACTION_CALL_TOGGLE_AUDIO_SESSION = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION"
     
+    @objc
     public static var sharedInstance: SwiftFlutterCallkitIncomingPlugin? = nil
     
     private var channel: FlutterMethodChannel? = nil
@@ -104,6 +105,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     
+    @objc
     public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
         
         self.endCallNotExist(data)

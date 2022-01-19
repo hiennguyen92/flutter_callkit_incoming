@@ -117,7 +117,8 @@ class Call: NSObject {
     
 }
 
-public class Data {
+@objc
+public class Data : NSObject {
     let uuid: String
     let nameCaller: String
     let appName: String
@@ -145,6 +146,8 @@ public class Data {
     let audioSessionPreferredIOBufferDuration: Double
     
     
+    // TODO Method cannot be marked @objc because the type of the parameter cannot be represented in Objective-C
+    @objc
     public init(args: [String: Any?]) {
         self.uuid = args["id"] as? String ?? ""
         self.nameCaller = args["nameCaller"] as? String ?? ""
