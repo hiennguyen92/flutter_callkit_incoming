@@ -120,6 +120,15 @@ class _MyAppState extends State<MyApp> {
               onPressed: () async {
                 this.activeCalls();
               },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.call_merge,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                this.endAllCalls();
+              },
             )
           ],
         ),
@@ -155,7 +164,7 @@ class _MyAppState extends State<MyApp> {
         'android': <String, dynamic>{
           'isCustomNotification': true,
           'isShowLogo': false,
-          'ringtonePath': 'ringtone_default',
+          'ringtonePath': 'system_ringtone_default',
           'backgroundColor': '#0955fa',
           'background': 'https://i.pravatar.cc/500',
           'actionColor': '#4CAF50'
@@ -203,4 +212,9 @@ class _MyAppState extends State<MyApp> {
     var calls = await FlutterCallkitIncoming.activeCalls();
     print(calls);
   }
+
+  Future<void> endAllCalls() async {
+    await FlutterCallkitIncoming.endAllCalls();
+  }
+
 }

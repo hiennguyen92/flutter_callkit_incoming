@@ -87,13 +87,15 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success("OK")
                 }
                 "endAllCalls" -> {
-                    val data = Data(call.arguments())
-                    context.sendBroadcast(
-                        CallkitIncomingBroadcastReceiver.getIntentEnded(
-                            context,
-                            data.toBundle()
+                    val calls = getDataActiveCalls(context)
+                    calls.forEach {
+                        context.sendBroadcast(
+                            CallkitIncomingBroadcastReceiver.getIntentEnded(
+                                context,
+                                it.toBundle()
+                            )
                         )
-                    )
+                    }
                     removeAllCalls(context)
                     result.success("OK")
                 }

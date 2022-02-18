@@ -43,6 +43,12 @@ fun getActiveCalls(context: Context?): String {
     return Utils.getGsonInstance().toJson(arrayData)
 }
 
+fun getDataActiveCalls(context: Context?): ArrayList<Data> {
+    val json = getString(context, "ACTIVE_CALLS", "[]")
+    return Utils.getGsonInstance()
+        .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
+}
+
 
 fun putString(context: Context?, key: String, value: String?) {
     if (context == null) return

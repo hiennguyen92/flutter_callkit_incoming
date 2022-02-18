@@ -5,6 +5,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -102,10 +103,18 @@ class CallkitSoundPlayer(private val context: Context) {
         if (resId != 0) {
             Uri.parse("android.resource://${context.packageName}/$resId")
         } else {
-            Uri.parse("android.resource://${context.packageName}/${R.raw.ringtone_default}")
+            if(fileName.equals("system_ringtone_default", true)){
+                RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE)
+            }else {
+                Uri.parse("android.resource://${context.packageName}/${R.raw.ringtone_default}")
+            }
         }
     } catch (e: Exception) {
-        Uri.parse("android.resource://${context.packageName}/${R.raw.ringtone_default}")
+        if(fileName.equals("system_ringtone_default", true)){
+            RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE)
+        }else {
+            Uri.parse("android.resource://${context.packageName}/${R.raw.ringtone_default}")
+        }
     }
 
 
