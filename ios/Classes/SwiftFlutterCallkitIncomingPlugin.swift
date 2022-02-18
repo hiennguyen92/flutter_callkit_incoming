@@ -20,7 +20,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     static let ACTION_CALL_TOGGLE_GROUP = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP"
     static let ACTION_CALL_TOGGLE_AUDIO_SESSION = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION"
     
-    public static var sharedInstance: SwiftFlutterCallkitIncomingPlugin? = nil
+    @objc public static var sharedInstance: SwiftFlutterCallkitIncomingPlugin? = nil
     
     private var channel: FlutterMethodChannel? = nil
     private var eventChannel: FlutterEventChannel? = nil
@@ -104,7 +104,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     
-    public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
+    @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
         
         self.endCallNotExist(data)
         
@@ -136,17 +136,23 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
     }
     
-    
-    public func startCall(_ data: Data) {
+    @objc public func startCall(_ data: Data) {
         initCallkitProvider(data)
         self.callManager?.startCall(data)
     }
     
-    public func endCall(_ data: Data) {
+    @objc public func endCall(_ data: Data) {
         let call = Call(uuid: UUID(uuidString: data.uuid)!)
         self.callManager?.endCall(call: call)
     }
     
+    @objc public func activeCalls() -> [[String: String]]? {
+        return self.callManager?.activeCalls()
+    }
+    
+    @objc public func endAllCalls() {
+        self.callManager?.endCallAlls()
+    }
     
     public func saveEndCall(_ uuid: String, _ reason: Int) {
         switch reason {
@@ -445,7 +451,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
 
 class EventCallbackHandler: FlutterStreamHandler {
     
-    private var eventSink: FlutterEventSink?
+    public var eventSink: FlutterEventSink?
     
     public func send(_ event: String, _ body: [String: Any?]) {
         let data: [String : Any] = [
@@ -454,6 +460,7 @@ class EventCallbackHandler: FlutterStreamHandler {
         ]
         eventSink?(data)
     }
+    
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         self.eventSink = events

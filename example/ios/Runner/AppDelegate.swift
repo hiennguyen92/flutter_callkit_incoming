@@ -19,6 +19,11 @@ import flutter_callkit_incoming
 //        info["handle"] = "0123456789"
 //        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
 //    }
+      
+//      DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+//          print("Fake from Pushkit")
+//          SwiftFlutterCallkitIncomingPlugin.sharedInstance?.eventCallbackHandler?.eventSink.
+//       }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
     

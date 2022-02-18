@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 
-class Call: NSObject {
+public class Call: NSObject {
     
     let uuid: UUID
     let isOutGoing: Bool
@@ -117,7 +117,7 @@ class Call: NSObject {
     
 }
 
-public class Data {
+@objc public class Data: NSObject {
     let uuid: String
     let nameCaller: String
     let appName: String
@@ -144,6 +144,31 @@ public class Data {
     let audioSessionPreferredSampleRate: Double
     let audioSessionPreferredIOBufferDuration: Double
     
+    @objc public init(id: String, nameCaller: String, handle: String) {
+        self.uuid = id
+        self.nameCaller = nameCaller
+        self.appName = "Callkit"
+        self.handle = handle
+        self.avatar = ""
+        self.type = 0
+        self.duration = 30000
+        self.extra = [:]
+        self.iconName = ""
+        self.handleType = ""
+        self.supportsVideo = true
+        self.maximumCallGroups = 2
+        self.maximumCallsPerCallGroup = 1
+        self.supportsDTMF = true
+        self.supportsHolding = true
+        self.supportsGrouping = true
+        self.supportsUngrouping = true
+        self.includesCallsInRecents = true
+        self.ringtonePath = ""
+        self.audioSessionMode = ""
+        self.audioSessionActive = true
+        self.audioSessionPreferredSampleRate = 44100.0
+        self.audioSessionPreferredIOBufferDuration = 0.005
+    }
     
     public init(args: [String: Any?]) {
         self.uuid = args["id"] as? String ?? ""
