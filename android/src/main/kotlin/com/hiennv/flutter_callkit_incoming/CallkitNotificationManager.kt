@@ -302,7 +302,7 @@ class CallkitNotificationManager(private val context: Context) {
             context,
             id,
             acceptIntent,
-            PendingIntent.FLAG_CANCEL_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
     }
 
