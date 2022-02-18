@@ -33,14 +33,14 @@ data class Data(val args: Map<String, Any?>) {
         if (android != null) {
             isCustomNotification = (android["isCustomNotification"] as? Boolean) ?: false
             isShowLogo = (android["isShowLogo"] as? Boolean) ?: false
-            ringtonePath = (android["ringtonePath"] as? String) ?: "ringtone_default"
+            ringtonePath = (android["ringtonePath"] as? String) ?: ""
             backgroundColor = (android["backgroundColor"] as? String) ?: "#0955fa"
             backgroundUrl = (android["backgroundUrl"] as? String) ?: ""
             actionColor = (android["actionColor"] as? String) ?: "#4CAF50"
         } else {
             isCustomNotification = false
             isShowLogo = false
-            ringtonePath = "ringtone_default"
+            ringtonePath = ""
             backgroundColor = "#0955fa"
             backgroundUrl = ""
             actionColor = "#4CAF50"
@@ -121,7 +121,7 @@ data class Data(val args: Map<String, Any?>) {
             )
             data.ringtonePath = bundle.getString(
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_RINGTONE_PATH,
-                "ringtone_default"
+                ""
             )
             data.backgroundColor = bundle.getString(
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_BACKGROUND_COLOR,

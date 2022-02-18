@@ -183,7 +183,7 @@ class _MyAppState extends State<MyApp> {
           'supportsHolding': true,
           'supportsGrouping': false,
           'supportsUngrouping': false,
-          'ringtonePath': 'Ringtone.caf'
+          'ringtonePath': 'system_ringtone_default'
         }
       };
       await FlutterCallkitIncoming.showCallkitIncoming(params);

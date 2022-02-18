@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 
 class CallkitSoundPlayer(private val context: Context) {
 
@@ -21,7 +22,7 @@ class CallkitSoundPlayer(private val context: Context) {
         private var callkitSoundPlayer: CallkitSoundPlayer? = null
 
         fun getInstance(context: Context): CallkitSoundPlayer {
-            if(callkitSoundPlayer == null) {
+            if (callkitSoundPlayer == null) {
                 callkitSoundPlayer = CallkitSoundPlayer(context)
             }
             return callkitSoundPlayer!!
@@ -29,7 +30,6 @@ class CallkitSoundPlayer(private val context: Context) {
 
 
     }
-
 
 
     private var data: Bundle? = null
@@ -79,7 +79,7 @@ class CallkitSoundPlayer(private val context: Context) {
     private fun playSound() {
         val sound = this.data?.getString(
             CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_RINGTONE_PATH,
-            "ringtone_default"
+            ""
         )
         val uri = sound?.let { getRingtoneUri(it) }
         mediaPlayer = MediaPlayer.create(context, uri).apply {
@@ -99,20 +99,23 @@ class CallkitSoundPlayer(private val context: Context) {
 
 
     private fun getRingtoneUri(fileName: String) = try {
+        if (TextUtils.isEmpty(fileName)) {
+            RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE)
+        }
         val resId = context.resources.getIdentifier(fileName, "raw", context.packageName)
         if (resId != 0) {
             Uri.parse("android.resource://${context.packageName}/$resId")
         } else {
-            if(fileName.equals("system_ringtone_default", true)){
+            if (fileName.equals("system_ringtone_default", true)) {
                 RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE)
-            }else {
+            } else {
                 Uri.parse("android.resource://${context.packageName}/${R.raw.ringtone_default}")
             }
         }
     } catch (e: Exception) {
-        if(fileName.equals("system_ringtone_default", true)){
+        if (fileName.equals("system_ringtone_default", true)) {
             RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE)
-        }else {
+        } else {
             Uri.parse("android.resource://${context.packageName}/${R.raw.ringtone_default}")
         }
     }
