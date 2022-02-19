@@ -105,6 +105,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
+        if(fromPushKit){
+            self.data = data
+        }
         
         self.endCallNotExist(data)
         
@@ -450,8 +453,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
 }
 
 class EventCallbackHandler: FlutterStreamHandler {
-    
-    public var eventSink: FlutterEventSink?
+    private var eventSink: FlutterEventSink?
     
     public func send(_ event: String, _ body: [String: Any?]) {
         let data: [String : Any] = [
@@ -460,7 +462,6 @@ class EventCallbackHandler: FlutterStreamHandler {
         ]
         eventSink?(data)
     }
-    
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         self.eventSink = events
