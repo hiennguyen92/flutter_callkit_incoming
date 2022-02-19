@@ -215,6 +215,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self.sharedProvider = CXProvider(configuration: createConfiguration(data))
             self.sharedProvider?.setDelegate(self, queue: nil)
         }
+        self.callManager?.setSharedProvider(self.sharedProvider!)
     }
     
     func createConfiguration(_ data: Data) -> CXProviderConfiguration {

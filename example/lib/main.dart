@@ -21,6 +21,16 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     listenerEvent();
+    initCurrentCall();
+  }
+
+
+  initCurrentCall() async {
+    //check current call from pushkit if possible
+    var calls = await FlutterCallkitIncoming.activeCalls();
+    if(calls is List && calls.isNotEmpty){
+      this._currentUuid = calls[0]['id'];
+    }
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -191,6 +201,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> endCurrentCall() async {
+    initCurrentCall();
     var params = <String, dynamic>{'id': this._currentUuid};
     await FlutterCallkitIncoming.endCall(params);
   }

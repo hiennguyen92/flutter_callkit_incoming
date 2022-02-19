@@ -11,18 +11,12 @@ import flutter_callkit_incoming
     ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
         
+        //Setup VOIP
         let mainQueue = DispatchQueue.main
         let voipRegistry: PKPushRegistry = PKPushRegistry(queue: mainQueue)
-        // Set the registry's delegate to self
         voipRegistry.delegate = self
-        // Set the push type to VoIP
         voipRegistry.desiredPushTypes = [PKPushType.voIP]
         
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 15.0) {
-//            print("Fake from Pushkit")
-//            let data = flutter_callkit_incoming.Data(id: "44d915e1-5ff4-4bed-bf13-c423048ec97a", nameCaller: "Hien Nguyen", handle: "0123456789")
-//            SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
-//        }
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
@@ -30,18 +24,25 @@ import flutter_callkit_incoming
                               continue userActivity: NSUserActivity,
                               restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         
-        if userActivity.activityType == "INStartVideoCallIntent" {
-            print("Open App when click action Callkit")
-        }
+        guard let handle = userActivity.handle else {
+                    return false
+                }
+
+                guard let isVideo = userActivity.isVideo else {
+                    return false
+                }
+        let data = flutter_callkit_incoming.Data(id: UUID().uuidString, nameCaller: "", handle: handle, type: isVideo ? 1 : 0)
+        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.startCall(data)
+        
         return super.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
-    
     
     // Handle updated push credentials
     func pushRegistry(_ registry: PKPushRegistry, didUpdate credentials: PKPushCredentials, for type: PKPushType) {
         print(credentials.token)
         let deviceToken = credentials.token.map { String(format: "%02x", $0) }.joined()
         print("pushRegistry -> deviceToken :\(deviceToken)")
+        //Save deviceToken to your Server
     }
     
     func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
@@ -50,7 +51,16 @@ import flutter_callkit_incoming
     
     // Handle incoming pushes
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-         print(payload.dictionaryPayload)
+        
+        guard type == .voIP else { return }
+        
+        let id = payload.dictionaryPayload["id"] as? String ?? ""
+        let nameCaller = payload.dictionaryPayload["nameCaller"] as? String ?? ""
+        let handle = payload.dictionaryPayload["handle"] as? String ?? ""
+        let isVideo = payload.dictionaryPayload["isVideo"] as? Bool ?? false
+        
+        let data = flutter_callkit_incoming.Data(id: id, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
+        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
     }
     
     

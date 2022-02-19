@@ -12,20 +12,33 @@ import CallKit
 class CallManager: NSObject {
     
     private let callController = CXCallController()
+    private var sharedProvider: CXProvider? = nil
     private(set) var calls = [Call]()
     
     
+    func setSharedProvider(_ sharedProvider: CXProvider) {
+        self.sharedProvider = sharedProvider
+    }
     
     func startCall(_ data: Data) {
         let handle = CXHandle(type: self.getHandleType(data.handleType), value: data.handle)
         let uuid = UUID(uuidString: data.uuid)
         let startCallAction = CXStartCallAction(call: uuid!, handle: handle)
-        
         startCallAction.isVideo = data.type > 0
         let callTransaction = CXTransaction()
         callTransaction.addAction(startCallAction)
         //requestCall
         requestCall(callTransaction, action: "startCall")
+        
+        let callUpdate = CXCallUpdate()
+        callUpdate.remoteHandle = handle
+        callUpdate.supportsDTMF = data.supportsDTMF
+        callUpdate.supportsHolding = data.supportsHolding
+        callUpdate.supportsGrouping = data.supportsGrouping
+        callUpdate.supportsUngrouping = data.supportsUngrouping
+        callUpdate.hasVideo = data.type > 0 ? true : false
+        callUpdate.localizedCallerName = data.nameCaller
+        self.sharedProvider?.reportCall(with: uuid!, updated: callUpdate)
     }
     
     func endCall(call: Call) {

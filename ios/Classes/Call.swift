@@ -144,13 +144,13 @@ public class Call: NSObject {
     let audioSessionPreferredSampleRate: Double
     let audioSessionPreferredIOBufferDuration: Double
     
-    @objc public init(id: String, nameCaller: String, handle: String) {
+    @objc public init(id: String, nameCaller: String, handle: String, type: Int) {
         self.uuid = id
         self.nameCaller = nameCaller
         self.appName = "Callkit"
         self.handle = handle
         self.avatar = ""
-        self.type = 0
+        self.type = type
         self.duration = 30000
         self.extra = [:]
         self.iconName = ""
