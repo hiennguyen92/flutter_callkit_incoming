@@ -63,7 +63,6 @@ import flutter_callkit_incoming
         let isVideo = payload.dictionaryPayload["isVideo"] as? Bool ?? false
         
         let data = flutter_callkit_incoming.Data(id: id, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
-        //CallKitLogo
         SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
     }
     
