@@ -10,7 +10,7 @@ import Intents
 
 extension NSUserActivity: StartCallConvertible {
 
-    var handle: String? {
+    public var handle: String? {
         guard
           let interaction = interaction,
           let startCallIntent = interaction.intent as? SupportedStartCallIntent,
@@ -18,11 +18,11 @@ extension NSUserActivity: StartCallConvertible {
         else {
             return nil
         }
-        print(contact)
+        print(interaction.intent)
         return contact.personHandle?.value
     }
 
-    var isVideo: Bool? {
+    public var isVideo: Bool? {
         guard
           let interaction = interaction,
           let startCallIntent = interaction.intent as? SupportedStartCallIntent

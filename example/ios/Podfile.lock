@@ -1,11 +1,17 @@
 PODS:
+  - CryptoSwift (1.4.3)
   - Flutter (1.0.0)
   - flutter_callkit_incoming (0.0.1):
+    - CryptoSwift
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_callkit_incoming (from `.symlinks/plugins/flutter_callkit_incoming/ios`)
+
+SPEC REPOS:
+  trunk:
+    - CryptoSwift
 
 EXTERNAL SOURCES:
   Flutter:
@@ -14,8 +20,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_callkit_incoming/ios"
 
 SPEC CHECKSUMS:
+  CryptoSwift: a0799ee936271bd2253a006f1e4523df21845000
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  flutter_callkit_incoming: d577a8ddc61393286a316f795f721590c880da60
+  flutter_callkit_incoming: 0f6e518c5de137564ef0fbd6c6ed3e6510871a22
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 

@@ -180,7 +180,7 @@ class _MyAppState extends State<MyApp> {
           'actionColor': '#4CAF50'
         },
         'ios': <String, dynamic>{
-          'iconName': 'AppIcon40x40',
+          'iconName': 'CallKitLogo',
           'handleType': '',
           'supportsVideo': true,
           'maximumCallGroups': 2,

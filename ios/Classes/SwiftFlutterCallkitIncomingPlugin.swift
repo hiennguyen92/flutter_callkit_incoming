@@ -33,6 +33,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private var answerCall : Call?
     
     private var data: Data?
+    private var isFromPushKit: Bool = false
     
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
         eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
@@ -76,7 +77,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             }
             if let getArgs = args as? [String: Any] {
                 self.data = Data(args: getArgs)
-                self.startCall(self.data!)
+                self.startCall(self.data!, fromPushKit: false)
             }
             result("OK")
             break
@@ -85,9 +86,13 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 result("OK")
                 return
             }
-            if let getArgs = args as? [String: Any] {
-                self.data = Data(args: getArgs)
+            if(self.isFromPushKit){
                 self.endCall(self.data!)
+            }else{
+                if let getArgs = args as? [String: Any] {
+                    self.data = Data(args: getArgs)
+                    self.endCall(self.data!)
+                }
             }
             result("OK")
             break
@@ -105,6 +110,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
+        self.isFromPushKit = fromPushKit
         if(fromPushKit){
             self.data = data
         }
@@ -112,7 +118,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.endCallNotExist(data)
         
         var handle: CXHandle?
-        handle = CXHandle(type: self.getHandleType(data.handleType), value: data.handle)
+        handle = CXHandle(type: self.getHandleType(data.handleType), value: data.getEncryptHandle())
         
         let callUpdate = CXCallUpdate()
         callUpdate.remoteHandle = handle
@@ -139,14 +145,24 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
     }
     
-    @objc public func startCall(_ data: Data) {
+    @objc public func startCall(_ data: Data, fromPushKit: Bool) {
+        self.isFromPushKit = fromPushKit
+        if(fromPushKit){
+            self.data = data
+        }
         initCallkitProvider(data)
         self.callManager?.startCall(data)
     }
     
     @objc public func endCall(_ data: Data) {
-        let call = Call(uuid: UUID(uuidString: data.uuid)!)
-        self.callManager?.endCall(call: call)
+        var call: Call? = nil
+        if(self.isFromPushKit){
+            call = Call(uuid: UUID(uuidString: self.data!.uuid)!)
+            self.isFromPushKit = false
+        }else {
+            call = Call(uuid: UUID(uuidString: data.uuid)!)
+        }
+        self.callManager?.endCall(call: call!)
     }
     
     @objc public func activeCalls() -> [[String: String]]? {
@@ -154,6 +170,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     @objc public func endAllCalls() {
+        self.isFromPushKit = false
         self.callManager?.endCallAlls()
     }
     

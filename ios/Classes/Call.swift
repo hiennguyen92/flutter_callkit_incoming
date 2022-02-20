@@ -153,7 +153,7 @@ public class Call: NSObject {
         self.type = type
         self.duration = 30000
         self.extra = [:]
-        self.iconName = ""
+        self.iconName = "CallKitLogo"
         self.handleType = ""
         self.supportsVideo = true
         self.maximumCallGroups = 2
@@ -182,7 +182,7 @@ public class Call: NSObject {
         
         
         if let ios = args["ios"] as? [String: Any] {
-            self.iconName = ios["iconName"] as? String ?? ""
+            self.iconName = ios["iconName"] as? String ?? "CallKitLogo"
             self.handleType = ios["handleType"] as? String ?? ""
             self.supportsVideo = ios["supportsVideo"] as? Bool ?? true
             self.maximumCallGroups = ios["maximumCallGroups"] as? Int ?? 2
@@ -198,7 +198,7 @@ public class Call: NSObject {
             self.audioSessionPreferredSampleRate = ios["audioSessionPreferredSampleRate"] as? Double ?? 44100.0
             self.audioSessionPreferredIOBufferDuration = ios["audioSessionPreferredIOBufferDuration"] as? Double ?? 0.005
         }else {
-            self.iconName = ""
+            self.iconName = "CallKitLogo"
             self.handleType = ""
             self.supportsVideo = true
             self.maximumCallGroups = 2
@@ -247,5 +247,10 @@ public class Call: NSObject {
         ] as [String : Any?]
         return map
     }
+    
+    func getEncryptHandle() -> String {
+        return String(format: "{\"nameCaller\":\"%@\", \"handle\":\"%@\"}", nameCaller, handle).encryptHandle()
+    }
+    
     
 }

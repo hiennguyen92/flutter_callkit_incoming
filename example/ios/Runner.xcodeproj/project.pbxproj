@@ -11,10 +11,10 @@
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		4E4CCCD734BE37EA87C4A47B /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCDA753F77D427CD020E9977 /* Pods_Runner.framework */; };
 		5A1B922527C02ACD00302164 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A1B922427C02ACD00302164 /* AppDelegate.m */; };
-		5A49A48D27C18606006C5AED /* NSUserActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A49A48C27C18606006C5AED /* NSUserActivity.swift */; };
 		5A49DFC327C03253004F80FB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A49DFC227C03253004F80FB /* main.m */; };
-		5A49DFC527C04D3A004F80FB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A49DFC427C04D39004F80FB /* AppDelegate.swift */; };
 		5A77E3C1271E194600207224 /* Ringtone.caf in Resources */ = {isa = PBXBuildFile; fileRef = 5A77E3C0271E18FE00207224 /* Ringtone.caf */; };
+		5A9D495327C2E0B400F9DE7D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9D495227C2E0B400F9DE7D /* AppDelegate.swift */; };
+		5A9D495527C2E75100F9DE7D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A9D495427C2E75100F9DE7D /* Images.xcassets */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -43,10 +43,10 @@
 		5A1B922427C02ACD00302164 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		5A49A47F27C138F1006C5AED /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		5A49A48027C16CD5006C5AED /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
-		5A49A48C27C18606006C5AED /* NSUserActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSUserActivity.swift; sourceTree = "<group>"; };
 		5A49DFC227C03253004F80FB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		5A49DFC427C04D39004F80FB /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5A77E3C0271E18FE00207224 /* Ringtone.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ringtone.caf; sourceTree = "<group>"; };
+		5A9D495227C2E0B400F9DE7D /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		5A9D495427C2E75100F9DE7D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
@@ -105,8 +105,8 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				5A9D495227C2E0B400F9DE7D /* AppDelegate.swift */,
 				5A49A47F27C138F1006C5AED /* Runner.entitlements */,
-				5A49DFC427C04D39004F80FB /* AppDelegate.swift */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				5A77E3C0271E18FE00207224 /* Ringtone.caf */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
@@ -118,7 +118,7 @@
 				5A1B922327C02A7300302164 /* AppDelegate.h */,
 				5A1B922427C02ACD00302164 /* AppDelegate.m */,
 				5A49DFC227C03253004F80FB /* main.m */,
-				5A49A48C27C18606006C5AED /* NSUserActivity.swift */,
+				5A9D495427C2E75100F9DE7D /* Images.xcassets */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -208,6 +208,7 @@
 				5A77E3C1271E194600207224 /* Ringtone.caf in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
+				5A9D495527C2E75100F9DE7D /* Images.xcassets in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 			);
@@ -290,8 +291,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5A49DFC527C04D3A004F80FB /* AppDelegate.swift in Sources */,
-				5A49A48D27C18606006C5AED /* NSUserActivity.swift in Sources */,
+				5A9D495327C2E0B400F9DE7D /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				5A49DFC327C03253004F80FB /* main.m in Sources */,
 				5A1B922527C02ACD00302164 /* AppDelegate.m in Sources */,

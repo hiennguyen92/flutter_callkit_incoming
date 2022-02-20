@@ -179,6 +179,17 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       info["handle"] = "0123456789"
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
     ```
+    ```objective-c
+      #if __has_include(<flutter_callkit_incoming/flutter_callkit_incoming-Swift.h>)
+      #import <flutter_callkit_incoming/flutter_callkit_incoming-Swift.h>
+      #else
+      #import "flutter_callkit_incoming-Swift.h"
+      #endif
+
+
+      Data * data = [[Data alloc]initWithId:@"44d915e1-5ff4-4bed-bf13-c423048ec97a" nameCaller:@"Hien Nguyen" handle:@"0123456789" type:1];
+      [SwiftFlutterCallkitIncomingPlugin.sharedInstance showCallkitIncoming:data fromPushKit:YES];
+    ```
 
 4. Properties
 

@@ -21,24 +21,24 @@ class CallManager: NSObject {
     }
     
     func startCall(_ data: Data) {
-        let handle = CXHandle(type: self.getHandleType(data.handleType), value: data.handle)
+        let handle = CXHandle(type: self.getHandleType(data.handleType), value: data.getEncryptHandle())
         let uuid = UUID(uuidString: data.uuid)
         let startCallAction = CXStartCallAction(call: uuid!, handle: handle)
         startCallAction.isVideo = data.type > 0
         let callTransaction = CXTransaction()
         callTransaction.addAction(startCallAction)
         //requestCall
-        requestCall(callTransaction, action: "startCall")
-        
-        let callUpdate = CXCallUpdate()
-        callUpdate.remoteHandle = handle
-        callUpdate.supportsDTMF = data.supportsDTMF
-        callUpdate.supportsHolding = data.supportsHolding
-        callUpdate.supportsGrouping = data.supportsGrouping
-        callUpdate.supportsUngrouping = data.supportsUngrouping
-        callUpdate.hasVideo = data.type > 0 ? true : false
-        callUpdate.localizedCallerName = data.nameCaller
-        self.sharedProvider?.reportCall(with: uuid!, updated: callUpdate)
+        self.requestCall(callTransaction, action: "startCall", completion: { _ in
+            let callUpdate = CXCallUpdate()
+            callUpdate.remoteHandle = handle
+            callUpdate.supportsDTMF = data.supportsDTMF
+            callUpdate.supportsHolding = data.supportsHolding
+            callUpdate.supportsGrouping = data.supportsGrouping
+            callUpdate.supportsUngrouping = data.supportsUngrouping
+            callUpdate.hasVideo = data.type > 0 ? true : false
+            callUpdate.localizedCallerName = data.nameCaller
+            self.sharedProvider?.reportCall(with: uuid!, updated: callUpdate)
+        })
     }
     
     func endCall(call: Call) {
@@ -46,7 +46,7 @@ class CallManager: NSObject {
         let callTransaction = CXTransaction()
         callTransaction.addAction(endCallAction)
         //requestCall
-        requestCall(callTransaction, action: "endCall")
+        self.requestCall(callTransaction, action: "endCall")
     }
     
     func endCallAlls() {
@@ -55,7 +55,7 @@ class CallManager: NSObject {
             let endCallAction = CXEndCallAction(call: call.uuid)
             let callTransaction = CXTransaction()
             callTransaction.addAction(endCallAction)
-            requestCall(callTransaction, action: "endCallAlls")
+            self.requestCall(callTransaction, action: "endCallAlls")
         }
     }
     
@@ -78,7 +78,7 @@ class CallManager: NSObject {
     }
     
     
-    private func requestCall(_ transaction: CXTransaction, action: String) {
+    private func requestCall(_ transaction: CXTransaction, action: String, completion: ((Bool) -> Void)? = nil) {
         callController.request(transaction){ error in
             if let error = error {
                 //fail
@@ -89,10 +89,12 @@ class CallManager: NSObject {
                 }else if(action == "endCall" || action == "endCallAlls"){
                     //push notification for End Call
                 }
+                completion?(error == nil)
                 print("Requested transaction successfully: \(action)")
             }
         }
     }
+    
     
     private func getHandleType(_ handleType: String?) -> CXHandle.HandleType {
         var typeDefault = CXHandle.HandleType.generic

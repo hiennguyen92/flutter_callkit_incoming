@@ -20,19 +20,22 @@ import flutter_callkit_incoming
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
+    // Call back from Recent history
     override func application(_ application: UIApplication,
                               continue userActivity: NSUserActivity,
                               restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         
-        guard let handle = userActivity.handle else {
-                    return false
-                }
-
-                guard let isVideo = userActivity.isVideo else {
-                    return false
-                }
-        let data = flutter_callkit_incoming.Data(id: UUID().uuidString, nameCaller: "", handle: handle, type: isVideo ? 1 : 0)
-        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.startCall(data)
+        guard let handleObj = userActivity.handle else {
+            return false
+        }
+        
+        guard let isVideo = userActivity.isVideo else {
+            return false
+        }
+        let nameCaller = handleObj.getDecryptHandle()["nameCaller"] as? String ?? ""
+        let handle = handleObj.getDecryptHandle()["handle"] as? String ?? ""
+        let data = flutter_callkit_incoming.Data(id: UUID().uuidString, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
+        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.startCall(data, fromPushKit: true)
         
         return super.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
@@ -60,6 +63,7 @@ import flutter_callkit_incoming
         let isVideo = payload.dictionaryPayload["isVideo"] as? Bool ?? false
         
         let data = flutter_callkit_incoming.Data(id: id, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
+        //CallKitLogo
         SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
     }
     
