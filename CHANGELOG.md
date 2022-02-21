@@ -1,3 +1,12 @@
+## 1.0.1
+
+* Pustkit and VoIP setup instructions (PUSHKIT.md)
+* Callback from Recent History IOS
+* Using System ringtone for default
+* Fixed func `endAllCalls()` Android
+* Bugs Android 12.
+* Fixed some bugs.
+
 ## 1.0.0+8
 
 * Share func call from native(iOS)
