@@ -1,3 +1,10 @@
+## 1.0.1+1
+
+* Switch using Service for Ringtone(Android)
+* Fixed issue vibration(Android)
+* Add `getDevicePushTokenVoIP()` feature
+* Fixed some bugs.
+
 ## 1.0.1
 
 * Pustkit and VoIP setup instructions (PUSHKIT.md)

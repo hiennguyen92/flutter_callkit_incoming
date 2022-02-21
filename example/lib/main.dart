@@ -24,11 +24,10 @@ class _MyAppState extends State<MyApp> {
     initCurrentCall();
   }
 
-
   initCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
-    if(calls is List && calls.isNotEmpty){
+    if (calls is List && calls.isNotEmpty) {
       this._currentUuid = calls[0]['id'];
     }
   }
@@ -79,6 +78,7 @@ class _MyAppState extends State<MyApp> {
             break;
           case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
             // TODO: only iOS
+            break;
           case CallEvent.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
             // TODO: only iOS
             break;
@@ -140,7 +140,6 @@ class _MyAppState extends State<MyApp> {
               ),
               onPressed: () async {
                 this.endAllCalls();
-                this.getDevicePushTokenVoIP();
               },
             )
           ],
@@ -173,7 +172,10 @@ class _MyAppState extends State<MyApp> {
         'type': 0,
         'duration': 30000,
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
-        'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
+        'headers': <String, dynamic>{
+          'apiKey': 'Abc@123!',
+          'platform': 'flutter'
+        },
         'android': <String, dynamic>{
           'isCustomNotification': true,
           'isShowLogo': false,
@@ -232,8 +234,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> getDevicePushTokenVoIP() async {
-    var devicePushTokenVoIP = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    var devicePushTokenVoIP =
+        await FlutterCallkitIncoming.getDevicePushTokenVoIP();
     print(devicePushTokenVoIP);
   }
-
 }

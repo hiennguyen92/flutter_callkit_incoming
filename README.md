@@ -7,6 +7,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 * Show an incoming call
 * Start an outgoing call
 * Custom UI Android/Callkit for iOS
+* Example using Pushkit/VoIP for iOS
 
   <br>
 
@@ -219,6 +220,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       let data = flutter_callkit_incoming.Data(id: "44d915e1-5ff4-4bed-bf13-c423048ec97a", nameCaller: "Hien Nguyen", handle: "0123456789", type: 0)
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
     ```
+    <br>
 
     ```objc
       //Objective-C
@@ -232,11 +234,11 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       Data * data = [[Data alloc]initWithId:@"44d915e1-5ff4-4bed-bf13-c423048ec97a" nameCaller:@"Hien Nguyen" handle:@"0123456789" type:1];
       [SwiftFlutterCallkitIncomingPlugin.sharedInstance showCallkitIncoming:data fromPushKit:YES];
     ```
+    <br>
 
     ```java
       //send custom event from native
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendEventCustom("customEvent", body: ["customKey": "customValue"])
-
 
     ```
 
