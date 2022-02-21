@@ -7,6 +7,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 * Show an incoming call
 * Start an outgoing call
 * Custom UI Android/Callkit for iOS
+* Example using Pushkit/VoIP for iOS
 
   <br>
 
