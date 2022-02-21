@@ -67,13 +67,13 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         'android': <String, dynamic>{
           'isCustomNotification': true,
           'isShowLogo': false,
-          'ringtonePath': 'ringtone_default',
+          'ringtonePath': 'system_ringtone_default',
           'backgroundColor': '#0955fa',
           'backgroundUrl': 'https://i.pravatar.cc/500',
           'actionColor': '#4CAF50'
         },
         'ios': <String, dynamic>{
-          'iconName': 'AppIcon40x40',
+          'iconName': 'CallKitLogo',
           'handleType': 'generic',
           'supportsVideo': true,
           'maximumCallGroups': 2,
@@ -86,7 +86,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
           'supportsHolding': true,
           'supportsGrouping': false,
           'supportsUngrouping': false,
-          'ringtonePath': 'Ringtone.caf'
+          'ringtonePath': 'system_ringtone_default'
         }
       };
       await FlutterCallkitIncoming.showCallkitIncoming(params);
@@ -173,13 +173,21 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     ```
   * Call from Native (iOS PushKit) 
     ```java
+      //Swift
       var info = [String: Any?]()
       info["id"] = "44d915e1-5ff4-4bed-bf13-c423048ec97a"
       info["nameCaller"] = "Hien Nguyen"
       info["handle"] = "0123456789"
+      info["type"] = 1
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
+
+
+      //OR
+      let data = flutter_callkit_incoming.Data(id: "44d915e1-5ff4-4bed-bf13-c423048ec97a", nameCaller: "Hien Nguyen", handle: "0123456789", type: 0)
+      SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
     ```
-    ```objective-c
+    ```objc
+      //Objective-C
       #if __has_include(<flutter_callkit_incoming/flutter_callkit_incoming-Swift.h>)
       #import <flutter_callkit_incoming/flutter_callkit_incoming-Swift.h>
       #else
@@ -215,7 +223,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     | --------------------------- | ----------------------------------------------------------------------- | ---------------- |
     | **`isCustomNotification`**  | Using custom notifications.                                             | `false`          |
     |       **`isShowLogo`**      | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png` | `false`          |
-    |      **`ringtonePath`**     | File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`                                                                                                    |`ringtone_default`|
+    |      **`ringtonePath`**     | File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`                                                                                                    |`system_ringtone_default` <br>using ringtone default of the phone|
     |     **`backgroundColor`**   | Incoming call screen background color.                                  |     `#0955fa`    |
     |      **`backgroundUrl`**    | Using image background for Incoming call screen.                        |       _None_     |
     |      **`actionColor`**      | Color used in button/text on notification.                              |    `#4CAF50`     |
@@ -226,7 +234,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 
     | Prop                                      | Description                                                             | Default     |
     | ----------------------------------------- | ----------------------------------------------------------------------- | ----------- |
-    |               **`iconName`**              | App's Icon. using for display inside Callkit(iOS)                       | `false`     |
+    |               **`iconName`**              | App's Icon. using for display inside Callkit(iOS)                       | `CallKitLogo` <br> using from `Images.xcassets/CallKitLogo`    |
     |              **`handleType`**             | Type handle call `generic`, `number`, `email`                           | `generic`   |
     |             **`supportsVideo`**           |                                                                         |   `true`    |
     |          **`maximumCallGroups`**          |                                                                         |     `2`     |
@@ -239,7 +247,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     |            **`supportsHolding`**          |                                                                         |    `true`   |
     |          **`supportsGrouping`**           |                                                                         |    `true`   |
     |         **`supportsUngrouping`**          |                                                                         |   `true`    |
-    |           **`ringtonePath`**              | Add file to root project xcode  `/ios/Runner/Ringtone.caf`  and Copy Bundle Resources(Build Phases)                                                                                                               |`Ringtone.caf`|
+    |           **`ringtonePath`**              | Add file to root project xcode  `/ios/Runner/Ringtone.caf`  and Copy Bundle Resources(Build Phases)                                                                                                               |`Ringtone.caf`<br>`system_ringtone_default` <br>using ringtone default of the phone|
 
 
 5. Source code
@@ -248,15 +256,21 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     please checkout repo github
     https://github.com/hiennguyen92/flutter_callkit_incoming
     ```
-  * <a href='https://github.com/hiennguyen92/flutter_callkit_incoming'>https://github.com/hiennguyen92/flutter_callkit_incoming</a>
+    * <a href='https://github.com/hiennguyen92/flutter_callkit_incoming'>https://github.com/hiennguyen92/flutter_callkit_incoming</a>
 
-    <br>
+  <br>
 
-6. Todo
+6. Pushkit - Received VoIP and Wake app from Terminated State (only for IOS)
+  * Please check <a href="https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/PUSHKIT.md">PUSHKIT.md</a> setup Pushkit for IOS
+
+  <br>
+
+7. Todo
   * Add `WakeLock` (background tasks) for Android
   * Switch using `service` for Android
 
     <br>
+
 ## :bulb: Demo
 
 1. Demo Illustration: 
