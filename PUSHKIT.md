@@ -6,8 +6,7 @@ If you are making VoIP application than you definitely want to update your appli
 
 ## 🚀&nbsp; Setup
 
-
-    Make sure when you create Bundle ID(https://developer.apple.com/account/resources/identifiers) for app you have checked `Push Notifications`
+Make sure when you create Bundle ID(https://developer.apple.com/account/resources/identifiers) for app you have checked `Push Notifications`
 
 1. Enable Voice over IP Setting
   * Xcode Project > Capabilities
@@ -15,7 +14,7 @@ If you are making VoIP application than you definitely want to update your appli
     ![image info](https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/Setting.png)
 
   <br>
-make sure when you create Bundle ID(https://developer.apple.com/account/resources/identifiers) you have checked Push Notifications
+
   * VoIP Services Certificate
 
     Go to https://developer.apple.com/account/resources/certificates/add
