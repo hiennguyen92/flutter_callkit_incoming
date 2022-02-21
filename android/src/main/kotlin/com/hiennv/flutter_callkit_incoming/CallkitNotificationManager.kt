@@ -12,10 +12,7 @@ import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
@@ -78,6 +75,7 @@ class CallkitNotificationManager(private val context: Context) {
 
         notificationBuilder = NotificationCompat.Builder(context, "callkit_incoming_channel_id")
         notificationBuilder.setAutoCancel(false)
+        notificationBuilder.setChannelId("callkit_incoming_channel_id")
         notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationBuilder.setCategory(Notification.CATEGORY_CALL)
@@ -160,7 +158,9 @@ class CallkitNotificationManager(private val context: Context) {
             ).build()
             notificationBuilder.addAction(acceptAction)
         }
-        getNotificationManager().notify(notificationId, notificationBuilder.build())
+        val notification = notificationBuilder.build()
+        notification.flags = Notification.FLAG_INSISTENT
+        getNotificationManager().notify(notificationId, notification)
     }
 
     fun showMissCallNotification(data: Bundle) {
@@ -177,6 +177,7 @@ class CallkitNotificationManager(private val context: Context) {
             }
         }
         notificationBuilder = NotificationCompat.Builder(context, "callkit_missed_channel_id")
+        notificationBuilder.setChannelId("callkit_missed_channel_id")
         notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
         notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_HANDLE, ""))
         notificationBuilder.setSubText(context.getString(R.string.text_missed_call))
@@ -205,18 +206,17 @@ class CallkitNotificationManager(private val context: Context) {
             notificationBuilder.color = Color.parseColor(actionColor)
         } catch (error: Exception) {
         }
-        notificationBuilder.setChannelId("callkit_missed_channel_id")
         val callbackAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
             R.drawable.ic_accept,
             context.getString(R.string.text_call_back),
             getCallbackPendingIntent(notificationId, data)
         ).build()
         notificationBuilder.addAction(callbackAction)
-
-        getNotificationManager().notify(notificationId, notificationBuilder.build())
+        val notification = notificationBuilder.build()
+        getNotificationManager().notify(notificationId, notification)
         Handler(Looper.getMainLooper()).postDelayed({
             try {
-                getNotificationManager().notify(notificationId, notificationBuilder.build())
+                getNotificationManager().notify(notificationId, notification)
             } catch (error: Exception) {
             }
         }, 1000)
@@ -250,7 +250,7 @@ class CallkitNotificationManager(private val context: Context) {
             ).apply {
                 description = ""
                 vibrationPattern =
-                    longArrayOf(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000)
+                    longArrayOf(0, 1000, 500, 1000, 500)
                 lightColor = Color.RED
                 enableLights(true)
                 enableVibration(true)
@@ -259,7 +259,7 @@ class CallkitNotificationManager(private val context: Context) {
 
             val attributes = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_UNKNOWN)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                 .build()
             val channelMissedCall = NotificationChannel(
                 "callkit_missed_channel_id",

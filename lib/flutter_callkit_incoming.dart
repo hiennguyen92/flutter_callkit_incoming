@@ -29,6 +29,7 @@ class FlutterCallkitIncoming {
   /// CallEvent.ACTION_CALL_TOGGLE_DMTF - only iOS
   /// CallEvent.ACTION_CALL_TOGGLE_GROUP - only iOS
   /// CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION - only iOS
+  /// CallEvent.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP - only iOS
   /// }
   static Stream<CallEvent?> get onEvent =>
       _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
@@ -65,6 +66,13 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("activeCalls");
   }
 
+  /// Get device push token VoIP.
+  /// On iOS: return deviceToken for VoIP.
+  /// On Android: return Empty
+  static Future getDevicePushTokenVoIP() async {
+    return await _channel.invokeMethod("getDevicePushTokenVoIP");
+  }
+
   static CallEvent? _receiveCallEvent(dynamic data) {
     var event = "";
     dynamic body = {};
@@ -77,6 +85,10 @@ class FlutterCallkitIncoming {
 }
 
 class CallEvent {
+
+  static const String ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP = 
+  "com.hiennv.flutter_callkit_incoming.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP";
+
   static const String ACTION_CALL_INCOMING =
       "com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING";
   static const String ACTION_CALL_START =

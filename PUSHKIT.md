@@ -7,7 +7,7 @@ If you are making VoIP application than you definitely want to update your appli
 ## 🚀&nbsp; Setup
 
 
-    Make sure when you create Bundle ID(https://developer.apple.com/account/resources/identifiers) for app you have checked `Push Notifications`
+    Make sure when you create Bundle ID(https://developer.apple.com/account/resources/identifiers) for you have checked `Push Notifications`
 
 1. Enable Voice over IP Setting
   * Xcode Project > Capabilities
@@ -15,7 +15,7 @@ If you are making VoIP application than you definitely want to update your appli
     ![image info](https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/Setting.png)
 
   <br>
-make sure when you create Bundle ID(https://developer.apple.com/account/resources/identifiers) you have checked Push Notifications
+
   * VoIP Services Certificate
 
     Go to https://developer.apple.com/account/resources/certificates/add
@@ -63,6 +63,7 @@ make sure when you create Bundle ID(https://developer.apple.com/account/resource
 <br>
 <br>
 3. Testing
+
   * Using App
     https://github.com/onmyway133/PushNotifications
 
@@ -75,6 +76,7 @@ make sure when you create Bundle ID(https://developer.apple.com/account/resource
     curl -v \
     -d '{"aps":{"alert":"Hien Nguyen Call"},"id":"44d915e1-5ff4-4bed-bf13-c423048ec97a","nameCaller":"Hien Nguyen","handle":"0123456789","isVideo":true}' \
     -H "apns-topic: com.hiennv.testing.voip" \
+    -H "apns-push-type: voip" \
     --http2 \
     --cert VOIP.pem:'<passphrase>' \
     https://api.development.push.apple.com/3/device/<device token>

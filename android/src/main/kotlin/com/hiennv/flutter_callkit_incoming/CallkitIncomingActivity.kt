@@ -12,10 +12,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.ACTION_CALL_INCOMING
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
@@ -34,6 +36,10 @@ import de.hdodenhof.circleimageview.CircleImageView
 import kotlin.math.abs
 import okhttp3.OkHttpClient
 import com.squareup.picasso.OkHttp3Downloader
+import android.view.ViewGroup.MarginLayoutParams
+
+
+
 
 
 class CallkitIncomingActivity : Activity() {
@@ -77,6 +83,7 @@ class CallkitIncomingActivity : Activity() {
     private lateinit var ivLogo: ImageView
     private lateinit var ivAvatar: CircleImageView
 
+    private lateinit var llAction: LinearLayout
     private lateinit var ivAcceptCall: ImageView
     private lateinit var ivDeclineCall: ImageView
 
@@ -216,6 +223,12 @@ class CallkitIncomingActivity : Activity() {
         tvNumber = findViewById(R.id.tvNumber)
         ivLogo = findViewById(R.id.ivLogo)
         ivAvatar = findViewById(R.id.ivAvatar)
+
+        llAction = findViewById(R.id.llAction)
+
+        val params = llAction.layoutParams as MarginLayoutParams
+        params.setMargins(0,0,0,Utils.getNavigationBarHeight(this@CallkitIncomingActivity))
+        llAction.layoutParams = params
 
         ivAcceptCall = findViewById(R.id.ivAcceptCall)
         ivDeclineCall = findViewById(R.id.ivDeclineCall)

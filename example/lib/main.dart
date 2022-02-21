@@ -79,6 +79,8 @@ class _MyAppState extends State<MyApp> {
             break;
           case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
             // TODO: only iOS
+          case CallEvent.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+            // TODO: only iOS
             break;
         }
         setState(() {
@@ -138,6 +140,7 @@ class _MyAppState extends State<MyApp> {
               ),
               onPressed: () async {
                 this.endAllCalls();
+                this.getDevicePushTokenVoIP();
               },
             )
           ],
@@ -226,6 +229,11 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> endAllCalls() async {
     await FlutterCallkitIncoming.endAllCalls();
+  }
+
+  Future<void> getDevicePushTokenVoIP() async {
+    var devicePushTokenVoIP = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    print(devicePushTokenVoIP);
   }
 
 }

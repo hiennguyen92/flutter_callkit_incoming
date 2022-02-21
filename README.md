@@ -126,6 +126,36 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     [{"id": "8BAA2B26-47AD-42C1-9197-1D75F662DF78", ...}]
     ```
 
+  * Get device push token VoIP. iOS: return deviceToken, Android: Empty
+
+    ```dart
+      await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    ```
+    Output
+
+    ```json
+    <device token>
+
+    //Example
+    d6a77ca80c5f09f87f353cdd328ec8d7d34e92eb108d046c91906f27f54949cd
+    
+    ```
+    Make sure using `SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP(deviceToken)` inside AppDelegate.swift (<a href="https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/ios/Runner/AppDelegate.swift">Example</a>)
+    ```swift
+    func pushRegistry(_ registry: PKPushRegistry, didUpdate credentials: PKPushCredentials, for type: PKPushType) {
+        print(credentials.token)
+        let deviceToken = credentials.token.map { String(format: "%02x", $0) }.joined()
+        //Save deviceToken to your server
+        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP(deviceToken)
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
+        print("didInvalidatePushTokenFor")
+        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP("")
+    }
+    ```
+
+
   * Listen events
     ```dart
       FlutterCallkitIncoming.onEvent.listen((event) {
@@ -168,6 +198,9 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
           case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
             // TODO: only iOS
             break;
+          case CallEvent.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+            // TODO: only iOS
+            break;
         }
       });
     ```
@@ -186,6 +219,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       let data = flutter_callkit_incoming.Data(id: "44d915e1-5ff4-4bed-bf13-c423048ec97a", nameCaller: "Hien Nguyen", handle: "0123456789", type: 0)
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
     ```
+
     ```objc
       //Objective-C
       #if __has_include(<flutter_callkit_incoming/flutter_callkit_incoming-Swift.h>)
@@ -197,6 +231,13 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 
       Data * data = [[Data alloc]initWithId:@"44d915e1-5ff4-4bed-bf13-c423048ec97a" nameCaller:@"Hien Nguyen" handle:@"0123456789" type:1];
       [SwiftFlutterCallkitIncomingPlugin.sharedInstance showCallkitIncoming:data fromPushKit:YES];
+    ```
+
+    ```java
+      //send custom event from native
+      SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendEventCustom("customEvent", body: ["customKey": "customValue"])
+
+
     ```
 
 4. Properties
@@ -267,7 +308,6 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 
 7. Todo
   * Add `WakeLock` (background tasks) for Android
-  * Switch using `service` for Android
 
     <br>
 

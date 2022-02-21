@@ -6,6 +6,7 @@ import AVFoundation
 @available(iOS 10.0, *)
 public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
     
+    static let ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP = "com.hiennv.flutter_callkit_incoming.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP"
     
     static let ACTION_CALL_INCOMING = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING"
     static let ACTION_CALL_START = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_START"
@@ -34,8 +35,13 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     private var data: Data?
     private var isFromPushKit: Bool = false
+    private let devicePushTokenVoIP = "DevicePushTokenVoIP"
     
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
+        eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
+    }
+    
+    @objc public func sendEventCustom(_ event: String, body: Any?) {
         eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
     }
     
@@ -103,11 +109,22 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self.callManager?.endCallAlls()
             result("OK")
             break
+        case "getDevicePushTokenVoIP":
+            result(self.getDevicePushTokenVoIP())
+            break;
         default:
             result(FlutterMethodNotImplemented)
         }
     }
     
+    @objc public func setDevicePushTokenVoIP(_ deviceToken: String) {
+        UserDefaults.standard.set(deviceToken, forKey: devicePushTokenVoIP)
+        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP, ["deviceTokenVoIP":deviceToken])
+    }
+    
+    @objc public func getDevicePushTokenVoIP() -> String {
+        return UserDefaults.standard.string(forKey: devicePushTokenVoIP) ?? ""
+    }
     
     @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
         self.isFromPushKit = fromPushKit
@@ -473,7 +490,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
 class EventCallbackHandler: FlutterStreamHandler {
     private var eventSink: FlutterEventSink?
     
-    public func send(_ event: String, _ body: [String: Any?]) {
+    public func send(_ event: String, _ body: Any) {
         let data: [String : Any] = [
             "event": event,
             "body": body

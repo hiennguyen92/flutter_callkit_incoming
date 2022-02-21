@@ -44,12 +44,13 @@ import flutter_callkit_incoming
     func pushRegistry(_ registry: PKPushRegistry, didUpdate credentials: PKPushCredentials, for type: PKPushType) {
         print(credentials.token)
         let deviceToken = credentials.token.map { String(format: "%02x", $0) }.joined()
-        print("pushRegistry -> deviceToken :\(deviceToken)")
-        //Save deviceToken to your Server
+        //Save deviceToken to your server
+        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP(deviceToken)
     }
     
     func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
-        print("pushRegistry:didInvalidatePushTokenForType:")
+        print("didInvalidatePushTokenFor")
+        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP("")
     }
     
     // Handle incoming pushes
