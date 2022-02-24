@@ -9,7 +9,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.*
@@ -131,18 +130,26 @@ class CallkitNotificationManager(private val context: Context) {
                 R.id.llAccept,
                 getAcceptPendingIntent(notificationId, data)
             )
-            val headers = data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
-            getPicassoInstance(context, headers).load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
-                .transform(CircleTransform())
-                .into(targetLoadAvatarCustomize)
+            val avatarUrl = data.getString(EXTRA_CALLKIT_AVATAR, "")
+            if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                val headers =
+                    data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+                getPicassoInstance(context, headers).load(avatarUrl)
+                    .transform(CircleTransform())
+                    .into(targetLoadAvatarCustomize)
+            }
             notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
             notificationBuilder.setCustomContentView(notificationViews)
             notificationBuilder.setCustomBigContentView(notificationViews)
             notificationBuilder.setCustomHeadsUpContentView(notificationViews)
         } else {
-            val headers = data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
-            getPicassoInstance(context, headers).load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
-                .into(targetLoadAvatarDefault)
+            val avatarUrl = data.getString(EXTRA_CALLKIT_AVATAR, "")
+            if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                val headers =
+                    data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+                getPicassoInstance(context, headers).load(avatarUrl)
+                    .into(targetLoadAvatarDefault)
+            }
             notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
             notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_HANDLE, ""))
             val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
@@ -178,18 +185,23 @@ class CallkitNotificationManager(private val context: Context) {
         }
         notificationBuilder = NotificationCompat.Builder(context, "callkit_missed_channel_id")
         notificationBuilder.setChannelId("callkit_missed_channel_id")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setCategory(Notification.CATEGORY_MISSED_CALL)
+        }
         notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
         notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_HANDLE, ""))
         notificationBuilder.setSubText(context.getString(R.string.text_missed_call))
         notificationBuilder.setSmallIcon(smallIcon)
         val isCustomNotification = data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
         if (isCustomNotification) {
-            val headers = data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            val headers =
+                data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
             getPicassoInstance(context, headers).load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
                 .transform(CircleTransform()).into(targetLoadAvatarDefault)
         } else {
-            val headers = data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            val headers =
+                data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
             getPicassoInstance(context, headers).load(data.getString(EXTRA_CALLKIT_AVATAR, ""))
                 .into(targetLoadAvatarDefault)
@@ -241,7 +253,6 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private fun createNotificationChanel() {
-        val sound: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelCall = NotificationChannel(
                 "callkit_incoming_channel_id",
@@ -257,10 +268,6 @@ class CallkitNotificationManager(private val context: Context) {
             }
             getNotificationManager().createNotificationChannel(channelCall)
 
-            val attributes = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                .build()
             val channelMissedCall = NotificationChannel(
                 "callkit_missed_channel_id",
                 "Missed Call",

@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 Flutter Callkit Incoming
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/hiennguyen92/flutter_callkit_incoming'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Hien Nguyen' => 'hien@hiennv.com' }
   s.source           = { :path => '.' }

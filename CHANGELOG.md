@@ -1,3 +1,11 @@
+## 1.0.1+2
+
+* Fixed issue default ringtone(Android)
+* Fixed issue vibration(Android)
+* Fixed issue sound play type ringtone volumn system(Android)
+* Fixed flow incomming screen(Android)
+* Fixed some bugs.
+
 ## 1.0.1+1
 
 * Switch using Service for Ringtone(Android)

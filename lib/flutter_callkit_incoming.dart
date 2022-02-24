@@ -85,9 +85,8 @@ class FlutterCallkitIncoming {
 }
 
 class CallEvent {
-
-  static const String ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP = 
-  "com.hiennv.flutter_callkit_incoming.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP";
+  static const String ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP =
+      "com.hiennv.flutter_callkit_incoming.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP";
 
   static const String ACTION_CALL_INCOMING =
       "com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING";

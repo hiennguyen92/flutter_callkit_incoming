@@ -1,7 +1,9 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
+import android.app.KeyguardManager.KeyguardLock
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -37,9 +39,8 @@ import kotlin.math.abs
 import okhttp3.OkHttpClient
 import com.squareup.picasso.OkHttp3Downloader
 import android.view.ViewGroup.MarginLayoutParams
-
-
-
+import android.os.PowerManager
+import android.os.PowerManager.WakeLock
 
 
 class CallkitIncomingActivity : Activity() {
@@ -93,9 +94,6 @@ class CallkitIncomingActivity : Activity() {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             setTurnScreenOn(true)
             setShowWhenLocked(true)
-
-            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            keyguardManager.requestDismissKeyguard(this, null)
         } else {
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -112,6 +110,16 @@ class CallkitIncomingActivity : Activity() {
             endedCallkitIncomingBroadcastReceiver,
             IntentFilter(ACTION_ENDED_CALL_INCOMING)
         )
+    }
+
+    private fun wakeLockRequest(duration: Long) {
+
+        val pm = applicationContext.getSystemService(POWER_SERVICE) as PowerManager
+        val wakeLock = pm.newWakeLock(
+            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "Callkit:PowerManager"
+        )
+        wakeLock.acquire(duration)
     }
 
     private fun transparentStatusAndNavigation() {
@@ -174,7 +182,7 @@ class CallkitIncomingActivity : Activity() {
             ivAcceptCall.setImageResource(R.drawable.ic_video)
         }
         val duration = data?.getLong(EXTRA_CALLKIT_DURATION, 0L) ?: 0L
-
+        wakeLockRequest(duration)
 
         finishTimeout(data, duration)
 
@@ -254,6 +262,10 @@ class CallkitIncomingActivity : Activity() {
         val intent =
             CallkitIncomingBroadcastReceiver.getIntentAccept(this@CallkitIncomingActivity, data)
         sendBroadcast(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            keyguardManager.requestDismissKeyguard(this, null)
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             finishAndRemoveTask()
         } else {

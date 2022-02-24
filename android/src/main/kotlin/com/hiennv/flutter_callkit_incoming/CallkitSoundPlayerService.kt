@@ -1,6 +1,7 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -12,6 +13,7 @@ import android.text.TextUtils
 
 class CallkitSoundPlayerService : Service() {
 
+    private var vibrator: Vibrator? = null
     private var mediaPlayer: MediaPlayer? = null
     private var data: Bundle? = null
     private val handler: Handler = Handler(Looper.getMainLooper())
@@ -29,7 +31,7 @@ class CallkitSoundPlayerService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         this.playSound(intent)
-
+        this.playVibrator()
         return START_STICKY;
     }
 
@@ -38,6 +40,21 @@ class CallkitSoundPlayerService : Service() {
         handler.removeCallbacks(runnableTimeout)
         mediaPlayer?.stop()
         mediaPlayer?.release()
+        vibrator?.cancel()
+    }
+
+    private fun playVibrator() {
+        vibrator  = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager =  this.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            getSystemService(VIBRATOR_SERVICE) as Vibrator
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0L, 1000L, 1000L), 0))
+        }else{
+            vibrator?.vibrate(longArrayOf(0L, 1000L, 1000L), 0)
+        }
     }
 
     private fun playSound(intent: Intent?) {
@@ -50,19 +67,31 @@ class CallkitSoundPlayerService : Service() {
             CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION,
             30000L
         )
-        val uri = sound?.let { getRingtoneUri(it) }
-        mediaPlayer = MediaPlayer.create(this@CallkitSoundPlayerService, uri).apply {
-            isLooping = true
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val attribution = AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                    .build()
-                setAudioAttributes(attribution)
-            } else {
-                setAudioStreamType(AudioManager.STREAM_NOTIFICATION)
-            }
-            start()
+        var uri = sound?.let { getRingtoneUri(it) }
+        if(uri == null){
+            uri = RingtoneManager.getActualDefaultRingtoneUri(
+                this@CallkitSoundPlayerService,
+                RingtoneManager.TYPE_RINGTONE
+            )
+        }
+        mediaPlayer = MediaPlayer()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val attribution = AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setLegacyStreamType(AudioManager.STREAM_RING)
+                .build()
+            mediaPlayer?.setAudioAttributes(attribution)
+        } else {
+            mediaPlayer?.setAudioStreamType(AudioManager.STREAM_RING)
+        }
+        try {
+            mediaPlayer?.setDataSource(applicationContext, uri!!)
+            mediaPlayer?.prepare()
+            mediaPlayer?.isLooping = true
+            mediaPlayer?.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         if (duration != null) {
             handler.postDelayed(runnableTimeout, duration)
