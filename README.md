@@ -282,7 +282,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     |             **`supportsVideo`**           |                                                                         |   `true`    |
     |          **`maximumCallGroups`**          |                                                                         |     `2`     |
     |       **`maximumCallsPerCallGroup`**      |                                                                         |     `1`     |
-    |           **`audioSessionMode`**          |                                                                         |   _None_    |
+    |           **`audioSessionMode`**          |                                                                         |   _None_, gameChat, measurement, moviePlayback, spokenAudio, videoChat, videoRecording, voiceChat, voicePrompt  |
     |        **`audioSessionActive`**           |                                                                         |    `true`   |
     |   **`audioSessionPreferredSampleRate`**   |                                                                         |  `44100.0`  |
     |**`audioSessionPreferredIOBufferDuration`**|                                                                         |  `0.005`    |
