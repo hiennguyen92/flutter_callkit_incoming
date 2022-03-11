@@ -144,15 +144,19 @@ public class Call: NSObject {
     let audioSessionPreferredSampleRate: Double
     let audioSessionPreferredIOBufferDuration: Double
     
-    @objc public init(id: String, nameCaller: String, handle: String, type: Int) {
+    @objc public init(id: String, nameCaller: String, handle: String, type: Int, avatar: String, appName: String, duration: Int, extra: NSDictionary) {
+        var anyDict = [String: Any?]()
+        for (value, key) in extra {
+            anyDict[key as! String] = value
+        }
         self.uuid = id
         self.nameCaller = nameCaller
-        self.appName = "Callkit"
+        self.appName = appName
         self.handle = handle
-        self.avatar = ""
+        self.avatar = avatar
         self.type = type
-        self.duration = 30000
-        self.extra = [:]
+        self.duration = duration
+        self.extra = anyDict
         self.iconName = "CallKitLogo"
         self.handleType = ""
         self.supportsVideo = true
