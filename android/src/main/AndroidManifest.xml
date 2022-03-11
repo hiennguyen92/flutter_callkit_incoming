@@ -39,7 +39,7 @@
         <service
             android:enabled="true"
             android:exported="true"
-            android:name=".CallkitSoundPlayerService"/>
+            android:name="com.hiennv.flutter_callkit_incoming.CallkitSoundPlayerService"/>
 
     </application>
 </manifest>

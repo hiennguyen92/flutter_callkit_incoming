@@ -1,3 +1,10 @@
+## 1.0.1+3
+
+* add props `isShowCallback` using show Callback for miss call(Android)
+* public props data call for Object-C/Swift
+* Example using FCM(Android)
+* Fixed some bugs.
+
 ## 1.0.1+2
 
 * Fixed issue default ringtone(Android)

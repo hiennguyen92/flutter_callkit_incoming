@@ -2,6 +2,8 @@
 
 A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Callkit for iOS).
 
+[![pub package](https://img.shields.io/pub/v/flutter_callkit_incoming.svg)](https://pub.dev/packages/flutter_callkit_incoming)
+[![Build Status](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml/badge.svg)](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml)
 ## :star: Features
 
 * Show an incoming call
@@ -10,6 +12,8 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 * Example using Pushkit/VoIP for iOS
 
   <br>
+
+  iOS: ONLY WORKING ON REAL DEVICE, not on simulator(Callkit framework not working on simulator)
 
 ## 🚀&nbsp; Installation
 
@@ -68,6 +72,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         'android': <String, dynamic>{
           'isCustomNotification': true,
           'isShowLogo': false,
+          'isShowCallback': false,
           'ringtonePath': 'system_ringtone_default',
           'backgroundColor': '#0955fa',
           'backgroundUrl': 'https://i.pravatar.cc/500',
@@ -206,18 +211,21 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       });
     ```
   * Call from Native (iOS PushKit) 
-    ```java
+    ```swift
       //Swift
       var info = [String: Any?]()
       info["id"] = "44d915e1-5ff4-4bed-bf13-c423048ec97a"
       info["nameCaller"] = "Hien Nguyen"
       info["handle"] = "0123456789"
       info["type"] = 1
+      //... set more data
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
 
 
       //OR
       let data = flutter_callkit_incoming.Data(id: "44d915e1-5ff4-4bed-bf13-c423048ec97a", nameCaller: "Hien Nguyen", handle: "0123456789", type: 0)
+      data.nameCaller = "Johnny"
+      //... set more data
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
     ```
     <br>
@@ -230,10 +238,13 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       #import "flutter_callkit_incoming-Swift.h"
       #endif
 
-
       Data * data = [[Data alloc]initWithId:@"44d915e1-5ff4-4bed-bf13-c423048ec97a" nameCaller:@"Hien Nguyen" handle:@"0123456789" type:1];
+      [data setNameCaller:@"Johnny"];
+      [data setExtra:@{ @"userId" : @"HelloXXXX", @"key2" : @"value2"}];
+      //... set more data
       [SwiftFlutterCallkitIncomingPlugin.sharedInstance showCallkitIncoming:data fromPushKit:YES];
     ```
+    
     <br>
 
     ```java
@@ -266,6 +277,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     | --------------------------- | ----------------------------------------------------------------------- | ---------------- |
     | **`isCustomNotification`**  | Using custom notifications.                                             | `false`          |
     |       **`isShowLogo`**      | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png` | `false`          |
+    |       **`isShowCallback`**      | Show callback action from miss call notification. | `true`          |
     |      **`ringtonePath`**     | File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`                                                                                                    |`system_ringtone_default` <br>using ringtone default of the phone|
     |     **`backgroundColor`**   | Incoming call screen background color.                                  |     `#0955fa`    |
     |      **`backgroundUrl`**    | Using image background for Incoming call screen.                        |       _None_     |
@@ -282,7 +294,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     |             **`supportsVideo`**           |                                                                         |   `true`    |
     |          **`maximumCallGroups`**          |                                                                         |     `2`     |
     |       **`maximumCallsPerCallGroup`**      |                                                                         |     `1`     |
-    |           **`audioSessionMode`**          |                                                                         |   _None_, gameChat, measurement, moviePlayback, spokenAudio, videoChat, videoRecording, voiceChat, voicePrompt  |
+    |           **`audioSessionMode`**          |                                                                         |   _None_, `gameChat`, `measurement`, `moviePlayback`, `spokenAudio`, `videoChat`, `videoRecording`, `voiceChat`, `voicePrompt`  |
     |        **`audioSessionActive`**           |                                                                         |    `true`   |
     |   **`audioSessionPreferredSampleRate`**   |                                                                         |  `44100.0`  |
     |**`audioSessionPreferredIOBufferDuration`**|                                                                         |  `0.005`    |
@@ -300,6 +312,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     https://github.com/hiennguyen92/flutter_callkit_incoming
     ```
     * <a href='https://github.com/hiennguyen92/flutter_callkit_incoming'>https://github.com/hiennguyen92/flutter_callkit_incoming</a>
+    * <a href='https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/lib/main.dart'>Example</a>
 
   <br>
 

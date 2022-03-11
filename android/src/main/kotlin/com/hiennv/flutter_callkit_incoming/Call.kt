@@ -23,27 +23,32 @@ data class Data(val args: Map<String, Any?>) {
 
     var isCustomNotification: Boolean = false
     var isShowLogo: Boolean = false
+    var isShowCallback: Boolean = true
     var ringtonePath: String
     var backgroundColor: String
     var backgroundUrl: String
     var actionColor: String
+
+    var isAccepted: Boolean = false
 
     init {
         val android: HashMap<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         if (android != null) {
             isCustomNotification = (android["isCustomNotification"] as? Boolean) ?: false
             isShowLogo = (android["isShowLogo"] as? Boolean) ?: false
+            isShowCallback = (android["isShowCallback"] as? Boolean) ?: true
             ringtonePath = (android["ringtonePath"] as? String) ?: ""
             backgroundColor = (android["backgroundColor"] as? String) ?: "#0955fa"
             backgroundUrl = (android["backgroundUrl"] as? String) ?: ""
             actionColor = (android["actionColor"] as? String) ?: "#4CAF50"
         } else {
-            isCustomNotification = false
-            isShowLogo = false
-            ringtonePath = ""
-            backgroundColor = "#0955fa"
-            backgroundUrl = ""
-            actionColor = "#4CAF50"
+            isCustomNotification = (args["isCustomNotification"] as? Boolean) ?: false
+            isShowLogo = (args["isShowLogo"] as? Boolean) ?: false
+            isShowCallback = (args["isShowCallback"] as? Boolean) ?: true
+            ringtonePath = (args["ringtonePath"] as? String) ?: ""
+            backgroundColor = (args["backgroundColor"] as? String) ?: "#0955fa"
+            backgroundUrl = (args["backgroundUrl"] as? String) ?: ""
+            actionColor = (args["actionColor"] as? String) ?: "#4CAF50"
         }
     }
 
@@ -75,6 +80,10 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putBoolean(
             CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
             isShowLogo
+        )
+        bundle.putBoolean(
+            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_CALLBACK,
+            isShowCallback
         )
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_RINGTONE_PATH, ringtonePath)
         bundle.putString(
@@ -118,6 +127,10 @@ data class Data(val args: Map<String, Any?>) {
             data.isShowLogo = bundle.getBoolean(
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
                 false
+            )
+            data.isShowCallback = bundle.getBoolean(
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_CALLBACK,
+                true
             )
             data.ringtonePath = bundle.getString(
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_RINGTONE_PATH,

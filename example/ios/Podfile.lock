@@ -1,19 +1,96 @@
 PODS:
   - CryptoSwift (1.4.3)
+  - Firebase/CoreOnly (8.11.0):
+    - FirebaseCore (= 8.11.0)
+  - Firebase/Messaging (8.11.0):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 8.11.0)
+  - firebase_core (1.12.0):
+    - Firebase/CoreOnly (= 8.11.0)
+    - Flutter
+  - firebase_messaging (11.2.6):
+    - Firebase/Messaging (= 8.11.0)
+    - firebase_core
+    - Flutter
+  - FirebaseCore (8.11.0):
+    - FirebaseCoreDiagnostics (~> 8.0)
+    - GoogleUtilities/Environment (~> 7.7)
+    - GoogleUtilities/Logger (~> 7.7)
+  - FirebaseCoreDiagnostics (8.13.0):
+    - GoogleDataTransport (~> 9.1)
+    - GoogleUtilities/Environment (~> 7.7)
+    - GoogleUtilities/Logger (~> 7.7)
+    - nanopb (~> 2.30908.0)
+  - FirebaseInstallations (8.13.0):
+    - FirebaseCore (~> 8.0)
+    - GoogleUtilities/Environment (~> 7.7)
+    - GoogleUtilities/UserDefaults (~> 7.7)
+    - PromisesObjC (< 3.0, >= 1.2)
+  - FirebaseMessaging (8.11.0):
+    - FirebaseCore (~> 8.0)
+    - FirebaseInstallations (~> 8.0)
+    - GoogleDataTransport (~> 9.1)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.7)
+    - GoogleUtilities/Environment (~> 7.7)
+    - GoogleUtilities/Reachability (~> 7.7)
+    - GoogleUtilities/UserDefaults (~> 7.7)
+    - nanopb (~> 2.30908.0)
   - Flutter (1.0.0)
   - flutter_callkit_incoming (0.0.1):
     - CryptoSwift
     - Flutter
+  - GoogleDataTransport (9.1.2):
+    - GoogleUtilities/Environment (~> 7.2)
+    - nanopb (~> 2.30908.0)
+    - PromisesObjC (< 3.0, >= 1.2)
+  - GoogleUtilities/AppDelegateSwizzler (7.7.0):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Network
+  - GoogleUtilities/Environment (7.7.0):
+    - PromisesObjC (< 3.0, >= 1.2)
+  - GoogleUtilities/Logger (7.7.0):
+    - GoogleUtilities/Environment
+  - GoogleUtilities/Network (7.7.0):
+    - GoogleUtilities/Logger
+    - "GoogleUtilities/NSData+zlib"
+    - GoogleUtilities/Reachability
+  - "GoogleUtilities/NSData+zlib (7.7.0)"
+  - GoogleUtilities/Reachability (7.7.0):
+    - GoogleUtilities/Logger
+  - GoogleUtilities/UserDefaults (7.7.0):
+    - GoogleUtilities/Logger
+  - nanopb (2.30908.0):
+    - nanopb/decode (= 2.30908.0)
+    - nanopb/encode (= 2.30908.0)
+  - nanopb/decode (2.30908.0)
+  - nanopb/encode (2.30908.0)
+  - PromisesObjC (2.0.0)
 
 DEPENDENCIES:
+  - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
+  - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_callkit_incoming (from `.symlinks/plugins/flutter_callkit_incoming/ios`)
 
 SPEC REPOS:
   trunk:
     - CryptoSwift
+    - Firebase
+    - FirebaseCore
+    - FirebaseCoreDiagnostics
+    - FirebaseInstallations
+    - FirebaseMessaging
+    - GoogleDataTransport
+    - GoogleUtilities
+    - nanopb
+    - PromisesObjC
 
 EXTERNAL SOURCES:
+  firebase_core:
+    :path: ".symlinks/plugins/firebase_core/ios"
+  firebase_messaging:
+    :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
   flutter_callkit_incoming:
@@ -21,8 +98,19 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   CryptoSwift: a0799ee936271bd2253a006f1e4523df21845000
+  Firebase: 44dd9724c84df18b486639e874f31436eaa9a20c
+  firebase_core: 443bccfd6aa6b42f07be365b500773dc69db2d87
+  firebase_messaging: 8dc3a6f069774a0bf4dac04dd79fdaffcb62e145
+  FirebaseCore: 2f4f85b453cc8fea4bb2b37e370007d2bcafe3f0
+  FirebaseCoreDiagnostics: c2836d254a8f0bbb4121ff18f2c2ea39d118fd08
+  FirebaseInstallations: 60edbf7e11d91ae4c751d26c200dfd037099abe0
+  FirebaseMessaging: 02e248e8997f71fa8cc9d78e9d49ec1a701ba14a
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  flutter_callkit_incoming: 0f6e518c5de137564ef0fbd6c6ed3e6510871a22
+  flutter_callkit_incoming: 71eacde00b49e3727491492b7c3e7e74b8c045d2
+  GoogleDataTransport: 629c20a4d363167143f30ea78320d5a7eb8bd940
+  GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
+  nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
+  PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 

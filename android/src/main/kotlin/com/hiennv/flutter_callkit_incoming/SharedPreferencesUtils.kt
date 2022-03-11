@@ -15,11 +15,16 @@ private fun initInstance(context: Context) {
 }
 
 
-fun addCall(context: Context?, data: Data) {
+fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
     val json = getString(context, "ACTIVE_CALLS", "[]")
     val arrayData: ArrayList<Data> = Utils.getGsonInstance()
         .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
-    arrayData.add(data)
+    val currentData = arrayData.find { it == data }
+    if(currentData != null) {
+        currentData.isAccepted = isAccepted
+    }else {
+        arrayData.add(data)
+    }
     putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().toJson(arrayData))
 }
 

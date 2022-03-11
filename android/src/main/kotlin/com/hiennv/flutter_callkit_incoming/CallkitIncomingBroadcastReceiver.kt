@@ -37,6 +37,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKIT_HEADERS = "EXTRA_CALLKIT_HEADERS"
         const val EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION = "EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION"
         const val EXTRA_CALLKIT_IS_SHOW_LOGO = "EXTRA_CALLKIT_IS_SHOW_LOGO"
+        const val EXTRA_CALLKIT_IS_SHOW_CALLBACK = "EXTRA_CALLKIT_IS_SHOW_CALLBACK"
         const val EXTRA_CALLKIT_RINGTONE_PATH = "EXTRA_CALLKIT_RINGTONE_PATH"
         const val EXTRA_CALLKIT_BACKGROUND_COLOR = "EXTRA_CALLKIT_BACKGROUND_COLOR"
         const val EXTRA_CALLKIT_BACKGROUND_URL = "EXTRA_CALLKIT_BACKGROUND_URL"
@@ -98,6 +99,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             ACTION_CALL_INCOMING -> {
                 try {
                     sendEventFlutter(ACTION_CALL_INCOMING, data)
+                    addCall(context, Data.fromBundle(data))
                     val soundPlayerServiceIntent = Intent(context, CallkitSoundPlayerService::class.java)
                     soundPlayerServiceIntent.putExtras(data)
                     context.startService(soundPlayerServiceIntent)
@@ -108,7 +110,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             ACTION_CALL_START -> {
                 try {
                     sendEventFlutter(ACTION_CALL_START, data)
-                    addCall(context, Data.fromBundle(data))
+                    addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }
@@ -119,7 +121,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     sendEventFlutter(ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data)
-                    addCall(context, Data.fromBundle(data))
+                    addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }
