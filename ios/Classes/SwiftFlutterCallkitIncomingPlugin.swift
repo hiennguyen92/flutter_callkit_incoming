@@ -176,6 +176,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         if(self.isFromPushKit){
             call = Call(uuid: UUID(uuidString: self.data!.uuid)!)
             self.isFromPushKit = false
+            self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
         }else {
             call = Call(uuid: UUID(uuidString: data.uuid)!)
         }
