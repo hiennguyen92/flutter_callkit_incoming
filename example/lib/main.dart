@@ -275,6 +275,18 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Future<void> showMissCallNotification() async {
+    this._currentUuid = _uuid.v4();
+    var params = <String, dynamic>{
+      'id': this._currentUuid,
+      'nameCaller': 'Hien Nguyen',
+      'handle': '0123456789',
+      'type': 1,
+      'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+    };
+    await FlutterCallkitIncoming.showMissCallNotification(params);
+  }
+
   Future<void> endCurrentCall() async {
     initCurrentCall();
     var params = <String, dynamic>{'id': this._currentUuid};

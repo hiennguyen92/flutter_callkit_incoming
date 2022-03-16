@@ -97,6 +97,18 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       };
       await FlutterCallkitIncoming.showCallkitIncoming(params);
     ```
+    * Show miss call notification
+    ```dart
+      this._currentUuid = _uuid.v4();
+      var params = <String, dynamic>{
+        'id': this._currentUuid,
+        'nameCaller': 'Hien Nguyen',
+        'handle': '0123456789',
+        'type': 1,
+        'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+      };
+      await FlutterCallkitIncoming.showMissCallNotification(params);
+    ```
 
   * Started an outgoing call
     ```dart
@@ -211,6 +223,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       });
     ```
   * Call from Native (iOS PushKit) 
+
     ```swift
       //Swift
       var info = [String: Any?]()

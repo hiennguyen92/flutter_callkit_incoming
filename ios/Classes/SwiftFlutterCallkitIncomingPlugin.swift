@@ -76,6 +76,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             }
             result("OK")
             break
+        case "showMissCallNotification":
+            result("OK")
+            break
         case "startCall":
             guard let args = call.arguments else {
                 result("OK")
