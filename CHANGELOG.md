@@ -1,3 +1,8 @@
+## 1.0.1+5
+
+* Update custom miss call notification
+* Fixed issue open app(terminated/background state).
+
 ## 1.0.1+4
 
 * add `showMissCallNotification` only for Android, using show miss call notification 
