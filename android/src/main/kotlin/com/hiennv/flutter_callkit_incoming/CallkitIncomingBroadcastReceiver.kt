@@ -1,8 +1,10 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
@@ -90,6 +92,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
 
 
+    @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
         //val callkitSoundPlayer = CallkitSoundPlayer.getInstance(context.applicationContext)
         val callkitNotificationManager = CallkitNotificationManager(context)
@@ -117,7 +120,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
             ACTION_CALL_ACCEPT -> {
                 try {
-                    Utils.backToForeground(context)
                     sendEventFlutter(ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data)
@@ -160,9 +162,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 try {
                     callkitNotificationManager.clearMissCallNotification(data)
                     sendEventFlutter(ACTION_CALL_CALLBACK, data)
-                    Utils.backToForeground(context)
-                    val closeNotificationPanel = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
-                    context.sendBroadcast(closeNotificationPanel)
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                        val closeNotificationPanel = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+                        context.sendBroadcast(closeNotificationPanel)
+                    }
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }

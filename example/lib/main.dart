@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
@@ -139,8 +142,14 @@ class _MyAppState extends State<MyApp> {
   initCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
-    if (calls is List && calls.isNotEmpty) {
-      this._currentUuid = calls[0]['id'];
+    print('initCurrentCall: $calls');
+    final objCalls = json.decode(calls);
+    if (objCalls is List) {
+      if (objCalls.isNotEmpty) {
+        this._currentUuid = objCalls[0]['id'];
+      } else {
+        this._currentUuid = "";
+      }
     }
   }
 
@@ -248,7 +257,7 @@ class _MyAppState extends State<MyApp> {
         'android': <String, dynamic>{
           'isCustomNotification': true,
           'isShowLogo': false,
-          'isShowCallback': false,
+          'isShowCallback': true,
           'ringtonePath': 'system_ringtone_default',
           'backgroundColor': '#0955fa',
           'background': 'https://i.pravatar.cc/500',
@@ -273,6 +282,24 @@ class _MyAppState extends State<MyApp> {
       };
       await FlutterCallkitIncoming.showCallkitIncoming(params);
     });
+  }
+
+  Future<void> showMissCallNotification() async {
+    this._currentUuid = _uuid.v4();
+    var params = <String, dynamic>{
+      'id': this._currentUuid,
+      'nameCaller': 'Hien Nguyen',
+      'handle': '0123456789',
+      'avatar': 'https://i.pravatar.cc/100',
+      'type': 1,
+      'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+      'android': <String, dynamic>{
+        'isCustomNotification': true,
+        'isShowCallback': true,
+        'actionColor': '#4CAF50'
+      }
+    };
+    await FlutterCallkitIncoming.showMissCallNotification(params);
   }
 
   Future<void> endCurrentCall() async {

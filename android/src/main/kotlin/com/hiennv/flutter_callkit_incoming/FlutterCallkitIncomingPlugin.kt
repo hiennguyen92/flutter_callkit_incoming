@@ -135,6 +135,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     )
                     result.success("OK")
                 }
+                "showMissCallNotification" -> {
+                    val data = Data(call.arguments())
+                    data.from = "notification"
+                    callkitNotificationManager?.showMissCallNotification(data.toBundle())
+                    result.success("OK")
+                }
                 "startCall" -> {
                     val data = Data(call.arguments())
                     context?.sendBroadcast(

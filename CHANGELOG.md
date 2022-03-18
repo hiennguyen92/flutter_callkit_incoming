@@ -1,3 +1,13 @@
+## 1.0.1+5
+
+* Update custom miss call notification
+* Fixed issue open app(terminated/background state).
+
+## 1.0.1+4
+
+* add `showMissCallNotification` only for Android, using show miss call notification 
+* Fixed some bugs.
+
 ## 1.0.1+3
 
 * add props `isShowCallback` using show Callback for miss call(Android)

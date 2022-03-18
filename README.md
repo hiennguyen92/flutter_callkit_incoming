@@ -4,6 +4,9 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 
 [![pub package](https://img.shields.io/pub/v/flutter_callkit_incoming.svg)](https://pub.dev/packages/flutter_callkit_incoming)
 [![Build Status](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml/badge.svg)](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml)
+
+<a href="https://www.buymeacoffee.com/hiennguyen92" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 ## :star: Features
 
 * Show an incoming call
@@ -96,6 +99,18 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         }
       };
       await FlutterCallkitIncoming.showCallkitIncoming(params);
+    ```
+    * Show miss call notification
+    ```dart
+      this._currentUuid = _uuid.v4();
+      var params = <String, dynamic>{
+        'id': this._currentUuid,
+        'nameCaller': 'Hien Nguyen',
+        'handle': '0123456789',
+        'type': 1,
+        'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+      };
+      await FlutterCallkitIncoming.showMissCallNotification(params);
     ```
 
   * Started an outgoing call
@@ -211,6 +226,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       });
     ```
   * Call from Native (iOS PushKit) 
+
     ```swift
       //Swift
       var info = [String: Any?]()
