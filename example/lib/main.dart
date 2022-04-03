@@ -11,7 +11,7 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
   listenerEvent(null);
-  showCallkitIncoming('5c3ab1f0-8750-42eb-8d29-ad28e3d7f336');
+  showCallkitIncoming(Uuid().v4()); //'5c3ab1f0-8750-42eb-8d29-ad28e3d7f336');
 }
 
 Future<void> listenerEvent(Function? callback) async {
@@ -77,10 +77,10 @@ Future<void> showCallkitIncoming(String uuid) async {
     'handle': '0123456789',
     'type': 0,
     'duration': 30000,
-    'textAccept': 'Accept A',
-    'textDecline': 'Decline A',
-    'textMissedCall': 'Missed call A',
-    'textCallback': 'Call back A',
+    'textAccept': 'Accept',
+    'textDecline': 'Decline',
+    'textMissedCall': 'Missed call',
+    'textCallback': 'Call back',
     'extra': <String, dynamic>{'userId': '1a2b3c4d'},
     'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
     'android': <String, dynamic>{
@@ -253,10 +253,10 @@ class _MyAppState extends State<MyApp> {
         'handle': '0123456789',
         'type': 0,
         'duration': 30000,
-        'textAccept': 'Accept A',
-        'textDecline': 'Decline A',
-        'textMissedCall': 'Missed call A',
-        'textCallback': 'Call back A',
+        'textAccept': 'Accept',
+        'textDecline': 'Decline',
+        'textMissedCall': 'Missed call',
+        'textCallback': 'Call back',
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
         'headers': <String, dynamic>{
           'apiKey': 'Abc@123!',
@@ -300,6 +300,8 @@ class _MyAppState extends State<MyApp> {
       'handle': '0123456789',
       'avatar': 'https://i.pravatar.cc/100',
       'type': 1,
+      'textMissedCall': 'Missed call',
+      'textCallback': 'Call back',
       'extra': <String, dynamic>{'userId': '1a2b3c4d'},
       'android': <String, dynamic>{
         'isCustomNotification': true,

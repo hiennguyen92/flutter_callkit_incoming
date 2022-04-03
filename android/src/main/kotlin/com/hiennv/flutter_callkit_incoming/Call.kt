@@ -9,6 +9,7 @@ class Call {
 data class Data(val args: Map<String, Any?>) {
 
     var id: String = (args["id"] as? String) ?: ""
+    var uuid: String = (args["id"] as? String) ?: ""
     var nameCaller: String = (args["nameCaller"] as? String) ?: ""
     var appName: String = (args["appName"] as? String) ?: ""
     var handle: String = (args["handle"] as? String) ?: ""
@@ -20,9 +21,9 @@ data class Data(val args: Map<String, Any?>) {
     var textMissedCall: String = (args["textMissedCall"] as? String) ?: ""
     var textCallback: String = (args["textCallback"] as? String) ?: ""
     var extra: HashMap<String, Any?> =
-        (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
+            (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
     var headers: HashMap<String, Any?> =
-        (args["headers"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
+            (args["headers"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
     var from: String = ""
 
     var isCustomNotification: Boolean = false
@@ -61,7 +62,7 @@ data class Data(val args: Map<String, Any?>) {
     }
 
     override fun equals(other: Any?): Boolean {
-        if(other == null) return false
+        if (other == null) return false
         val e: Data = other as Data
         return this.id == e.id
     }
@@ -82,25 +83,25 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA, extra)
         bundle.putSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS, headers)
         bundle.putBoolean(
-            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
-            isCustomNotification
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
+                isCustomNotification
         )
         bundle.putBoolean(
-            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
-            isShowLogo
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
+                isShowLogo
         )
         bundle.putBoolean(
-            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_CALLBACK,
-            isShowCallback
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_CALLBACK,
+                isShowCallback
         )
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_RINGTONE_PATH, ringtonePath)
         bundle.putString(
-            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_BACKGROUND_COLOR,
-            backgroundColor
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_BACKGROUND_COLOR,
+                backgroundColor
         )
         bundle.putString(
-            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_BACKGROUND_URL,
-            backgroundUrl
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_BACKGROUND_URL,
+                backgroundUrl
         )
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACTION_COLOR, actionColor)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACTION_FROM, from)
@@ -113,16 +114,16 @@ data class Data(val args: Map<String, Any?>) {
             val data = Data(emptyMap())
             data.id = bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ID, "")
             data.nameCaller =
-                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_NAME_CALLER, "")
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_NAME_CALLER, "")
             data.appName =
-                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_APP_NAME, "")
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_APP_NAME, "")
             data.handle =
-                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HANDLE, "")
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HANDLE, "")
             data.avatar =
-                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_AVATAR, "")
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_AVATAR, "")
             data.type = bundle.getInt(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TYPE, 0)
             data.duration =
-                bundle.getLong(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION, 30000L)
+                    bundle.getLong(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION, 30000L)
             data.textAccept =
                     bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_ACCEPT, "")
             data.textDecline =
@@ -132,38 +133,38 @@ data class Data(val args: Map<String, Any?>) {
             data.textCallback =
                     bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_CALLBACK, "")
             data.extra =
-                bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>
+                    bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>
             data.headers =
-                bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+                    bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
             data.isCustomNotification = bundle.getBoolean(
-                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
-                false
+                    CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
+                    false
             )
             data.isShowLogo = bundle.getBoolean(
-                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
-                false
+                    CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
+                    false
             )
             data.isShowCallback = bundle.getBoolean(
-                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_CALLBACK,
-                true
+                    CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_CALLBACK,
+                    true
             )
             data.ringtonePath = bundle.getString(
-                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_RINGTONE_PATH,
-                ""
+                    CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_RINGTONE_PATH,
+                    ""
             )
             data.backgroundColor = bundle.getString(
-                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_BACKGROUND_COLOR,
-                "#0955fa"
+                    CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_BACKGROUND_COLOR,
+                    "#0955fa"
             )
             data.backgroundUrl =
-                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_BACKGROUND_URL, "")
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_BACKGROUND_URL, "")
             data.actionColor = bundle.getString(
-                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACTION_COLOR,
-                "#4CAF50"
+                    CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACTION_COLOR,
+                    "#4CAF50"
             )
             data.from =
-                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACTION_FROM, "")
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACTION_FROM, "")
             return data
         }
     }

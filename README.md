@@ -275,11 +275,15 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     | --------------- | ----------------------------------------------------------------------- | ----------- |
     |  **`id`**       | UUID identifier for each call. UUID should be unique for every call and when the call is  ended, the same UUID for that call to be used. suggest using <a href='https://pub.dev/packages/uuid'>uuid</a>    | Required    |
     | **`nameCaller`**| Caller's name.                                                          | _None_      |
-    | **`appName`**   | App's name. using for display inside Callkit(iOS).                      |   App Name  |
+    | **`appName`**   | App's name. using for display inside Callkit(iOS).                      |   App Name, `Deprecated for iOS > 14, default using App name`  |
     | **`avatar`**    | Avatar's URL used for display for Android. `/android/src/main/res/drawable-xxxhdpi/ic_default_avatar.png`                             |    _None_   |
     | **`handle`**    | Phone number/Email/Any.                                                 |    _None_   |
     |   **`type`**    |  0 - Audio Call, 1 - Video Call                                         |     `0`     |
     | **`duration`**  | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed.                                                                                     |    `30000`  |
+   | **`textAccept`**  | Text `Accept` used in Android                                            |    `Accept`  |
+   | **`textDecline`**  | Text `Decline` used in Android                                           |    `Decline`  |
+   | **`textMissedCall`**  | Text `Missed Call` used in Android (show in miss call notification)  |    `Missed Call`  |
+   | **`textCallback`**  | Text `Call back` used in Android (show in miss call notification)     |    `Call back`  |
     |   **`extra`**   | Any data added to the event when received.                              |     `{}`    |
     |   **`headers`** | Any data for custom header avatar/background image.                     |     `{}`    |
     |  **`android`**  | Android data needed to customize UI.                                    |    Below    |

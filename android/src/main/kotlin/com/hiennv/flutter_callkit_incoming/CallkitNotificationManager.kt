@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.media.RingtoneManager
@@ -17,7 +16,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
@@ -30,9 +28,9 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_ACCEPT
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_CALLBACK
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_DECLINE
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_MISSED_CALL
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_CALLBACK
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
 import com.squareup.picasso.OkHttp3Downloader
@@ -101,6 +99,7 @@ class CallkitNotificationManager(private val context: Context) {
                 getActivityPendingIntent(notificationId, data), true
         )
         notificationBuilder.setContentIntent(getActivityPendingIntent(notificationId, data))
+        notificationBuilder.setDeleteIntent(getTimeOutPendingIntent(notificationId, data))
         val typeCall = data.getInt(EXTRA_CALLKIT_TYPE, -1)
         var smallIcon = context.applicationInfo.icon
         if (typeCall > 0) {
@@ -141,7 +140,7 @@ class CallkitNotificationManager(private val context: Context) {
             val textDecline = data.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
             notificationViews?.setTextViewText(
                     R.id.tvDecline,
-                    if(TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline
+                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline
             )
             notificationViews?.setOnClickPendingIntent(
                     R.id.llAccept,
@@ -150,7 +149,7 @@ class CallkitNotificationManager(private val context: Context) {
             val textAccept = data.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
             notificationViews?.setTextViewText(
                     R.id.tvAccept,
-                    if(TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept
+                    if (TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept
             )
             val avatarUrl = data.getString(EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
@@ -160,7 +159,11 @@ class CallkitNotificationManager(private val context: Context) {
                         .transform(CircleTransform())
                         .into(targetLoadAvatarCustomize)
             }
-            notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            if (Build.MANUFACTURER.equals("Xiaomi", ignoreCase = true)) {
+                //Ignore
+            } else {
+                notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            }
             notificationBuilder.setCustomContentView(notificationViews)
             notificationBuilder.setCustomBigContentView(notificationViews)
             notificationBuilder.setCustomHeadsUpContentView(notificationViews)
@@ -177,14 +180,14 @@ class CallkitNotificationManager(private val context: Context) {
             val textDecline = data.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
             val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                     R.drawable.ic_decline,
-                    if(TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline,
+                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline,
                     getDeclinePendingIntent(notificationId, data)
             ).build()
             notificationBuilder.addAction(declineAction)
             val textAccept = data.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
             val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                     R.drawable.ic_accept,
-                    if(TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
+                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
                     getAcceptPendingIntent(notificationId, data)
             ).build()
             notificationBuilder.addAction(acceptAction)
@@ -232,9 +235,9 @@ class CallkitNotificationManager(private val context: Context) {
                     getCallbackPendingIntent(notificationId, data)
             )
             val isShowCallback = data.getBoolean(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_CALLBACK, true)
-            notificationViews?.setViewVisibility(R.id.llCallback, if(isShowCallback) View.VISIBLE else View.GONE)
+            notificationViews?.setViewVisibility(R.id.llCallback, if (isShowCallback) View.VISIBLE else View.GONE)
             val textCallback = data.getString(EXTRA_CALLKIT_TEXT_CALLBACK, "")
-            notificationViews?.setTextViewText(R.id.tvCallback, if(TextUtils.isEmpty(textCallback)) context.getString(R.string.text_call_back) else textCallback)
+            notificationViews?.setTextViewText(R.id.tvCallback, if (TextUtils.isEmpty(textCallback)) context.getString(R.string.text_call_back) else textCallback)
 
             val avatarUrl = data.getString(EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
@@ -263,7 +266,7 @@ class CallkitNotificationManager(private val context: Context) {
                 val textCallback = data.getString(EXTRA_CALLKIT_TEXT_CALLBACK, "")
                 val callbackAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                         R.drawable.ic_accept,
-                        if(TextUtils.isEmpty(textCallback)) context.getString(R.string.text_call_back) else textCallback,
+                        if (TextUtils.isEmpty(textCallback)) context.getString(R.string.text_call_back) else textCallback,
                         getCallbackPendingIntent(notificationId, data)
                 ).build()
                 notificationBuilder.addAction(callbackAction)
@@ -369,6 +372,16 @@ class CallkitNotificationManager(private val context: Context) {
                 context,
                 id,
                 declineIntent,
+                getFlagPendingIntent()
+        )
+    }
+
+    private fun getTimeOutPendingIntent(id: Int, data: Bundle): PendingIntent {
+        val timeOutIntent = CallkitIncomingBroadcastReceiver.getIntentTimeout(context, data)
+        return PendingIntent.getBroadcast(
+                context,
+                id,
+                timeOutIntent,
                 getFlagPendingIntent()
         )
     }
