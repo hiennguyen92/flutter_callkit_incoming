@@ -1,3 +1,9 @@
+## 1.0.1+6
+
+* Add props for text
+* Fixed issue open app(terminated/background state).
+* Fixed some bugs.
+
 ## 1.0.1+5
 
 * Update custom miss call notification
