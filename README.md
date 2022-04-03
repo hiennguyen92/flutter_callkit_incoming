@@ -69,6 +69,10 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         'avatar': 'https://i.pravatar.cc/100',
         'handle': '0123456789',
         'type': 0,
+        'textAccept': 'Accept',
+        'textDecline': 'Decline',
+        'textMissedCall': 'Missed call',
+        'textCallback': 'Call back',
         'duration': 30000,
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
         'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
@@ -108,6 +112,8 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         'nameCaller': 'Hien Nguyen',
         'handle': '0123456789',
         'type': 1,
+        'textMissedCall': 'Missed call',
+        'textCallback': 'Call back',
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
       };
       await FlutterCallkitIncoming.showMissCallNotification(params);
