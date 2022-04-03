@@ -41,6 +41,9 @@ import com.squareup.picasso.OkHttp3Downloader
 import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
+import android.text.TextUtils
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_ACCEPT
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_DECLINE
 
 
 class CallkitIncomingActivity : Activity() {
@@ -86,7 +89,10 @@ class CallkitIncomingActivity : Activity() {
 
     private lateinit var llAction: LinearLayout
     private lateinit var ivAcceptCall: ImageView
+    private lateinit var tvAccept: TextView
+
     private lateinit var ivDeclineCall: ImageView
+    private lateinit var tvDecline: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -186,6 +192,11 @@ class CallkitIncomingActivity : Activity() {
 
         finishTimeout(data, duration)
 
+        val textAccept = data?.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
+        tvAccept.text = if(TextUtils.isEmpty(textAccept)) getString(R.string.text_accept) else textAccept
+        val textDecline = data?.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
+        tvDecline.text = if(TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
+
         val backgroundColor = data?.getString(EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
         try {
             ivBackground.setBackgroundColor(Color.parseColor(backgroundColor))
@@ -239,7 +250,9 @@ class CallkitIncomingActivity : Activity() {
         llAction.layoutParams = params
 
         ivAcceptCall = findViewById(R.id.ivAcceptCall)
+        tvAccept = findViewById(R.id.tvAccept)
         ivDeclineCall = findViewById(R.id.ivDeclineCall)
+        tvDecline = findViewById(R.id.tvDecline)
         animateAcceptCall()
 
         ivAcceptCall.setOnClickListener {

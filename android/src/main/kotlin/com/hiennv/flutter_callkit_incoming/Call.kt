@@ -15,6 +15,10 @@ data class Data(val args: Map<String, Any?>) {
     var avatar: String = (args["avatar"] as? String) ?: ""
     var type: Int = (args["type"] as? Int) ?: 0
     var duration: Long = (args["duration"] as? Long) ?: 30000L
+    var textAccept: String = (args["textAccept"] as? String) ?: ""
+    var textDecline: String = (args["textDecline"] as? String) ?: ""
+    var textMissedCall: String = (args["textMissedCall"] as? String) ?: ""
+    var textCallback: String = (args["textCallback"] as? String) ?: ""
     var extra: HashMap<String, Any?> =
         (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
     var headers: HashMap<String, Any?> =
@@ -71,6 +75,10 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_AVATAR, avatar)
         bundle.putInt(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TYPE, type)
         bundle.putLong(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION, duration)
+        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_ACCEPT, textAccept)
+        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_DECLINE, textDecline)
+        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_MISSED_CALL, textMissedCall)
+        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_CALLBACK, textCallback)
         bundle.putSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA, extra)
         bundle.putSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS, headers)
         bundle.putBoolean(
@@ -115,6 +123,14 @@ data class Data(val args: Map<String, Any?>) {
             data.type = bundle.getInt(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TYPE, 0)
             data.duration =
                 bundle.getLong(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION, 30000L)
+            data.textAccept =
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_ACCEPT, "")
+            data.textDecline =
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_DECLINE, "")
+            data.textMissedCall =
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_MISSED_CALL, "")
+            data.textCallback =
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_CALLBACK, "")
             data.extra =
                 bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>
             data.headers =

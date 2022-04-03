@@ -77,6 +77,10 @@ Future<void> showCallkitIncoming(String uuid) async {
     'handle': '0123456789',
     'type': 0,
     'duration': 30000,
+    'textAccept': 'Accept A',
+    'textDecline': 'Decline A',
+    'textMissedCall': 'Missed call A',
+    'textCallback': 'Call back A',
     'extra': <String, dynamic>{'userId': '1a2b3c4d'},
     'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
     'android': <String, dynamic>{
@@ -249,6 +253,10 @@ class _MyAppState extends State<MyApp> {
         'handle': '0123456789',
         'type': 0,
         'duration': 30000,
+        'textAccept': 'Accept A',
+        'textDecline': 'Decline A',
+        'textMissedCall': 'Missed call A',
+        'textCallback': 'Call back A',
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
         'headers': <String, dynamic>{
           'apiKey': 'Abc@123!',

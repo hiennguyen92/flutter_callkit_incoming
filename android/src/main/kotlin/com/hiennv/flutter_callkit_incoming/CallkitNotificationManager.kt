@@ -16,6 +16,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
@@ -28,6 +29,10 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ID
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_ACCEPT
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_DECLINE
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_MISSED_CALL
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_CALLBACK
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
 import com.squareup.picasso.OkHttp3Downloader
@@ -133,9 +138,19 @@ class CallkitNotificationManager(private val context: Context) {
                     R.id.llDecline,
                     getDeclinePendingIntent(notificationId, data)
             )
+            val textDecline = data.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
+            notificationViews?.setTextViewText(
+                    R.id.tvDecline,
+                    if(TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline
+            )
             notificationViews?.setOnClickPendingIntent(
                     R.id.llAccept,
                     getAcceptPendingIntent(notificationId, data)
+            )
+            val textAccept = data.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
+            notificationViews?.setTextViewText(
+                    R.id.tvAccept,
+                    if(TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept
             )
             val avatarUrl = data.getString(EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
@@ -159,15 +174,17 @@ class CallkitNotificationManager(private val context: Context) {
             }
             notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKIT_NAME_CALLER, ""))
             notificationBuilder.setContentText(data.getString(EXTRA_CALLKIT_HANDLE, ""))
+            val textDecline = data.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
             val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                     R.drawable.ic_decline,
-                    context.getString(R.string.text_decline),
+                    if(TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline,
                     getDeclinePendingIntent(notificationId, data)
             ).build()
             notificationBuilder.addAction(declineAction)
+            val textAccept = data.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
             val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                     R.drawable.ic_accept,
-                    context.getString(R.string.text_accept),
+                    if(TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
                     getAcceptPendingIntent(notificationId, data)
             ).build()
             notificationBuilder.addAction(acceptAction)
@@ -178,7 +195,7 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     fun showMissCallNotification(data: Bundle) {
-        notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
+        notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode() + 1
         createNotificationChanel()
         val missedCallSound: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val typeCall = data.getInt(EXTRA_CALLKIT_TYPE, -1)
@@ -195,7 +212,8 @@ class CallkitNotificationManager(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationBuilder.setCategory(Notification.CATEGORY_MISSED_CALL)
         }
-        notificationBuilder.setSubText(context.getString(R.string.text_missed_call))
+        val textMissedCall = data.getString(EXTRA_CALLKIT_TEXT_MISSED_CALL, "")
+        notificationBuilder.setSubText(if (TextUtils.isEmpty(textMissedCall)) context.getString(R.string.text_missed_call) else textMissedCall)
         notificationBuilder.setSmallIcon(smallIcon)
         val isCustomNotification = data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
         if (isCustomNotification) {
@@ -215,6 +233,8 @@ class CallkitNotificationManager(private val context: Context) {
             )
             val isShowCallback = data.getBoolean(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_CALLBACK, true)
             notificationViews?.setViewVisibility(R.id.llCallback, if(isShowCallback) View.VISIBLE else View.GONE)
+            val textCallback = data.getString(EXTRA_CALLKIT_TEXT_CALLBACK, "")
+            notificationViews?.setTextViewText(R.id.tvCallback, if(TextUtils.isEmpty(textCallback)) context.getString(R.string.text_call_back) else textCallback)
 
             val avatarUrl = data.getString(EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
@@ -240,9 +260,10 @@ class CallkitNotificationManager(private val context: Context) {
             }
             val isShowCallback = data.getBoolean(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_CALLBACK, true)
             if (isShowCallback) {
+                val textCallback = data.getString(EXTRA_CALLKIT_TEXT_CALLBACK, "")
                 val callbackAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                         R.drawable.ic_accept,
-                        context.getString(R.string.text_call_back),
+                        if(TextUtils.isEmpty(textCallback)) context.getString(R.string.text_call_back) else textCallback,
                         getCallbackPendingIntent(notificationId, data)
                 ).build()
                 notificationBuilder.addAction(callbackAction)
