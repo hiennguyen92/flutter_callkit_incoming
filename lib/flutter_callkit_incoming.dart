@@ -119,8 +119,8 @@ class CallEvent {
   static const String ACTION_CALL_TOGGLE_AUDIO_SESSION =
       "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION";
 
-  late String name;
-  late dynamic body;
+  String name;
+  dynamic body;
 
   CallEvent(this.name, this.body);
 

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.app.KeyguardManager.KeyguardLock
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -41,6 +42,9 @@ import com.squareup.picasso.OkHttp3Downloader
 import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
+import android.text.TextUtils
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_ACCEPT
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_DECLINE
 
 
 class CallkitIncomingActivity : Activity() {
@@ -86,7 +90,10 @@ class CallkitIncomingActivity : Activity() {
 
     private lateinit var llAction: LinearLayout
     private lateinit var ivAcceptCall: ImageView
+    private lateinit var tvAccept: TextView
+
     private lateinit var ivDeclineCall: ImageView
+    private lateinit var tvDecline: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -186,6 +193,11 @@ class CallkitIncomingActivity : Activity() {
 
         finishTimeout(data, duration)
 
+        val textAccept = data?.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
+        tvAccept.text = if(TextUtils.isEmpty(textAccept)) getString(R.string.text_accept) else textAccept
+        val textDecline = data?.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
+        tvDecline.text = if(TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
+
         val backgroundColor = data?.getString(EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
         try {
             ivBackground.setBackgroundColor(Color.parseColor(backgroundColor))
@@ -239,7 +251,9 @@ class CallkitIncomingActivity : Activity() {
         llAction.layoutParams = params
 
         ivAcceptCall = findViewById(R.id.ivAcceptCall)
+        tvAccept = findViewById(R.id.tvAccept)
         ivDeclineCall = findViewById(R.id.ivDeclineCall)
+        tvDecline = findViewById(R.id.tvDecline)
         animateAcceptCall()
 
         ivAcceptCall.setOnClickListener {
@@ -259,9 +273,15 @@ class CallkitIncomingActivity : Activity() {
 
     private fun onAcceptClick() {
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
-        val intent =
-            CallkitIncomingBroadcastReceiver.getIntentAccept(this@CallkitIncomingActivity, data)
-        sendBroadcast(intent)
+        val intent = packageManager.getLaunchIntentForPackage(packageName)?.cloneFilter()
+        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (intent != null) {
+            val intentTransparent = TransparentActivity.getIntentAccept(this@CallkitIncomingActivity, data)
+            startActivities(arrayOf(intent, intentTransparent))
+        } else {
+            val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(this@CallkitIncomingActivity, data)
+            sendBroadcast(acceptIntent)
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
             keyguardManager.requestDismissKeyguard(this, null)

@@ -157,7 +157,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.sharedProvider?.reportNewIncomingCall(with: uuid!, update: callUpdate) { error in
             if(error == nil) {
                 self.configurAudioSession()
-                let call = Call(uuid: uuid!)
+                let call = Call(uuid: uuid!, data: data)
                 call.handle = data.handle
                 self.callManager?.addCall(call)
                 self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_INCOMING, data.toJSON())
@@ -177,16 +177,16 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     @objc public func endCall(_ data: Data) {
         var call: Call? = nil
         if(self.isFromPushKit){
-            call = Call(uuid: UUID(uuidString: self.data!.uuid)!)
+            call = Call(uuid: UUID(uuidString: self.data!.uuid)!, data: data)
             self.isFromPushKit = false
             self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
         }else {
-            call = Call(uuid: UUID(uuidString: data.uuid)!)
+            call = Call(uuid: UUID(uuidString: data.uuid)!, data: data)
         }
         self.callManager?.endCall(call: call!)
     }
     
-    @objc public func activeCalls() -> [[String: String]]? {
+    @objc public func activeCalls() -> [[String: Any]]? {
         return self.callManager?.activeCalls()
     }
     
@@ -358,7 +358,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
-        let call = Call(uuid: action.callUUID, isOutGoing: true)
+        let call = Call(uuid: action.callUUID, data: self.data!, isOutGoing: true)
         call.handle = action.handle.value
         configurAudioSession()
         call.hasStartedConnectDidChange = { [weak self] in
@@ -368,6 +368,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, startedConnectingAt: call.connectedData)
         }
         self.outgoingCall = call;
+        self.callManager?.addCall(call)
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_START, self.data?.toJSON())
         action.fulfill()
     }

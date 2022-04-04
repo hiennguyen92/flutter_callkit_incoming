@@ -69,6 +69,10 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         'avatar': 'https://i.pravatar.cc/100',
         'handle': '0123456789',
         'type': 0,
+        'textAccept': 'Accept',
+        'textDecline': 'Decline',
+        'textMissedCall': 'Missed call',
+        'textCallback': 'Call back',
         'duration': 30000,
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
         'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
@@ -108,6 +112,8 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         'nameCaller': 'Hien Nguyen',
         'handle': '0123456789',
         'type': 1,
+        'textMissedCall': 'Missed call',
+        'textCallback': 'Call back',
         'extra': <String, dynamic>{'userId': '1a2b3c4d'},
       };
       await FlutterCallkitIncoming.showMissCallNotification(params);
@@ -275,11 +281,15 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     | --------------- | ----------------------------------------------------------------------- | ----------- |
     |  **`id`**       | UUID identifier for each call. UUID should be unique for every call and when the call is  ended, the same UUID for that call to be used. suggest using <a href='https://pub.dev/packages/uuid'>uuid</a>    | Required    |
     | **`nameCaller`**| Caller's name.                                                          | _None_      |
-    | **`appName`**   | App's name. using for display inside Callkit(iOS).                      |   App Name  |
+    | **`appName`**   | App's name. using for display inside Callkit(iOS).                      |   App Name, `Deprecated for iOS > 14, default using App name`  |
     | **`avatar`**    | Avatar's URL used for display for Android. `/android/src/main/res/drawable-xxxhdpi/ic_default_avatar.png`                             |    _None_   |
     | **`handle`**    | Phone number/Email/Any.                                                 |    _None_   |
     |   **`type`**    |  0 - Audio Call, 1 - Video Call                                         |     `0`     |
     | **`duration`**  | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed.                                                                                     |    `30000`  |
+   | **`textAccept`**  | Text `Accept` used in Android                                            |    `Accept`  |
+   | **`textDecline`**  | Text `Decline` used in Android                                           |    `Decline`  |
+   | **`textMissedCall`**  | Text `Missed Call` used in Android (show in miss call notification)  |    `Missed Call`  |
+   | **`textCallback`**  | Text `Call back` used in Android (show in miss call notification)     |    `Call back`  |
     |   **`extra`**   | Any data added to the event when received.                              |     `{}`    |
     |   **`headers`** | Any data for custom header avatar/background image.                     |     `{}`    |
     |  **`android`**  | Android data needed to customize UI.                                    |    Below    |

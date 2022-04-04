@@ -11,6 +11,7 @@ import AVFoundation
 public class Call: NSObject {
     
     let uuid: UUID
+    let data: Data
     let isOutGoing: Bool
     
     var handle: String?
@@ -87,8 +88,9 @@ public class Call: NSObject {
         return Date().timeIntervalSince(connectDate)
     }
     
-    init(uuid: UUID, isOutGoing: Bool = false){
+    init(uuid: UUID, data: Data, isOutGoing: Bool = false){
         self.uuid = uuid
+        self.data = data
         self.isOutGoing = isOutGoing
     }
     
@@ -244,6 +246,7 @@ public class Call: NSObject {
         ] as [String : Any?]
         let map = [
             "uuid": uuid,
+            "id": uuid,
             "nameCaller": nameCaller,
             "appName": appName,
             "handle": handle,
