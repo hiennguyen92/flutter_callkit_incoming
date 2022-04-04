@@ -2,6 +2,8 @@ import 'dart:ffi';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming_example/app_router.dart';
+import 'package:flutter_callkit_incoming_example/navigation_service.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
@@ -16,8 +18,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> listenerEvent(Function? callback) async {
   try {
-    FlutterCallkitIncoming.onEvent.listen((event) {
-      print(event);
+    FlutterCallkitIncoming.onEvent.listen((event) async {
       switch (event!.name) {
         case CallEvent.ACTION_CALL_INCOMING:
           // TODO: received an incoming call
@@ -29,6 +30,7 @@ Future<void> listenerEvent(Function? callback) async {
         case CallEvent.ACTION_CALL_ACCEPT:
           // TODO: accepted an incoming call
           // TODO: show screen calling in Flutter
+          // TODO: It may not be possible to navigate here because the App Widget has not been rendered. can save data call to local or use activeCalls() and check it in `WidgetsBinding.instance?.addPostFrameCallback`
           break;
         case CallEvent.ACTION_CALL_DECLINE:
           // TODO: declined an incoming call
@@ -62,7 +64,7 @@ Future<void> listenerEvent(Function? callback) async {
           break;
       }
       if (callback != null) {
-        callback(event.toString());
+        callback(event);
       }
     });
   } on Exception {}
@@ -122,37 +124,36 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var _uuid = Uuid();
+  var _uuid;
   var _currentUuid;
-  var textEvents = "";
 
   late final FirebaseMessaging _firebaseMessaging;
 
   @override
   void initState() {
     super.initState();
-    listenerEvent(onEvent);
-    initCurrentCall();
+    _uuid = Uuid();
     initFirebase();
-  }
-
-  onEvent(event) {
-    if (!mounted) return;
-    setState(() {
-      textEvents += "${event.toString()}\n";
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      var currentCall = await getCurrentCall();
+      if (currentCall != null) {
+        showCallkitIncoming(this._currentUuid);
+      }
     });
   }
 
-  initCurrentCall() async {
+  getCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
-    print('initCurrentCall: $calls');
     final objCalls = json.decode(calls);
     if (objCalls is List) {
       if (objCalls.isNotEmpty) {
+        print('DATA: $objCalls');
         this._currentUuid = objCalls[0]['id'];
+        return objCalls[0];
       } else {
         this._currentUuid = "";
+        return null;
       }
     }
   }
@@ -175,169 +176,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.call,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                this.makeFakeCallInComing();
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.call_end,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                this.endCurrentCall();
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.call_made,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                this.startOutGoingCall();
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.call_merge,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                this.activeCalls();
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.clear_all_sharp,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                this.endAllCalls();
-              },
-            )
-          ],
-        ),
-        body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints viewportConstraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: viewportConstraints.maxHeight,
-                ),
-                child: Text('$textEvents'),
-              ),
-            );
-          },
-        ),
-      ),
+      theme: ThemeData.light(),
+      onGenerateRoute: AppRoute.generateRoute,
+      initialRoute: AppRoute.homePage,
+      navigatorKey: NavigationService.instance.navigationKey,
+      navigatorObservers: <NavigatorObserver>[
+        NavigationService.instance.routeObserver
+      ],
     );
-  }
-
-  Future<void> makeFakeCallInComing() async {
-    await Future.delayed(const Duration(seconds: 10), () async {
-      this._currentUuid = _uuid.v4();
-      var params = <String, dynamic>{
-        'id': _currentUuid,
-        'nameCaller': 'Hien Nguyen',
-        'appName': 'Callkit',
-        'avatar': 'https://i.pravatar.cc/100',
-        'handle': '0123456789',
-        'type': 0,
-        'duration': 30000,
-        'textAccept': 'Accept',
-        'textDecline': 'Decline',
-        'textMissedCall': 'Missed call',
-        'textCallback': 'Call back',
-        'extra': <String, dynamic>{'userId': '1a2b3c4d'},
-        'headers': <String, dynamic>{
-          'apiKey': 'Abc@123!',
-          'platform': 'flutter'
-        },
-        'android': <String, dynamic>{
-          'isCustomNotification': true,
-          'isShowLogo': false,
-          'isShowCallback': true,
-          'ringtonePath': 'system_ringtone_default',
-          'backgroundColor': '#0955fa',
-          'background': 'https://i.pravatar.cc/500',
-          'actionColor': '#4CAF50'
-        },
-        'ios': <String, dynamic>{
-          'iconName': 'CallKitLogo',
-          'handleType': '',
-          'supportsVideo': true,
-          'maximumCallGroups': 2,
-          'maximumCallsPerCallGroup': 1,
-          'audioSessionMode': 'default',
-          'audioSessionActive': true,
-          'audioSessionPreferredSampleRate': 44100.0,
-          'audioSessionPreferredIOBufferDuration': 0.005,
-          'supportsDTMF': true,
-          'supportsHolding': true,
-          'supportsGrouping': false,
-          'supportsUngrouping': false,
-          'ringtonePath': 'system_ringtone_default'
-        }
-      };
-      await FlutterCallkitIncoming.showCallkitIncoming(params);
-    });
-  }
-
-  Future<void> showMissCallNotification() async {
-    this._currentUuid = _uuid.v4();
-    var params = <String, dynamic>{
-      'id': this._currentUuid,
-      'nameCaller': 'Hien Nguyen',
-      'handle': '0123456789',
-      'avatar': 'https://i.pravatar.cc/100',
-      'type': 1,
-      'textMissedCall': 'Missed call',
-      'textCallback': 'Call back',
-      'extra': <String, dynamic>{'userId': '1a2b3c4d'},
-      'android': <String, dynamic>{
-        'isCustomNotification': true,
-        'isShowCallback': true,
-        'actionColor': '#4CAF50'
-      }
-    };
-    await FlutterCallkitIncoming.showMissCallNotification(params);
-  }
-
-  Future<void> endCurrentCall() async {
-    initCurrentCall();
-    var params = <String, dynamic>{'id': this._currentUuid};
-    await FlutterCallkitIncoming.endCall(params);
-  }
-
-  Future<void> startOutGoingCall() async {
-    this._currentUuid = _uuid.v4();
-    var params = <String, dynamic>{
-      'id': this._currentUuid,
-      'nameCaller': 'Hien Nguyen',
-      'handle': '0123456789',
-      'type': 1,
-      'extra': <String, dynamic>{'userId': '1a2b3c4d'},
-      'ios': <String, dynamic>{'handleType': 'number'}
-    }; //number/email
-    await FlutterCallkitIncoming.startCall(params);
-  }
-
-  Future<void> activeCalls() async {
-    var calls = await FlutterCallkitIncoming.activeCalls();
-    print(calls);
-  }
-
-  Future<void> endAllCalls() async {
-    await FlutterCallkitIncoming.endAllCalls();
   }
 
   Future<void> getDevicePushTokenVoIP() async {
