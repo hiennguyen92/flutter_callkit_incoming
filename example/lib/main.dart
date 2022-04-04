@@ -19,6 +19,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> listenerEvent(Function? callback) async {
   try {
     FlutterCallkitIncoming.onEvent.listen((event) async {
+      print('ROOT: $event');
       switch (event!.name) {
         case CallEvent.ACTION_CALL_INCOMING:
           // TODO: received an incoming call
@@ -137,7 +138,7 @@ class _MyAppState extends State<MyApp> {
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       var currentCall = await getCurrentCall();
       if (currentCall != null) {
-        showCallkitIncoming(this._currentUuid);
+        NavigationService.instance.pushNamed(AppRoute.callingPage);
       }
     });
   }

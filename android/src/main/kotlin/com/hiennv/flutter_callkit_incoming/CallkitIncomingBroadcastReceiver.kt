@@ -97,13 +97,13 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
-        //val callkitSoundPlayer = CallkitSoundPlayer.getInstance(context.applicationContext)
         val callkitNotificationManager = CallkitNotificationManager(context)
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA) ?: return
         when (action) {
             ACTION_CALL_INCOMING -> {
                 try {
+                    callkitNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
                     val soundPlayerServiceIntent = Intent(context, CallkitSoundPlayerService::class.java)
