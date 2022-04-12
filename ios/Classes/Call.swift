@@ -174,7 +174,7 @@ public class Call: NSObject {
     
     @objc public convenience init(args: NSDictionary) {
         var argsConvert = [String: Any?]()
-        for (value, key) in args {
+        for (key, value) in args {
             argsConvert[key as! String] = value
         }
         self.init(args: argsConvert)
