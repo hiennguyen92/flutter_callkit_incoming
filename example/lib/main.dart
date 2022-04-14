@@ -138,7 +138,8 @@ class _MyAppState extends State<MyApp> {
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       var currentCall = await getCurrentCall();
       if (currentCall != null) {
-        NavigationService.instance.pushNamed(AppRoute.callingPage);
+        NavigationService.instance
+            .pushNamed(AppRoute.callingPage, args: currentCall);
       }
     });
   }

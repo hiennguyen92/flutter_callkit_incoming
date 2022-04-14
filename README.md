@@ -16,7 +16,9 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 
   <br>
 
-  iOS: ONLY WORKING ON REAL DEVICE, not on simulator(Callkit framework not working on simulator)
+## iOS: ONLY WORKING ON REAL DEVICE, not on simulator(Callkit framework not working on simulator)
+
+<br>
 
 ## 🚀&nbsp; Installation
 
@@ -242,14 +244,19 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       info["type"] = 1
       //... set more data
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
+    ```
 
+    <br>
 
+    ```swift
       //OR
       let data = flutter_callkit_incoming.Data(id: "44d915e1-5ff4-4bed-bf13-c423048ec97a", nameCaller: "Hien Nguyen", handle: "0123456789", type: 0)
       data.nameCaller = "Johnny"
+      data.extra = ["user": "abc@123", "platform": "ios"]
       //... set more data
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
     ```
+    
     <br>
 
     ```objc
@@ -269,7 +276,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     
     <br>
 
-    ```java
+    ```swift
       //send custom event from native
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendEventCustom("customEvent", body: ["customKey": "customValue"])
 
@@ -348,7 +355,8 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
   <br>
 
 7. Todo
-  * Add `WakeLock` (background tasks) for Android
+  *
+  *
 
     <br>
 

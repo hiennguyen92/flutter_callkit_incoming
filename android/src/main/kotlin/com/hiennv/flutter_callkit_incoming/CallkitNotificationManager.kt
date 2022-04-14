@@ -159,11 +159,7 @@ class CallkitNotificationManager(private val context: Context) {
                         .transform(CircleTransform())
                         .into(targetLoadAvatarCustomize)
             }
-            if (Build.MANUFACTURER.equals("Xiaomi", ignoreCase = true)) {
-                //Ignore
-            } else {
-                notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            }
+            notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
             notificationBuilder.setCustomContentView(notificationViews)
             notificationBuilder.setCustomBigContentView(notificationViews)
             notificationBuilder.setCustomHeadsUpContentView(notificationViews)
@@ -346,7 +342,7 @@ class CallkitNotificationManager(private val context: Context) {
 
     private fun getAcceptPendingIntent(id: Int, data: Bundle): PendingIntent {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
-        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         if (intent != null) {
             val intentTransparent = TransparentActivity.getIntentAccept(context, data)
             return PendingIntent.getActivities(

@@ -200,53 +200,53 @@ class HomePageState extends State<HomePage> {
     print(devicePushTokenVoIP);
   }
 
-
   Future<void> listenerEvent(Function? callback) async {
     try {
       FlutterCallkitIncoming.onEvent.listen((event) {
         print(event);
         switch (event!.name) {
           case CallEvent.ACTION_CALL_INCOMING:
-          // TODO: received an incoming call
+            // TODO: received an incoming call
             break;
           case CallEvent.ACTION_CALL_START:
-          // TODO: started an outgoing call
-          // TODO: show screen calling in Flutter
+            // TODO: started an outgoing call
+            // TODO: show screen calling in Flutter
             break;
           case CallEvent.ACTION_CALL_ACCEPT:
-          // TODO: accepted an incoming call
-          // TODO: show screen calling in Flutter
-            NavigationService.instance.pushNamed(AppRoute.callingPage);
+            // TODO: accepted an incoming call
+            // TODO: show screen calling in Flutter
+            NavigationService.instance
+                .pushNamed(AppRoute.callingPage, args: event.body);
             break;
           case CallEvent.ACTION_CALL_DECLINE:
-          // TODO: declined an incoming call
+            // TODO: declined an incoming call
             break;
           case CallEvent.ACTION_CALL_ENDED:
-          // TODO: ended an incoming/outgoing call
+            // TODO: ended an incoming/outgoing call
             break;
           case CallEvent.ACTION_CALL_TIMEOUT:
-          // TODO: missed an incoming call
+            // TODO: missed an incoming call
             break;
           case CallEvent.ACTION_CALL_CALLBACK:
-          // TODO: only Android - click action `Call back` from missed call notification
+            // TODO: only Android - click action `Call back` from missed call notification
             break;
           case CallEvent.ACTION_CALL_TOGGLE_HOLD:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_CALL_TOGGLE_MUTE:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_CALL_TOGGLE_DMTF:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_CALL_TOGGLE_GROUP:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
         }
         if (callback != null) {
@@ -262,7 +262,4 @@ class HomePageState extends State<HomePage> {
       textEvents += "${event.toString()}\n";
     });
   }
-
-
-
 }
