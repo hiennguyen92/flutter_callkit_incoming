@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'dart:io';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
@@ -116,6 +117,7 @@ Future<void> showCallkitIncoming(String uuid) async {
 }
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -124,7 +126,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   var _uuid;
   var _currentUuid;
 
@@ -135,13 +137,12 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _uuid = Uuid();
     initFirebase();
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      var currentCall = await getCurrentCall();
-      if (currentCall != null) {
-        NavigationService.instance
-            .pushNamed(AppRoute.callingPage, args: currentCall);
-      }
-    });
+    listenerEvent(onEvent);
+    WidgetsBinding.instance?.addObserver(this);
+  }
+
+  onEvent(event) {
+    print(event.toString());
   }
 
   getCurrentCall() async {
@@ -158,6 +159,27 @@ class _MyAppState extends State<MyApp> {
         return null;
       }
     }
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    print(state);
+    if(state == AppLifecycleState.resumed){
+      var currentCall = await getCurrentCall();
+      if (currentCall != null) {
+        NavigationService.instance
+            .pushNamedAndRemoveUntil(AppRoute.callingPage, args: currentCall, predicate: (Route<dynamic> route){
+
+              return false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
   }
 
   initFirebase() async {

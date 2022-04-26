@@ -342,7 +342,7 @@ class CallkitNotificationManager(private val context: Context) {
 
     private fun getAcceptPendingIntent(id: Int, data: Bundle): PendingIntent {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
-        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (intent != null) {
             val intentTransparent = TransparentActivity.getIntentAccept(context, data)
             return PendingIntent.getActivities(

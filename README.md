@@ -106,7 +106,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       };
       await FlutterCallkitIncoming.showCallkitIncoming(params);
     ```
-    * Show miss call notification
+  * Show miss call notification
     ```dart
       this._currentUuid = _uuid.v4();
       var params = <String, dynamic>{
