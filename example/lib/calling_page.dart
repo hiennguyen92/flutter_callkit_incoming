@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_callkit_incoming_example/navigation_service.dart';
+import 'package:http/http.dart';
 
 class CallingPage extends StatefulWidget {
   @override
@@ -32,16 +33,23 @@ class CallingPageState extends State<CallingPage> {
                       foregroundColor:
                           MaterialStateProperty.all<Color>(Colors.blue),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       FlutterCallkitIncoming.endCall(calling);
                       calling = null;
                       NavigationService.instance.goBack();
+                      await requestHttp('END_CALL');
                     },
                     child: Text('End Call'),
                   )
                 ],
               ),
             )));
+  }
+
+  //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
+  Future<void> requestHttp(content) async {
+    get(Uri.parse(
+        'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:flutter_callkit_incoming_example/navigation_service.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -203,8 +204,8 @@ class HomePageState extends State<HomePage> {
 
   Future<void> listenerEvent(Function? callback) async {
     try {
-      FlutterCallkitIncoming.onEvent.listen((event) {
-        print(event);
+      FlutterCallkitIncoming.onEvent.listen((event) async {
+        print('HOME: $event');
         switch (event!.name) {
           case CallEvent.ACTION_CALL_INCOMING:
             // TODO: received an incoming call
@@ -221,6 +222,7 @@ class HomePageState extends State<HomePage> {
             break;
           case CallEvent.ACTION_CALL_DECLINE:
             // TODO: declined an incoming call
+            await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
             break;
           case CallEvent.ACTION_CALL_ENDED:
             // TODO: ended an incoming/outgoing call
@@ -255,6 +257,12 @@ class HomePageState extends State<HomePage> {
         }
       });
     } on Exception {}
+  }
+
+  //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
+  Future<void> requestHttp(content) async {
+    get(Uri.parse(
+        'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
 
   onEvent(event) {

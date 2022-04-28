@@ -82,6 +82,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
           'isCustomNotification': true,
           'isShowLogo': false,
           'isShowCallback': false,
+          'isShowMissedCallNotification': true,
           'ringtonePath': 'system_ringtone_default',
           'backgroundColor': '#0955fa',
           'backgroundUrl': 'https://i.pravatar.cc/500',
@@ -310,6 +311,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     | --------------------------- | ----------------------------------------------------------------------- | ---------------- |
     | **`isCustomNotification`**  | Using custom notifications.                                             | `false`          |
     |       **`isShowLogo`**      | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png` | `false`          |
+    |       **`isShowMissedCallNotification`**      | Show missed call notification when timeout | `true`          |
     |       **`isShowCallback`**      | Show callback action from miss call notification. | `true`          |
     |      **`ringtonePath`**     | File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`                                                                                                    |`system_ringtone_default` <br>using ringtone default of the phone|
     |     **`backgroundColor`**   | Incoming call screen background color.                                  |     `#0955fa`    |

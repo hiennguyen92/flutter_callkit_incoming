@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming_example/app_router.dart';
@@ -9,67 +7,10 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
-import 'dart:io';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
-  listenerEvent(null);
-  showCallkitIncoming(Uuid().v4()); //'5c3ab1f0-8750-42eb-8d29-ad28e3d7f336');
-}
-
-Future<void> listenerEvent(Function? callback) async {
-  try {
-    FlutterCallkitIncoming.onEvent.listen((event) async {
-      print('ROOT: $event');
-      switch (event!.name) {
-        case CallEvent.ACTION_CALL_INCOMING:
-          // TODO: received an incoming call
-          break;
-        case CallEvent.ACTION_CALL_START:
-          // TODO: started an outgoing call
-          // TODO: show screen calling in Flutter
-          break;
-        case CallEvent.ACTION_CALL_ACCEPT:
-          // TODO: accepted an incoming call
-          // TODO: show screen calling in Flutter
-          // TODO: It may not be possible to navigate here because the App Widget has not been rendered. can save data call to local or use activeCalls() and check it in `WidgetsBinding.instance?.addPostFrameCallback`
-          break;
-        case CallEvent.ACTION_CALL_DECLINE:
-          // TODO: declined an incoming call
-          break;
-        case CallEvent.ACTION_CALL_ENDED:
-          // TODO: ended an incoming/outgoing call
-          break;
-        case CallEvent.ACTION_CALL_TIMEOUT:
-          // TODO: missed an incoming call
-          break;
-        case CallEvent.ACTION_CALL_CALLBACK:
-          // TODO: only Android - click action `Call back` from missed call notification
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_HOLD:
-          // TODO: only iOS
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_MUTE:
-          // TODO: only iOS
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_DMTF:
-          // TODO: only iOS
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_GROUP:
-          // TODO: only iOS
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
-          // TODO: only iOS
-          break;
-        case CallEvent.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
-          // TODO: only iOS
-          break;
-      }
-      if (callback != null) {
-        callback(event);
-      }
-    });
-  } on Exception {}
+  showCallkitIncoming(Uuid().v4());
 }
 
 Future<void> showCallkitIncoming(String uuid) async {
@@ -126,7 +67,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   var _uuid;
   var _currentUuid;
 
@@ -137,12 +78,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     super.initState();
     _uuid = Uuid();
     initFirebase();
-    listenerEvent(onEvent);
     WidgetsBinding.instance?.addObserver(this);
-  }
-
-  onEvent(event) {
-    print(event.toString());
   }
 
   getCurrentCall() async {
@@ -164,13 +100,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     print(state);
-    if(state == AppLifecycleState.resumed){
+    if (state == AppLifecycleState.resumed) {
       var currentCall = await getCurrentCall();
       if (currentCall != null) {
-        NavigationService.instance
-            .pushNamedAndRemoveUntil(AppRoute.callingPage, args: currentCall, predicate: (Route<dynamic> route){
-
-              return false;
+        NavigationService.instance.pushNamedAndRemoveUntil(AppRoute.callingPage,
+            args: currentCall, predicate: (Route<dynamic> route) {
+          return false;
         });
       }
     }

@@ -117,7 +117,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.1+5"
+    version: "1.0.1+7"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -128,6 +128,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  http:
+    dependency: "direct main"
+    description:
+      name: http
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.13.4"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.0"
   js:
     dependency: transitive
     description:

@@ -219,11 +219,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     func endCallNotExist(_ data: Data) {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(data.duration)) {
             let call = self.callManager?.callWithUUID(uuid: UUID(uuidString: data.uuid)!)
-            print(call)
-            print(self.answerCall)
-            print(self.outgoingCall)
             if (call != nil && self.answerCall == nil && self.outgoingCall == nil) {
-                print("Vao Roi")
                 self.callEndTimeout(data)
             }
         }
@@ -386,6 +382,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         action.fulfill()
     }
     
+
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else {
             action.fail()
@@ -395,11 +392,15 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.callManager?.removeCall(call)
         if (self.answerCall == nil && self.outgoingCall == nil) {
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                action.fulfill()
+            }
         }else {
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, self.data?.toJSON())
+            action.fulfill()
         }
-        action.fulfill()
     }
+    
     
     public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
         guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else {

@@ -1,3 +1,9 @@
+## 1.0.1+8
+
+* Add props `isShowMissedCallNotification` using sshow Missed call notification(Android)
+* Fixed issue decline(terminated/background state - there will be about 3 seconds to call the api before the app is closed.)
+* Fixed some bugs.
+
 ## 1.0.1+7
 
 * Fixed issue open app(terminated/background state).
