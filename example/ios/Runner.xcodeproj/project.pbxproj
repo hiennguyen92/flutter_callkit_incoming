@@ -89,7 +89,6 @@
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
-				F5DD6C658D9A6B3B706DCEC7 /* Pods */,
 				F6975C61C36B9C505BA2B35B /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -136,6 +135,7 @@
 		F6975C61C36B9C505BA2B35B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F5DD6C658D9A6B3B706DCEC7 /* Pods */,
 				5A49A48027C16CD5006C5AED /* Intents.framework */,
 				CCDA753F77D427CD020E9977 /* Pods_Runner.framework */,
 			);

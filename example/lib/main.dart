@@ -79,6 +79,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     _uuid = Uuid();
     initFirebase();
     WidgetsBinding.instance?.addObserver(this);
+    //Check call when open app from terminated
+    checkAndNavigationCallingPage();
   }
 
   getCurrentCall() async {
@@ -97,17 +99,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
+  checkAndNavigationCallingPage() async {
+    var currentCall = await getCurrentCall();
+    if (currentCall != null) {
+      NavigationService.instance
+          .pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
+    }
+  }
+
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     print(state);
     if (state == AppLifecycleState.resumed) {
-      var currentCall = await getCurrentCall();
-      if (currentCall != null) {
-        NavigationService.instance.pushNamedAndRemoveUntil(AppRoute.callingPage,
-            args: currentCall, predicate: (Route<dynamic> route) {
-          return false;
-        });
-      }
+      //Check call when open app from background
+      checkAndNavigationCallingPage();
     }
   }
 

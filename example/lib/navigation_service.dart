@@ -32,6 +32,25 @@ class NavigationService {
     );
   }
 
+  Future<T?> pushNamedIfNotCurrent<T extends Object>(String routeName,
+      {Object? args}) async {
+    if (!isCurrent(routeName)) {
+      return pushNamed(routeName, args: args);
+    }
+    return null;
+  }
+
+  bool isCurrent(String routeName) {
+    bool isCurrent = false;
+    navigationKey.currentState!.popUntil((route) {
+      if (route.settings.name == routeName) {
+        isCurrent = true;
+      }
+      return true;
+    });
+    return isCurrent;
+  }
+
   /// Pushing new page into navigation stack
   ///
   /// `route` is route generator
