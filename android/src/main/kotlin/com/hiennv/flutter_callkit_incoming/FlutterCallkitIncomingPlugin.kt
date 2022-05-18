@@ -127,7 +127,8 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         try {
             when (call.method) {
                 "showCallkitIncoming" -> {
-                    val data = Data(call.arguments())
+
+                    val data = Data(call.arguments()?: HashMap<String, Any?>())
                     data.from = "notification"
                     //send BroadcastReceiver
                     context?.sendBroadcast(
@@ -139,13 +140,13 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success("OK")
                 }
                 "showMissCallNotification" -> {
-                    val data = Data(call.arguments())
+                    val data = Data(call.arguments()?: HashMap<String, Any?>())
                     data.from = "notification"
                     callkitNotificationManager?.showMissCallNotification(data.toBundle())
                     result.success("OK")
                 }
                 "startCall" -> {
-                    val data = Data(call.arguments())
+                    val data = Data(call.arguments()?: HashMap<String, Any?>())
                     context?.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentStart(
                             requireNotNull(context),
@@ -155,7 +156,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success("OK")
                 }
                 "endCall" -> {
-                    val data = Data(call.arguments())
+                    val data = Data(call.arguments()?: HashMap<String, Any?>())
                     context?.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentEnded(
                             requireNotNull(context),
