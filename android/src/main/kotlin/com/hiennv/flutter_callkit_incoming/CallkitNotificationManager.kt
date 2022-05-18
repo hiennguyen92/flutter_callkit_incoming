@@ -159,11 +159,7 @@ class CallkitNotificationManager(private val context: Context) {
                         .transform(CircleTransform())
                         .into(targetLoadAvatarCustomize)
             }
-            if (Build.MANUFACTURER.equals("Xiaomi", ignoreCase = true)) {
-                //Ignore
-            } else {
-                notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            }
+            notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
             notificationBuilder.setCustomContentView(notificationViews)
             notificationBuilder.setCustomBigContentView(notificationViews)
             notificationBuilder.setCustomHeadsUpContentView(notificationViews)

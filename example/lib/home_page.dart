@@ -5,6 +5,7 @@ import 'package:flutter_callkit_incoming_example/navigation_service.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -126,7 +127,7 @@ class HomePageState extends State<HomePage> {
         'avatar': 'https://i.pravatar.cc/100',
         'handle': '0123456789',
         'type': 0,
-        'duration': 30000,
+        'duration': 10000,
         'textAccept': 'Accept',
         'textDecline': 'Decline',
         'textMissedCall': 'Missed call',
@@ -140,6 +141,7 @@ class HomePageState extends State<HomePage> {
           'isCustomNotification': true,
           'isShowLogo': false,
           'isShowCallback': true,
+          'isShowMissedCallNotification': true,
           'ringtonePath': 'system_ringtone_default',
           'backgroundColor': '#0955fa',
           'background': 'https://i.pravatar.cc/500',
@@ -200,53 +202,54 @@ class HomePageState extends State<HomePage> {
     print(devicePushTokenVoIP);
   }
 
-
   Future<void> listenerEvent(Function? callback) async {
     try {
-      FlutterCallkitIncoming.onEvent.listen((event) {
-        print(event);
+      FlutterCallkitIncoming.onEvent.listen((event) async {
+        print('HOME: $event');
         switch (event!.name) {
           case CallEvent.ACTION_CALL_INCOMING:
-          // TODO: received an incoming call
+            // TODO: received an incoming call
             break;
           case CallEvent.ACTION_CALL_START:
-          // TODO: started an outgoing call
-          // TODO: show screen calling in Flutter
+            // TODO: started an outgoing call
+            // TODO: show screen calling in Flutter
             break;
           case CallEvent.ACTION_CALL_ACCEPT:
-          // TODO: accepted an incoming call
-          // TODO: show screen calling in Flutter
-            NavigationService.instance.pushNamed(AppRoute.callingPage);
+            // TODO: accepted an incoming call
+            // TODO: show screen calling in Flutter
+            NavigationService.instance
+                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
             break;
           case CallEvent.ACTION_CALL_DECLINE:
-          // TODO: declined an incoming call
+            // TODO: declined an incoming call
+            await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
             break;
           case CallEvent.ACTION_CALL_ENDED:
-          // TODO: ended an incoming/outgoing call
+            // TODO: ended an incoming/outgoing call
             break;
           case CallEvent.ACTION_CALL_TIMEOUT:
-          // TODO: missed an incoming call
+            // TODO: missed an incoming call
             break;
           case CallEvent.ACTION_CALL_CALLBACK:
-          // TODO: only Android - click action `Call back` from missed call notification
+            // TODO: only Android - click action `Call back` from missed call notification
             break;
           case CallEvent.ACTION_CALL_TOGGLE_HOLD:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_CALL_TOGGLE_MUTE:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_CALL_TOGGLE_DMTF:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_CALL_TOGGLE_GROUP:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
           case CallEvent.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
-          // TODO: only iOS
+            // TODO: only iOS
             break;
         }
         if (callback != null) {
@@ -256,13 +259,16 @@ class HomePageState extends State<HomePage> {
     } on Exception {}
   }
 
+  //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
+  Future<void> requestHttp(content) async {
+    get(Uri.parse(
+        'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
+  }
+
   onEvent(event) {
     if (!mounted) return;
     setState(() {
       textEvents += "${event.toString()}\n";
     });
   }
-
-
-
 }

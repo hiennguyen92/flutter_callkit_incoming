@@ -14,7 +14,7 @@
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:exported="true"
             android:theme="@style/CallkitIncomingTheme">
             <intent-filter>

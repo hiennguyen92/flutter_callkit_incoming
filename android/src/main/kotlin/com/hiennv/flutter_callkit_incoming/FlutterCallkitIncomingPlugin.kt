@@ -87,6 +87,10 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         )
     }
 
+    public fun showMissCallNotification(data: Data) {
+        callkitNotificationManager?.showIncomingNotification(data.toBundle())
+    }
+
     public fun startCall(data: Data) {
         context?.sendBroadcast(
             CallkitIncomingBroadcastReceiver.getIntentStart(
@@ -125,7 +129,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "showCallkitIncoming" -> {
                     val data = Data(call.arguments())
                     data.from = "notification"
-                    callkitNotificationManager?.showIncomingNotification(data.toBundle())
                     //send BroadcastReceiver
                     context?.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentIncoming(

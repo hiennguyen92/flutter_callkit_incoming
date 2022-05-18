@@ -35,6 +35,7 @@ import flutter_callkit_incoming
         let nameCaller = handleObj.getDecryptHandle()["nameCaller"] as? String ?? ""
         let handle = handleObj.getDecryptHandle()["handle"] as? String ?? ""
         let data = flutter_callkit_incoming.Data(id: UUID().uuidString, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
+        //set more data
         data.nameCaller = "Johnny"
         SwiftFlutterCallkitIncomingPlugin.sharedInstance?.startCall(data, fromPushKit: true)
         
@@ -57,7 +58,7 @@ import flutter_callkit_incoming
     
     // Handle incoming pushes
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        
+        print("didReceiveIncomingPushWith")
         guard type == .voIP else { return }
         
         let id = payload.dictionaryPayload["id"] as? String ?? ""
@@ -66,6 +67,10 @@ import flutter_callkit_incoming
         let isVideo = payload.dictionaryPayload["isVideo"] as? Bool ?? false
         
         let data = flutter_callkit_incoming.Data(id: id, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
+        //set more data
+        data.extra = ["user": "abc@123", "platform": "ios"]
+        //data.iconName = ...
+        //data.....
         SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
     }
     

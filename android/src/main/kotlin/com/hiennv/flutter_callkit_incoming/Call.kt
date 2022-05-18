@@ -15,7 +15,7 @@ data class Data(val args: Map<String, Any?>) {
     var handle: String = (args["handle"] as? String) ?: ""
     var avatar: String = (args["avatar"] as? String) ?: ""
     var type: Int = (args["type"] as? Int) ?: 0
-    var duration: Long = (args["duration"] as? Long) ?: 30000L
+    var duration: Long = (args["duration"] as? Long) ?: ((args["duration"] as? Int)?.toLong() ?: 30000L)
     var textAccept: String = (args["textAccept"] as? String) ?: ""
     var textDecline: String = (args["textDecline"] as? String) ?: ""
     var textMissedCall: String = (args["textMissedCall"] as? String) ?: ""
@@ -33,6 +33,7 @@ data class Data(val args: Map<String, Any?>) {
     var backgroundColor: String
     var backgroundUrl: String
     var actionColor: String
+    var isShowMissedCallNotification: Boolean = true
 
     var isAccepted: Boolean = false
 
@@ -46,6 +47,7 @@ data class Data(val args: Map<String, Any?>) {
             backgroundColor = (android["backgroundColor"] as? String) ?: "#0955fa"
             backgroundUrl = (android["backgroundUrl"] as? String) ?: ""
             actionColor = (android["actionColor"] as? String) ?: "#4CAF50"
+            isShowMissedCallNotification = (android["isShowMissedCallNotification"] as? Boolean) ?: true
         } else {
             isCustomNotification = (args["isCustomNotification"] as? Boolean) ?: false
             isShowLogo = (args["isShowLogo"] as? Boolean) ?: false
@@ -54,6 +56,7 @@ data class Data(val args: Map<String, Any?>) {
             backgroundColor = (args["backgroundColor"] as? String) ?: "#0955fa"
             backgroundUrl = (args["backgroundUrl"] as? String) ?: ""
             actionColor = (args["actionColor"] as? String) ?: "#4CAF50"
+            isShowMissedCallNotification = (args["isShowMissedCallNotification"] as? Boolean) ?: true
         }
     }
 
@@ -105,6 +108,10 @@ data class Data(val args: Map<String, Any?>) {
         )
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACTION_COLOR, actionColor)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACTION_FROM, from)
+        bundle.putBoolean(
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_MISSED_CALL_NOTIFICATION,
+                isShowMissedCallNotification
+        )
         return bundle
     }
 
@@ -165,6 +172,10 @@ data class Data(val args: Map<String, Any?>) {
             )
             data.from =
                     bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACTION_FROM, "")
+            data.isShowMissedCallNotification = bundle.getBoolean(
+                    CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_MISSED_CALL_NOTIFICATION,
+                    true
+            )
             return data
         }
     }

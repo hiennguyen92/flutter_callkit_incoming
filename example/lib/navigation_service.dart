@@ -32,13 +32,31 @@ class NavigationService {
     );
   }
 
+  Future<T?> pushNamedIfNotCurrent<T extends Object>(String routeName,
+      {Object? args}) async {
+    if (!isCurrent(routeName)) {
+      return pushNamed(routeName, args: args);
+    }
+    return null;
+  }
+
+  bool isCurrent(String routeName) {
+    bool isCurrent = false;
+    navigationKey.currentState!.popUntil((route) {
+      if (route.settings.name == routeName) {
+        isCurrent = true;
+      }
+      return true;
+    });
+    return isCurrent;
+  }
+
   /// Pushing new page into navigation stack
   ///
   /// `route` is route generator
   Future<T?> push<T extends Object>(Route<T> route) async {
     return navigationKey.currentState?.push<T>(route);
   }
-
 
   /// Replace the current route of the navigator by pushing the given route and
   /// then disposing the previous route once the new route has finished
@@ -55,10 +73,10 @@ class NavigationService {
   /// Push the route with the given name onto the navigator, and then remove all
   /// the previous routes until the `predicate` returns true.
   Future<T?> pushNamedAndRemoveUntil<T extends Object>(
-      String routeName, {
-        Object? args,
-        bool Function(Route<dynamic>)? predicate,
-      }) async {
+    String routeName, {
+    Object? args,
+    bool Function(Route<dynamic>)? predicate,
+  }) async {
     return navigationKey.currentState?.pushNamedAndRemoveUntil<T>(
       routeName,
       predicate ?? (_) => false,
@@ -69,9 +87,9 @@ class NavigationService {
   /// Push the given route onto the navigator, and then remove all the previous
   /// routes until the `predicate` returns true.
   Future<T?> pushAndRemoveUntil<T extends Object>(
-      Route<T> route, {
-        bool Function(Route<dynamic>)? predicate,
-      }) async {
+    Route<T> route, {
+    bool Function(Route<dynamic>)? predicate,
+  }) async {
     return navigationKey.currentState?.pushAndRemoveUntil<T>(
       route,
       predicate ?? (_) => false,
@@ -97,5 +115,4 @@ class NavigationService {
   void popUntil(String route) {
     navigationKey.currentState!.popUntil(ModalRoute.withName(route));
   }
-
 }

@@ -14,6 +14,8 @@ import android.text.TextUtils
 class CallkitSoundPlayerService : Service() {
 
     private var vibrator: Vibrator? = null
+    private var audioManager: AudioManager? = null
+
     private var mediaPlayer: MediaPlayer? = null
     private var data: Bundle? = null
 
@@ -48,10 +50,17 @@ class CallkitSoundPlayerService : Service() {
         } else {
             getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0L, 1000L, 1000L), 0))
-        } else {
-            vibrator?.vibrate(longArrayOf(0L, 1000L, 1000L), 0)
+        audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
+        when (audioManager?.ringerMode) {
+            AudioManager.RINGER_MODE_SILENT -> {
+            }
+            else -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0L, 1000L, 1000L), 0))
+                } else {
+                    vibrator?.vibrate(longArrayOf(0L, 1000L, 1000L), 0)
+                }
+            }
         }
     }
 

@@ -10,9 +10,11 @@ class AppRoute {
   static Route<Object>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case homePage:
-        return MaterialPageRoute(builder: (_) => HomePage());
+        return MaterialPageRoute(
+            builder: (_) => HomePage(), settings: settings);
       case callingPage:
-        return MaterialPageRoute(builder: (_) => CallingPage());
+        return MaterialPageRoute(
+            builder: (_) => CallingPage(), settings: settings);
       default:
         return null;
     }
