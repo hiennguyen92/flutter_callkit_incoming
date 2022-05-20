@@ -106,13 +106,14 @@ class HomePageState extends State<HomePage> {
   initCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
-    print('initCurrentCall: $calls');
-    final objCalls = json.decode(calls);
-    if (objCalls is List) {
-      if (objCalls.isNotEmpty) {
-        this._currentUuid = objCalls[0]['id'];
+    if (calls is List) {
+      if (calls.isNotEmpty) {
+        print('DATA: $calls');
+        this._currentUuid = calls[0]['id'];
+        return calls[0];
       } else {
         this._currentUuid = "";
+        return null;
       }
     }
   }
