@@ -37,8 +37,8 @@
 
         <ImageView
             android:id="@+id/ivAvatar"
-            android:layout_width="@dimen/base_margin_x4"
-            android:layout_height="@dimen/base_margin_x4"
+            android:layout_width="@dimen/base_margin_x3"
+            android:layout_height="@dimen/base_margin_x3"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
             android:scaleType="centerCrop"
