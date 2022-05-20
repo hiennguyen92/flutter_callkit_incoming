@@ -127,7 +127,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         try {
             when (call.method) {
                 "showCallkitIncoming" -> {
-
                     val data = Data(call.arguments()?: HashMap<String, Any?>())
                     data.from = "notification"
                     //send BroadcastReceiver
@@ -188,7 +187,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success("OK")
                 }
                 "activeCalls" -> {
-                    result.success(getActiveCalls(context))
+                    result.success(getDataActiveCalls(context))
                 }
                 "getDevicePushTokenVoIP" -> {
                     result.success("")

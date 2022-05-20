@@ -377,7 +377,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             action.fail()
             return
         }
-        configurAudioSession()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
+            self.configurAudioSession()
+        }
         self.answerCall = call
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
         action.fulfill()

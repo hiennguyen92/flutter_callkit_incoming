@@ -78,7 +78,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     _uuid = Uuid();
     initFirebase();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
     //Check call when open app from terminated
     checkAndNavigationCallingPage();
   }
@@ -86,12 +86,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   getCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
-    final objCalls = json.decode(calls);
-    if (objCalls is List) {
-      if (objCalls.isNotEmpty) {
-        print('DATA: $objCalls');
-        this._currentUuid = objCalls[0]['id'];
-        return objCalls[0];
+    if (calls is List) {
+      if (calls.isNotEmpty) {
+        print('DATA: $calls');
+        this._currentUuid = calls[0]['id'];
+        return calls[0];
       } else {
         this._currentUuid = "";
         return null;
@@ -118,7 +117,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 

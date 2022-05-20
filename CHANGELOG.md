@@ -1,3 +1,10 @@
+## 1.0.2+1
+
+* Issue no audio when Accpet(iOS)
+* Duplicate sound notificaiton(Android)
+* Support Flutter 3
+* Fixed some bugs.
+
 ## 1.0.2
 
 * Fixed issue open app(terminated/background state - Android).
