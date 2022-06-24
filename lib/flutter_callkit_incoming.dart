@@ -68,7 +68,7 @@ class FlutterCallkitIncoming {
   /// Get active calls.
   /// On iOS: return active calls from Callkit.
   /// On Android: only return last call
-  static Future activeCalls() async {
+  static Future<List<dynamic>> activeCalls() async {
     return await _channel.invokeMethod("activeCalls");
   }
 

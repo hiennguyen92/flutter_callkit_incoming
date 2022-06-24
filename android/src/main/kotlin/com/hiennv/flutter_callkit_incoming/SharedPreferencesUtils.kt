@@ -54,6 +54,10 @@ fun getDataActiveCalls(context: Context?): ArrayList<Data> {
         .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
 }
 
+fun getDataActiveCallsForFlutter(context: Context?): ArrayList<Map<String, Any?>> {
+    val json = getString(context, "ACTIVE_CALLS", "[]")
+    return Utils.getGsonInstance().fromJson(json, object: TypeToken<ArrayList<Map<String, Any?>>>() {}.type)
+}
 
 fun putString(context: Context?, key: String, value: String?) {
     if (context == null) return
