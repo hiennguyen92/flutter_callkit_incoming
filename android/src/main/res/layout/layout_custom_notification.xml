@@ -40,6 +40,7 @@
             android:layout_width="@dimen/base_margin_x4"
             android:layout_height="@dimen/base_margin_x4"
             android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
             android:scaleType="centerCrop"
             android:visibility="invisible" />
     </RelativeLayout>
@@ -47,14 +48,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/base_margin"
+        android:layout_marginTop="@dimen/base_margin_half"
         android:orientation="horizontal">
 
 
         <LinearLayout
             android:id="@+id/llDecline"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/base_margin_x3_5"
             android:layout_marginRight="@dimen/base_margin_half"
             android:layout_weight="1"
             android:background="@drawable/rounded_button_decline"
@@ -76,7 +77,7 @@
                 android:id="@+id/tvDecline"
                 style="@style/Widget.Compat.NotificationActionText"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/base_margin_x4"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/text_decline"
                 android:textAllCaps="false"
@@ -87,7 +88,7 @@
         <LinearLayout
             android:id="@+id/llAccept"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/base_margin_x3_5"
             android:layout_marginLeft="@dimen/base_margin_half"
             android:layout_weight="1"
             android:background="@drawable/rounded_button_accept"
@@ -109,7 +110,7 @@
                 android:id="@+id/tvAccept"
                 style="@style/Widget.Compat.NotificationActionText"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/base_margin_x4"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/text_accept"
                 android:textAllCaps="false"
