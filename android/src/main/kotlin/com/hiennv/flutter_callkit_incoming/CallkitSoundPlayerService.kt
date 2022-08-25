@@ -77,6 +77,19 @@ class CallkitSoundPlayerService : Service() {
                     RingtoneManager.TYPE_RINGTONE
             )
         }
+        try {
+            mediaPlayer(uri!!)
+        } catch (e: Exception) {
+            try {
+                uri = getRingtoneUri("ringtone_default")
+                mediaPlayer(uri!!)
+            } catch (e2: Exception) {
+                e2.printStackTrace()
+            }
+        }
+    }
+
+    private fun mediaPlayer(uri: Uri) {
         mediaPlayer = MediaPlayer()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val attribution = AudioAttributes.Builder()
@@ -88,16 +101,11 @@ class CallkitSoundPlayerService : Service() {
         } else {
             mediaPlayer?.setAudioStreamType(AudioManager.STREAM_RING)
         }
-        try {
-            mediaPlayer?.setDataSource(applicationContext, uri!!)
-            mediaPlayer?.prepare()
-            mediaPlayer?.isLooping = true
-            mediaPlayer?.start()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        mediaPlayer?.setDataSource(applicationContext, uri)
+        mediaPlayer?.prepare()
+        mediaPlayer?.isLooping = true
+        mediaPlayer?.start()
     }
-
 
     private fun getRingtoneUri(fileName: String) = try {
         if (TextUtils.isEmpty(fileName)) {

@@ -128,7 +128,7 @@ class HomePageState extends State<HomePage> {
         'avatar': 'https://i.pravatar.cc/100',
         'handle': '0123456789',
         'type': 0,
-        'duration': 10000,
+        'duration': 30000,
         'textAccept': 'Accept',
         'textDecline': 'Decline',
         'textMissedCall': 'Missed call',
@@ -145,7 +145,7 @@ class HomePageState extends State<HomePage> {
           'isShowMissedCallNotification': true,
           'ringtonePath': 'system_ringtone_default',
           'backgroundColor': '#0955fa',
-          'background': 'https://i.pravatar.cc/500',
+          'backgroundUrl': 'assets/test.png',
           'actionColor': '#4CAF50'
         },
         'ios': <String, dynamic>{

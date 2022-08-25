@@ -8,6 +8,7 @@
     <dimen name="base_margin_x3">30dp</dimen>
     <dimen name="base_margin_x3_5">35dp</dimen>
     <dimen name="base_margin_x4">40dp</dimen>
+    <dimen name="base_margin_x4_8">48dp</dimen>
     <dimen name="base_margin_x5">50dp</dimen>
     <dimen name="base_margin_x6">60dp</dimen>
 

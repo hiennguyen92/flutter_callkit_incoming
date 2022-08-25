@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.media.RingtoneManager
@@ -16,7 +17,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
@@ -49,6 +49,7 @@ class CallkitNotificationManager(private val context: Context) {
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var notificationViews: RemoteViews? = null
+    private var notificationSmallViews: RemoteViews? = null
     private var notificationId: Int = 9696
 
     private var targetLoadAvatarDefault = object : Target {
@@ -57,19 +58,24 @@ class CallkitNotificationManager(private val context: Context) {
             getNotificationManager().notify(notificationId, notificationBuilder.build())
         }
 
-        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+        }
 
-        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+        }
     }
 
     private var targetLoadAvatarCustomize = object : Target {
         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
             notificationViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
             notificationViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
+            notificationSmallViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
+            notificationSmallViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
             getNotificationManager().notify(notificationId, notificationBuilder.build())
         }
 
-        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+        }
 
         override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
         }
@@ -122,45 +128,23 @@ class CallkitNotificationManager(private val context: Context) {
         if (isCustomNotification) {
             notificationViews =
                     RemoteViews(context.packageName, R.layout.layout_custom_notification)
-            notificationViews?.setTextViewText(
-                    R.id.tvNameCaller,
-                    data.getString(EXTRA_CALLKIT_NAME_CALLER, "")
-            )
-            notificationViews?.setTextViewText(
-                    R.id.tvNumber,
-                    data.getString(EXTRA_CALLKIT_HANDLE, "")
-            )
-            notificationViews?.setOnClickPendingIntent(
-                    R.id.llDecline,
-                    getDeclinePendingIntent(notificationId, data)
-            )
-            val textDecline = data.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
-            notificationViews?.setTextViewText(
-                    R.id.tvDecline,
-                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline
-            )
-            notificationViews?.setOnClickPendingIntent(
-                    R.id.llAccept,
-                    getAcceptPendingIntent(notificationId, data)
-            )
-            val textAccept = data.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
-            notificationViews?.setTextViewText(
-                    R.id.tvAccept,
-                    if (TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept
-            )
-            val avatarUrl = data.getString(EXTRA_CALLKIT_AVATAR, "")
-            if (avatarUrl != null && avatarUrl.isNotEmpty()) {
-                val headers =
-                        data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
-                getPicassoInstance(context, headers).load(avatarUrl)
-                        .transform(CircleTransform())
-                        .into(targetLoadAvatarCustomize)
+            initNotificationViews(notificationViews!!, data)
+
+
+            if (Build.MANUFACTURER.equals("Samsung", ignoreCase = true) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                notificationSmallViews =
+                        RemoteViews(context.packageName, R.layout.layout_custom_small_ex_notification)
+                initNotificationViews(notificationSmallViews!!, data)
+            } else {
+                notificationSmallViews =
+                        RemoteViews(context.packageName, R.layout.layout_custom_small_notification)
+                initNotificationViews(notificationSmallViews!!, data)
             }
 
             notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            notificationBuilder.setCustomContentView(notificationViews)
+            notificationBuilder.setCustomContentView(notificationSmallViews)
             notificationBuilder.setCustomBigContentView(notificationViews)
-            notificationBuilder.setCustomHeadsUpContentView(notificationViews)
+            notificationBuilder.setCustomHeadsUpContentView(notificationSmallViews)
         } else {
             val avatarUrl = data.getString(EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
@@ -189,6 +173,43 @@ class CallkitNotificationManager(private val context: Context) {
         val notification = notificationBuilder.build()
         notification.flags = Notification.FLAG_INSISTENT
         getNotificationManager().notify(notificationId, notification)
+    }
+
+    private fun initNotificationViews(remoteViews: RemoteViews, data: Bundle) {
+        remoteViews.setTextViewText(
+                R.id.tvNameCaller,
+                data.getString(EXTRA_CALLKIT_NAME_CALLER, "")
+        )
+        remoteViews.setTextViewText(
+                R.id.tvNumber,
+                data.getString(EXTRA_CALLKIT_HANDLE, "")
+        )
+        remoteViews.setOnClickPendingIntent(
+                R.id.llDecline,
+                getDeclinePendingIntent(notificationId, data)
+        )
+        val textDecline = data.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
+        remoteViews.setTextViewText(
+                R.id.tvDecline,
+                if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline
+        )
+        remoteViews.setOnClickPendingIntent(
+                R.id.llAccept,
+                getAcceptPendingIntent(notificationId, data)
+        )
+        val textAccept = data.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
+        remoteViews.setTextViewText(
+                R.id.tvAccept,
+                if (TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept
+        )
+        val avatarUrl = data.getString(EXTRA_CALLKIT_AVATAR, "")
+        if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+            val headers =
+                    data.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            getPicassoInstance(context, headers).load(avatarUrl)
+                    .transform(CircleTransform())
+                    .into(targetLoadAvatarCustomize)
+        }
     }
 
     fun showMissCallNotification(data: Bundle) {
@@ -312,9 +333,9 @@ class CallkitNotificationManager(private val context: Context) {
     private fun createNotificationChanel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             var channelCall = getNotificationManager().getNotificationChannel("callkit_incoming_channel_id")
-            if (channelCall != null){
+            if (channelCall != null) {
                 channelCall.setSound(null, null)
-            }else {
+            } else {
                 channelCall = NotificationChannel(
                         "callkit_incoming_channel_id",
                         "Incoming Call",

@@ -1,7 +1,14 @@
+## 1.0.2+2
+
+* Fix notification Android 12
+* Fix sound notification
+* Support `backgroundUrl` using path assets
+* Fixed some bugs.
+
 ## 1.0.2+1
 
-* Issue no audio when Accpet(iOS)
-* Duplicate sound notificaiton(Android)
+* Issue no audio when Accept(iOS)
+* Duplicate sound notification(Android)
 * Support Flutter 3
 * Fixed some bugs.
 
