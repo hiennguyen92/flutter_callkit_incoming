@@ -34,6 +34,7 @@ data class Data(val args: Map<String, Any?>) {
     var backgroundUrl: String
     var actionColor: String
     var isShowMissedCallNotification: Boolean = true
+    var incomingCallNotificationChannelName: String? = null
 
     var isAccepted: Boolean = false
 
@@ -48,6 +49,7 @@ data class Data(val args: Map<String, Any?>) {
             backgroundUrl = (android["backgroundUrl"] as? String) ?: ""
             actionColor = (android["actionColor"] as? String) ?: "#4CAF50"
             isShowMissedCallNotification = (android["isShowMissedCallNotification"] as? Boolean) ?: true
+            incomingCallNotificationChannelName = android["incomingCallNotificationChannelName"] as? String
         } else {
             isCustomNotification = (args["isCustomNotification"] as? Boolean) ?: false
             isShowLogo = (args["isShowLogo"] as? Boolean) ?: false
@@ -112,6 +114,10 @@ data class Data(val args: Map<String, Any?>) {
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_MISSED_CALL_NOTIFICATION,
                 isShowMissedCallNotification
         )
+        bundle.putString(
+            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME,
+            incomingCallNotificationChannelName
+        )
         return bundle
     }
 
@@ -175,6 +181,9 @@ data class Data(val args: Map<String, Any?>) {
             data.isShowMissedCallNotification = bundle.getBoolean(
                     CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_MISSED_CALL_NOTIFICATION,
                     true
+            )
+            data.incomingCallNotificationChannelName = bundle.getString(
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME
             )
             return data
         }

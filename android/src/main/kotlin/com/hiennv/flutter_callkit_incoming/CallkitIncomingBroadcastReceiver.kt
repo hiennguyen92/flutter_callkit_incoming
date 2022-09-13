@@ -49,6 +49,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKIT_BACKGROUND_COLOR = "EXTRA_CALLKIT_BACKGROUND_COLOR"
         const val EXTRA_CALLKIT_BACKGROUND_URL = "EXTRA_CALLKIT_BACKGROUND_URL"
         const val EXTRA_CALLKIT_ACTION_COLOR = "EXTRA_CALLKIT_ACTION_COLOR"
+        const val EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME = "EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME"
 
         const val EXTRA_CALLKIT_ACTION_FROM = "EXTRA_CALLKIT_ACTION_FROM"
 
@@ -186,7 +187,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 "ringtonePath" to data.getString(EXTRA_CALLKIT_RINGTONE_PATH, ""),
                 "backgroundColor" to data.getString(EXTRA_CALLKIT_BACKGROUND_COLOR, ""),
                 "backgroundUrl" to data.getString(EXTRA_CALLKIT_BACKGROUND_URL, ""),
-                "actionColor" to data.getString(EXTRA_CALLKIT_ACTION_COLOR, "")
+                "actionColor" to data.getString(EXTRA_CALLKIT_ACTION_COLOR, ""),
+                "incomingCallNotificationChannelName" to data.getString(EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, ""),
         )
         val forwardData = mapOf(
                 "id" to data.getString(EXTRA_CALLKIT_ID, ""),
