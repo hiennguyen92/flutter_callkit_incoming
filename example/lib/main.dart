@@ -37,6 +37,7 @@ Future<void> showCallkitIncoming(String uuid) async {
       'backgroundUrl': 'https://i.pravatar.cc/500',
       'actionColor': '#4CAF50',
       'incomingCallNotificationChannelName': "Incoming Call",
+      'missedCallNotificationChannelName': "Missed Call",
     },
     'ios': <String, dynamic>{
       'iconName': 'CallKitLogo',
