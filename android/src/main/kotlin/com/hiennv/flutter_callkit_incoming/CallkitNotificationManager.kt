@@ -48,6 +48,7 @@ class CallkitNotificationManager(private val context: Context) {
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
         private const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
+        private const val NOTIFICATION_CHANNEL_ID_MISSED = "callkit_missed_channel_id"
     }
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
@@ -234,8 +235,8 @@ class CallkitNotificationManager(private val context: Context) {
                 smallIcon = R.drawable.ic_call_missed
             }
         }
-        notificationBuilder = NotificationCompat.Builder(context, "callkit_missed_channel_id")
-        notificationBuilder.setChannelId("callkit_missed_channel_id")
+        notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_MISSED)
+        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_MISSED)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 notificationBuilder.setCategory(Notification.CATEGORY_MISSED_CALL)
@@ -380,7 +381,7 @@ class CallkitNotificationManager(private val context: Context) {
             getNotificationManager().createNotificationChannel(channelCall)
 
             val channelMissedCall = NotificationChannel(
-                    "callkit_missed_channel_id",
+                    NOTIFICATION_CHANNEL_ID_MISSED,
                     missedCallChannelName,
                     NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
