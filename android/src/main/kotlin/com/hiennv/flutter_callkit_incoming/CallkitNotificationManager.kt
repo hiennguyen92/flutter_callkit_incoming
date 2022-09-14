@@ -46,6 +46,8 @@ class CallkitNotificationManager(private val context: Context) {
     companion object {
 
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
+
+        private const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
     }
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
@@ -92,9 +94,9 @@ class CallkitNotificationManager(private val context: Context) {
             data.getString(EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, "Missed Call"),
         )
 
-        notificationBuilder = NotificationCompat.Builder(context, "callkit_incoming_channel_id")
+        notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.setAutoCancel(false)
-        notificationBuilder.setChannelId("callkit_incoming_channel_id")
+        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationBuilder.setCategory(NotificationCompat.CATEGORY_CALL)
@@ -126,7 +128,7 @@ class CallkitNotificationManager(private val context: Context) {
             notificationBuilder.color = Color.parseColor(actionColor)
         } catch (error: Exception) {
         }
-        notificationBuilder.setChannelId("callkit_incoming_channel_id")
+        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
         val isCustomNotification = data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
         if (isCustomNotification) {
@@ -337,18 +339,29 @@ class CallkitNotificationManager(private val context: Context) {
         }, 1000)
     }
 
+    fun incomingChannelEnabled(): Boolean {
+        val notificationManager = getNotificationManager()
+        val channel = notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
+
+        return notificationManager.areNotificationsEnabled() &&
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                        channel != null &&
+                        channel.importance > NotificationManagerCompat.IMPORTANCE_NONE) ||
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.O
+    }
+
     private fun createNotificationChanel(
         incomingCallChannelName: String,
         missedCallChannelName: String,
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            var channelCall = getNotificationManager().getNotificationChannel("callkit_incoming_channel_id")
+            var channelCall = getNotificationManager().getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
             if (channelCall != null) {
                 channelCall.setSound(null, null)
             } else {
                 channelCall = NotificationChannel(
-                        "callkit_incoming_channel_id",
                         incomingCallChannelName,
+                        NOTIFICATION_CHANNEL_ID_INCOMING,
                         NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     description = ""
