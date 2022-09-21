@@ -103,6 +103,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val callkitNotificationManager = CallkitNotificationManager(context)
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA) ?: return
+
+        Cache.updateLatestEvent(action, data.toData())
+
         when (action) {
             ACTION_CALL_INCOMING -> {
                 try {
@@ -186,30 +189,40 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun sendEventFlutter(event: String, data: Bundle) {
+    private fun sendEventFlutter(event: String, bundle: Bundle) {
+        FlutterCallkitIncomingPlugin.sendEvent(event, bundle.toData())
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun Bundle.toData(): Map<String, Any> {
         val android = mapOf(
-                "isCustomNotification" to data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false),
-                "ringtonePath" to data.getString(EXTRA_CALLKIT_RINGTONE_PATH, ""),
-                "backgroundColor" to data.getString(EXTRA_CALLKIT_BACKGROUND_COLOR, ""),
-                "backgroundUrl" to data.getString(EXTRA_CALLKIT_BACKGROUND_URL, ""),
-                "actionColor" to data.getString(EXTRA_CALLKIT_ACTION_COLOR, ""),
-                "incomingCallNotificationChannelName" to data.getString(EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, ""),
-                "missedCallNotificationChannelName" to data.getString(EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, ""),
+            "isCustomNotification" to getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false),
+            "ringtonePath" to getString(EXTRA_CALLKIT_RINGTONE_PATH, ""),
+            "backgroundColor" to getString(EXTRA_CALLKIT_BACKGROUND_COLOR, ""),
+            "backgroundUrl" to getString(EXTRA_CALLKIT_BACKGROUND_URL, ""),
+            "actionColor" to getString(EXTRA_CALLKIT_ACTION_COLOR, ""),
+            "incomingCallNotificationChannelName" to getString(
+                EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME,
+                ""
+            ),
+            "missedCallNotificationChannelName" to getString(
+                EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME,
+                ""
+            ),
         )
-        val forwardData = mapOf(
-                "id" to data.getString(EXTRA_CALLKIT_ID, ""),
-                "nameCaller" to data.getString(EXTRA_CALLKIT_NAME_CALLER, ""),
-                "avatar" to data.getString(EXTRA_CALLKIT_AVATAR, ""),
-                "number" to data.getString(EXTRA_CALLKIT_HANDLE, ""),
-                "type" to data.getInt(EXTRA_CALLKIT_TYPE, 0),
-                "duration" to data.getLong(EXTRA_CALLKIT_DURATION, 0L),
-                "textAccept" to data.getString(EXTRA_CALLKIT_TEXT_ACCEPT, ""),
-                "textDecline" to data.getString(EXTRA_CALLKIT_TEXT_DECLINE, ""),
-                "textMissedCall" to data.getString(EXTRA_CALLKIT_TEXT_MISSED_CALL, ""),
-                "textCallback" to data.getString(EXTRA_CALLKIT_TEXT_CALLBACK, ""),
-                "extra" to data.getSerializable(EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>,
-                "android" to android
+        return mapOf(
+            "id" to getString(EXTRA_CALLKIT_ID, ""),
+            "nameCaller" to getString(EXTRA_CALLKIT_NAME_CALLER, ""),
+            "avatar" to getString(EXTRA_CALLKIT_AVATAR, ""),
+            "number" to getString(EXTRA_CALLKIT_HANDLE, ""),
+            "type" to getInt(EXTRA_CALLKIT_TYPE, 0),
+            "duration" to getLong(EXTRA_CALLKIT_DURATION, 0L),
+            "textAccept" to getString(EXTRA_CALLKIT_TEXT_ACCEPT, ""),
+            "textDecline" to getString(EXTRA_CALLKIT_TEXT_DECLINE, ""),
+            "textMissedCall" to getString(EXTRA_CALLKIT_TEXT_MISSED_CALL, ""),
+            "textCallback" to getString(EXTRA_CALLKIT_TEXT_CALLBACK, ""),
+            "extra" to getSerializable(EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>,
+            "android" to android
         )
-        FlutterCallkitIncomingPlugin.sendEvent(event, forwardData)
     }
 }
