@@ -17,6 +17,10 @@ AndroidParams _$AndroidParamsFromJson(Map<String, dynamic> json) =>
       backgroundColor: json['backgroundColor'] as String?,
       backgroundUrl: json['backgroundUrl'] as String?,
       actionColor: json['actionColor'] as String?,
+      incomingCallNotificationChannelName:
+          json['incomingCallNotificationChannelName'] as String?,
+      missedCallNotificationChannelName:
+          json['missedCallNotificationChannelName'] as String?,
     );
 
 Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
@@ -29,4 +33,8 @@ Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
       'backgroundColor': instance.backgroundColor,
       'backgroundUrl': instance.backgroundUrl,
       'actionColor': instance.actionColor,
+      'incomingCallNotificationChannelName':
+          instance.incomingCallNotificationChannelName,
+      'missedCallNotificationChannelName':
+          instance.missedCallNotificationChannelName,
     };

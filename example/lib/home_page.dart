@@ -139,6 +139,8 @@ class HomePageState extends State<HomePage> {
           backgroundColor: '#0955fa',
           backgroundUrl: 'assets/test.png',
           actionColor: '#4CAF50',
+          incomingCallNotificationChannelName: 'Incoming Call',
+          missedCallNotificationChannelName: 'Missed Call',
         ),
         ios: IOSParams(
           iconName: 'CallKitLogo',

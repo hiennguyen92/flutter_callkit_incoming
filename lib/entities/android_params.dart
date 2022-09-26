@@ -13,6 +13,8 @@ class AndroidParams {
     this.backgroundColor,
     this.backgroundUrl,
     this.actionColor,
+    this.incomingCallNotificationChannelName,
+    this.missedCallNotificationChannelName,
   });
 
   final bool? isCustomNotification;
@@ -23,6 +25,8 @@ class AndroidParams {
   final String? backgroundColor;
   final String? backgroundUrl;
   final String? actionColor;
+  final String? incomingCallNotificationChannelName;
+  final String? missedCallNotificationChannelName;
 
   factory AndroidParams.fromJson(Map<String, dynamic> json) => _$AndroidParamsFromJson(json);
 
