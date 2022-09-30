@@ -79,6 +79,16 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("getDevicePushTokenVoIP");
   }
 
+  /// Get latest action
+  static Future<CallEvent?> getLatestEvent() async {
+    final event = await _channel.invokeMethod("getLatestEvent");
+    if (event != null) {
+      return Future.value(_receiveCallEvent(event));
+    } else {
+      return null;
+    }
+  }
+
   static CallEvent? _receiveCallEvent(dynamic data) {
     var event = "";
     dynamic body = {};

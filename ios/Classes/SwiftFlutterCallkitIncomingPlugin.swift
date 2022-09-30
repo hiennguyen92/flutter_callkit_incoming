@@ -38,7 +38,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
     
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
-        eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
+        let data = body ?? [:] as [String : Any?]
+        eventCallbackHandler?.send(event, data)
+        Cache.shared.updateLatestEvent(action: event, data: data)
     }
     
     @objc public func sendEventCustom(_ event: String, body: Any?) {
@@ -114,6 +116,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             break
         case "getDevicePushTokenVoIP":
             result(self.getDevicePushTokenVoIP())
+            break;
+        case "getLatestEvent":
+            result(Cache.shared.latestEvent)
+            // reset
+            Cache.shared.clearLatestEvent()
             break;
         default:
             result(FlutterMethodNotImplemented)
