@@ -361,8 +361,8 @@ class CallkitNotificationManager(private val context: Context) {
                 channelCall.setSound(null, null)
             } else {
                 channelCall = NotificationChannel(
-                        incomingCallChannelName,
                         NOTIFICATION_CHANNEL_ID_INCOMING,
+                        incomingCallChannelName,
                         NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     description = ""
