@@ -176,13 +176,18 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     @objc public func endCall(_ data: Data) {
         var call: Call? = nil
         if(self.isFromPushKit){
-            call = Call(uuid: UUID(uuidString: self.data!.uuid)!, data: data)
+            let uuidString = self.data!.uuid
+            call = Call(uuid: UUID(uuidString: uuidString)!, data: data)
             self.isFromPushKit = false
             self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
+            
+            self.saveEndCall(uuidString, 2)
         }else {
-            call = Call(uuid: UUID(uuidString: data.uuid)!, data: data)
+            let uuidString = data.uuid
+            call = Call(uuid: UUID(uuidString: uuidString)!, data: data)
+            
+            self.saveEndCall(uuidString, 2)
         }
-        self.callManager?.endCall(call: call!)
     }
     
     @objc public func activeCalls() -> [[String: Any]]? {
