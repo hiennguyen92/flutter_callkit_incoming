@@ -27,6 +27,7 @@ data class Data(val args: Map<String, Any?>) {
     var from: String = ""
 
     var isCustomNotification: Boolean = false
+    var isCustomSmallExNotification: Boolean = false
     var isShowLogo: Boolean = false
     var isShowCallback: Boolean = true
     var ringtonePath: String
@@ -43,6 +44,8 @@ data class Data(val args: Map<String, Any?>) {
         val android: HashMap<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         if (android != null) {
             isCustomNotification = (android["isCustomNotification"] as? Boolean) ?: false
+            isCustomSmallExNotification =
+                (android["isCustomSmallExNotification"] as? Boolean) ?: false
             isShowLogo = (android["isShowLogo"] as? Boolean) ?: false
             isShowCallback = (android["isShowCallback"] as? Boolean) ?: true
             ringtonePath = (android["ringtonePath"] as? String) ?: ""
@@ -54,6 +57,7 @@ data class Data(val args: Map<String, Any?>) {
             missedCallNotificationChannelName = android["missedCallNotificationChannelName"] as? String
         } else {
             isCustomNotification = (args["isCustomNotification"] as? Boolean) ?: false
+            isCustomSmallExNotification = (args["isCustomSmallExNotification"] as? Boolean) ?: false
             isShowLogo = (args["isShowLogo"] as? Boolean) ?: false
             isShowCallback = (args["isShowCallback"] as? Boolean) ?: true
             ringtonePath = (args["ringtonePath"] as? String) ?: ""
@@ -92,6 +96,10 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putBoolean(
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
                 isCustomNotification
+        )
+        bundle.putBoolean(
+            CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION,
+            isCustomSmallExNotification
         )
         bundle.putBoolean(
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
@@ -157,8 +165,12 @@ data class Data(val args: Map<String, Any?>) {
                     bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
             data.isCustomNotification = bundle.getBoolean(
-                    CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
-                    false
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
+                false
+            )
+            data.isCustomSmallExNotification = bundle.getBoolean(
+                CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION,
+                false
             )
             data.isShowLogo = bundle.getBoolean(
                     CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_SHOW_LOGO,
