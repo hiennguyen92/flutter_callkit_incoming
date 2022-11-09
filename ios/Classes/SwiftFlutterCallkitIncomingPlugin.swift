@@ -132,8 +132,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP, ["deviceTokenVoIP":deviceToken])
     }
     
-    @objc public func getDevicePushTokenVoIP() -> String {
-        return UserDefaults.standard.string(forKey: devicePushTokenVoIP) ?? ""
+    @objc public func getDevicePushTokenVoIP() -> String? {
+        return UserDefaults.standard.string(forKey: devicePushTokenVoIP)
     }
     
     @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {

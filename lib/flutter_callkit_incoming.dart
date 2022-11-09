@@ -74,7 +74,7 @@ class FlutterCallkitIncoming {
   /// Get device push token VoIP.
   /// On iOS: return deviceToken for VoIP.
   /// On Android: return Empty
-  static Future getDevicePushTokenVoIP() async {
+  static Future<String?> getDevicePushTokenVoIP() async {
     return await _channel.invokeMethod("getDevicePushTokenVoIP");
   }
 
