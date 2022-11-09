@@ -6,23 +6,39 @@ part of 'ios_params.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-IOSParams _$IOSParamsFromJson(Map<String, dynamic> json) => IOSParams(
-      iconName: json['iconName'] as String?,
-      handleType: json['handleType'] as String?,
-      supportsVideo: json['supportsVideo'] as bool?,
-      maximumCallGroups: json['maximumCallGroups'] as int?,
-      maximumCallsPerCallGroup: json['maximumCallsPerCallGroup'] as int?,
-      audioSessionMode: json['audioSessionMode'] as String?,
-      audioSessionActive: json['audioSessionActive'] as bool?,
-      audioSessionPreferredSampleRate:
-          (json['audioSessionPreferredSampleRate'] as num?)?.toDouble(),
-      audioSessionPreferredIOBufferDuration:
-          (json['audioSessionPreferredIOBufferDuration'] as num?)?.toDouble(),
-      supportsDTMF: json['supportsDTMF'] as bool?,
-      supportsHolding: json['supportsHolding'] as bool?,
-      supportsGrouping: json['supportsGrouping'] as bool?,
-      supportsUngrouping: json['supportsUngrouping'] as bool?,
-      ringtonePath: json['ringtonePath'] as String?,
+IOSParams _$IOSParamsFromJson(Map json) => $checkedCreate(
+      'IOSParams',
+      json,
+      ($checkedConvert) {
+        final val = IOSParams(
+          iconName: $checkedConvert('iconName', (v) => v as String?),
+          handleType: $checkedConvert('handleType', (v) => v as String?),
+          supportsVideo: $checkedConvert('supportsVideo', (v) => v as bool?),
+          maximumCallGroups:
+              $checkedConvert('maximumCallGroups', (v) => v as int?),
+          maximumCallsPerCallGroup:
+              $checkedConvert('maximumCallsPerCallGroup', (v) => v as int?),
+          audioSessionMode:
+              $checkedConvert('audioSessionMode', (v) => v as String?),
+          audioSessionActive:
+              $checkedConvert('audioSessionActive', (v) => v as bool?),
+          audioSessionPreferredSampleRate: $checkedConvert(
+              'audioSessionPreferredSampleRate',
+              (v) => (v as num?)?.toDouble()),
+          audioSessionPreferredIOBufferDuration: $checkedConvert(
+              'audioSessionPreferredIOBufferDuration',
+              (v) => (v as num?)?.toDouble()),
+          supportsDTMF: $checkedConvert('supportsDTMF', (v) => v as bool?),
+          supportsHolding:
+              $checkedConvert('supportsHolding', (v) => v as bool?),
+          supportsGrouping:
+              $checkedConvert('supportsGrouping', (v) => v as bool?),
+          supportsUngrouping:
+              $checkedConvert('supportsUngrouping', (v) => v as bool?),
+          ringtonePath: $checkedConvert('ringtonePath', (v) => v as String?),
+        );
+        return val;
+      },
     );
 
 Map<String, dynamic> _$IOSParamsToJson(IOSParams instance) => <String, dynamic>{

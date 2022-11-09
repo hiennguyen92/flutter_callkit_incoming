@@ -6,27 +6,47 @@ part of 'call_kit_params.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-CallKitParams _$CallKitParamsFromJson(Map<String, dynamic> json) =>
-    CallKitParams(
-      id: json['id'] as String?,
-      nameCaller: json['nameCaller'] as String?,
-      appName: json['appName'] as String?,
-      avatar: json['avatar'] as String?,
-      handle: json['handle'] as String?,
-      type: (json['type'] as num?)?.toDouble(),
-      duration: (json['duration'] as num?)?.toDouble(),
-      textAccept: json['textAccept'] as String?,
-      textDecline: json['textDecline'] as String?,
-      textMissedCall: json['textMissedCall'] as String?,
-      textCallback: json['textCallback'] as String?,
-      extra: json['extra'] as Map<String, dynamic>?,
-      headers: json['headers'] as Map<String, dynamic>?,
-      android: json['android'] == null
-          ? null
-          : AndroidParams.fromJson(json['android'] as Map<String, dynamic>),
-      ios: json['ios'] == null
-          ? null
-          : IOSParams.fromJson(json['ios'] as Map<String, dynamic>),
+CallKitParams _$CallKitParamsFromJson(Map json) => $checkedCreate(
+      'CallKitParams',
+      json,
+      ($checkedConvert) {
+        final val = CallKitParams(
+          id: $checkedConvert('id', (v) => v as String),
+          nameCaller: $checkedConvert('nameCaller', (v) => v as String?),
+          appName: $checkedConvert('appName', (v) => v as String?),
+          avatar: $checkedConvert('avatar', (v) => v as String?),
+          handle: $checkedConvert('handle', (v) => v as String?),
+          type: $checkedConvert('type', (v) => (v as num?)?.toDouble()),
+          duration: $checkedConvert('duration', (v) => (v as num?)?.toDouble()),
+          textAccept: $checkedConvert('textAccept', (v) => v as String?),
+          textDecline: $checkedConvert('textDecline', (v) => v as String?),
+          textMissedCall:
+              $checkedConvert('textMissedCall', (v) => v as String?),
+          textCallback: $checkedConvert('textCallback', (v) => v as String?),
+          extra: $checkedConvert(
+              'extra',
+              (v) => (v as Map?)?.map(
+                    (k, e) => MapEntry(k as String, e),
+                  )),
+          headers: $checkedConvert(
+              'headers',
+              (v) => (v as Map?)?.map(
+                    (k, e) => MapEntry(k as String, e),
+                  )),
+          android: $checkedConvert(
+              'android',
+              (v) => v == null
+                  ? null
+                  : AndroidParams.fromJson(
+                      Map<String, dynamic>.from(v as Map))),
+          ios: $checkedConvert(
+              'ios',
+              (v) => v == null
+                  ? null
+                  : IOSParams.fromJson(Map<String, dynamic>.from(v as Map))),
+        );
+        return val;
+      },
     );
 
 Map<String, dynamic> _$CallKitParamsToJson(CallKitParams instance) =>
