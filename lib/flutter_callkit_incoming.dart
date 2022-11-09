@@ -11,8 +11,10 @@ import 'entities/entities.dart';
 /// * endAllCalls()
 
 class FlutterCallkitIncoming {
-  static const MethodChannel _channel = const MethodChannel('flutter_callkit_incoming');
-  static const EventChannel _eventChannel = const EventChannel('flutter_callkit_incoming_events');
+  static const MethodChannel _channel =
+      const MethodChannel('flutter_callkit_incoming');
+  static const EventChannel _eventChannel =
+      const EventChannel('flutter_callkit_incoming_events');
 
   /// Listen to event callback from [FlutterCallkitIncoming].
   ///
@@ -31,44 +33,55 @@ class FlutterCallkitIncoming {
   /// Event.ACTION_CALL_TOGGLE_AUDIO_SESSION - only iOS
   /// Event.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP - only iOS
   /// }
-  static Stream<CallEvent?> get onEvent => _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
+  static Stream<CallEvent?> get onEvent =>
+      _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
 
   /// Show Callkit Incoming.
   /// On iOS, using Callkit. On Android, using a custom UI.
   static Future<void> showCallkitIncoming(CallKitParams params) async {
-    await _channel.invokeMethod("showCallkitIncoming", params.toJson());
+    await _channel.invokeMethod<void>("showCallkitIncoming", params.toJson());
   }
 
   /// Show Miss Call Notification.
   /// Only Android
   static Future<void> showMissCallNotification(CallKitParams params) async {
-    await _channel.invokeMethod("showMissCallNotification", params.toJson());
+    await _channel.invokeMethod<void>(
+        "showMissCallNotification", params.toJson());
   }
 
   /// Start an Outgoing call.
   /// On iOS, using Callkit(create a history into the Phone app).
   /// On Android, Nothing(only callback event listener).
   static Future<void> startCall(CallKitParams params) async {
-    await _channel.invokeMethod("startCall", params.toJson());
+    await _channel.invokeMethod<void>("startCall", params.toJson());
   }
 
   /// End an Incoming/Outgoing call.
   /// On iOS, using Callkit(update a history into the Phone app).
   /// On Android, Nothing(only callback event listener).
   static Future<void> endCall(String id) async {
-    await _channel.invokeMethod("endCall", {'id': id});
+    await _channel.invokeMethod<void>("endCall", {'id': id});
   }
 
   /// End all calls.
   static Future<void> endAllCalls() async {
-    await _channel.invokeMethod("endAllCalls");
+    await _channel.invokeMethod<void>("endAllCalls");
   }
 
   /// Get active calls.
   /// On iOS: return active calls from Callkit.
   /// On Android: only return last call
-  static Future<dynamic> activeCalls() async {
-    return await _channel.invokeMethod("activeCalls");
+  static Future<List<CallKitParams>?> activeCalls() async {
+    final jsonList =
+        await _channel.invokeMethod<void>("activeCalls") as List<Object?>?;
+
+    if (jsonList == null) {
+      return null;
+    }
+    return jsonList
+        .map((e) => CallKitParams.fromJson(
+            Map<String, dynamic>.from(e as Map<Object?, Object?>)))
+        .toList();
   }
 
   /// Get device push token VoIP.
@@ -80,7 +93,7 @@ class FlutterCallkitIncoming {
 
   /// Get latest action
   static Future<CallEvent?> getLatestEvent() async {
-    final event = await _channel.invokeMethod("getLatestEvent");
+    final event = await _channel.invokeMethod<String>("getLatestEvent");
     if (event != null) {
       return Future.value(_receiveCallEvent(event));
     } else {
@@ -89,14 +102,13 @@ class FlutterCallkitIncoming {
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {
-    Event? event;
-    Map<String, dynamic> body = {};
-
-    if (data is Map) {
-      event = Event.values.firstWhere((e) => e.name == data['event']);
-      body = Map<String, dynamic>.from(data['body']);
-      return CallEvent(body, event);
+    if (data is! Map) {
+      return null;
     }
-    return null;
+
+    final event = Event.values.firstWhere((e) => e.name == data['event']);
+    final body =
+        Map<String, dynamic>.from(data['body'] as Map<Object?, Object?>);
+    return CallEvent(body, event);
   }
 }
