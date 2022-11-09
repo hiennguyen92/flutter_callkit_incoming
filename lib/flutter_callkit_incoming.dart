@@ -38,13 +38,13 @@ class FlutterCallkitIncoming {
 
   /// Show Callkit Incoming.
   /// On iOS, using Callkit. On Android, using a custom UI.
-  static Future<void> showCallkitIncoming(CallKitParams params) async {
+  static Future<void> showCallkitIncoming(CallKit params) async {
     await _channel.invokeMethod<void>("showCallkitIncoming", params.toJson());
   }
 
   /// Show Miss Call Notification.
   /// Only Android
-  static Future<void> showMissCallNotification(CallKitParams params) async {
+  static Future<void> showMissCallNotification(CallKit params) async {
     await _channel.invokeMethod<void>(
         "showMissCallNotification", params.toJson());
   }
@@ -52,7 +52,7 @@ class FlutterCallkitIncoming {
   /// Start an Outgoing call.
   /// On iOS, using Callkit(create a history into the Phone app).
   /// On Android, Nothing(only callback event listener).
-  static Future<void> startCall(CallKitParams params) async {
+  static Future<void> startCall(CallKit params) async {
     await _channel.invokeMethod<void>("startCall", params.toJson());
   }
 
@@ -71,7 +71,7 @@ class FlutterCallkitIncoming {
   /// Get active calls.
   /// On iOS: return active calls from Callkit.
   /// On Android: only return last call
-  static Future<List<CallKitParams>?> activeCalls() async {
+  static Future<List<CallKit>?> activeCalls() async {
     final jsonList =
         await _channel.invokeMethod<void>("activeCalls") as List<Object?>?;
 
@@ -79,7 +79,7 @@ class FlutterCallkitIncoming {
       return null;
     }
     return jsonList
-        .map((e) => CallKitParams.fromJson(
+        .map((e) => CallKit.fromJson(
             Map<String, dynamic>.from(e as Map<Object?, Object?>)))
         .toList();
   }

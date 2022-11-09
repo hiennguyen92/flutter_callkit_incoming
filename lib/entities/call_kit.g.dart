@@ -1,16 +1,16 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'call_kit_params.dart';
+part of 'call_kit.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-CallKitParams _$CallKitParamsFromJson(Map json) => $checkedCreate(
-      'CallKitParams',
+CallKit _$CallKitFromJson(Map json) => $checkedCreate(
+      'CallKit',
       json,
       ($checkedConvert) {
-        final val = CallKitParams(
+        final val = CallKit(
           id: $checkedConvert('id', (v) => v as String),
           nameCaller: $checkedConvert('nameCaller', (v) => v as String?),
           appName: $checkedConvert('appName', (v) => v as String?),
@@ -49,8 +49,7 @@ CallKitParams _$CallKitParamsFromJson(Map json) => $checkedCreate(
       },
     );
 
-Map<String, dynamic> _$CallKitParamsToJson(CallKitParams instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$CallKitToJson(CallKit instance) => <String, dynamic>{
       'id': instance.id,
       'nameCaller': instance.nameCaller,
       'appName': instance.appName,
@@ -64,6 +63,6 @@ Map<String, dynamic> _$CallKitParamsToJson(CallKitParams instance) =>
       'textCallback': instance.textCallback,
       'extra': instance.extra,
       'headers': instance.headers,
-      'android': instance.android?.toJson(),
-      'ios': instance.ios?.toJson(),
+      'android': instance.android,
+      'ios': instance.ios,
     };
