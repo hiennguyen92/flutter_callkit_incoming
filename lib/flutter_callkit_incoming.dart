@@ -35,32 +35,32 @@ class FlutterCallkitIncoming {
 
   /// Show Callkit Incoming.
   /// On iOS, using Callkit. On Android, using a custom UI.
-  static Future showCallkitIncoming(CallKitParams params) async {
+  static Future<void> showCallkitIncoming(CallKitParams params) async {
     await _channel.invokeMethod("showCallkitIncoming", params.toJson());
   }
 
   /// Show Miss Call Notification.
   /// Only Android
-  static Future showMissCallNotification(CallKitParams params) async {
+  static Future<void> showMissCallNotification(CallKitParams params) async {
     await _channel.invokeMethod("showMissCallNotification", params.toJson());
   }
 
   /// Start an Outgoing call.
   /// On iOS, using Callkit(create a history into the Phone app).
   /// On Android, Nothing(only callback event listener).
-  static Future startCall(CallKitParams params) async {
+  static Future<void> startCall(CallKitParams params) async {
     await _channel.invokeMethod("startCall", params.toJson());
   }
 
   /// End an Incoming/Outgoing call.
   /// On iOS, using Callkit(update a history into the Phone app).
   /// On Android, Nothing(only callback event listener).
-  static Future endCall(String id) async {
+  static Future<void> endCall(String id) async {
     await _channel.invokeMethod("endCall", {'id': id});
   }
 
   /// End all calls.
-  static Future endAllCalls() async {
+  static Future<void> endAllCalls() async {
     await _channel.invokeMethod("endAllCalls");
   }
 
