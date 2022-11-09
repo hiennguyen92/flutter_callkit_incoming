@@ -192,6 +192,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "getDevicePushTokenVoIP" -> {
                     result.success("")
                 }
+                "getLatestEvent" -> {
+                    result.success(Cache.latestEvent)
+                    // reset
+                    Cache.clearLatestEvent()
+                }
             }
         } catch (error: Exception) {
             result.error("error", error.message, "")
