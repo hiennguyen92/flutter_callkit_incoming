@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/entities/android_params.dart';
 import 'package:flutter_callkit_incoming/entities/call_event.dart';
-import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/call_kit.dart';
 import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_callkit_incoming_example/app_router.dart';
@@ -97,18 +97,16 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  initCurrentCall() async {
+  Future<CallKit?> initCurrentCall() async {
     //check current call from pushkit if possible
-    var calls = await FlutterCallkitIncoming.activeCalls();
-    if (calls is List) {
-      if (calls.isNotEmpty) {
-        print('DATA: $calls');
-        _currentUuid = calls[0]['id'];
-        return calls[0];
-      } else {
-        _currentUuid = "";
-        return null;
-      }
+    final calls = await FlutterCallkitIncoming.activeCalls();
+    if (calls != null && calls.isNotEmpty) {
+      print('DATA: $calls');
+      _currentUuid = calls.first.id;
+      return calls.first;
+    } else {
+      _currentUuid = "";
+      return null;
     }
   }
 
@@ -116,8 +114,8 @@ class HomePageState extends State<HomePage> {
     await Future.delayed(const Duration(seconds: 10), () async {
       _currentUuid = _uuid.v4();
 
-      final params = CallKitParams(
-        id: _currentUuid,
+      final params = CallKit(
+        id: _currentUuid!,
         nameCaller: 'Hien Nguyen',
         appName: 'Callkit',
         avatar: 'https://i.pravatar.cc/100',
@@ -170,8 +168,8 @@ class HomePageState extends State<HomePage> {
 
   Future<void> startOutGoingCall() async {
     _currentUuid = _uuid.v4();
-    final params = CallKitParams(
-      id: _currentUuid,
+    final params = CallKit(
+      id: _currentUuid!,
       nameCaller: 'Hien Nguyen',
       handle: '0123456789',
       type: 1,
@@ -191,7 +189,8 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> getDevicePushTokenVoIP() async {
-    var devicePushTokenVoIP = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    var devicePushTokenVoIP =
+        await FlutterCallkitIncoming.getDevicePushTokenVoIP();
     print(devicePushTokenVoIP);
   }
 
@@ -210,7 +209,8 @@ class HomePageState extends State<HomePage> {
           case Event.ACTION_CALL_ACCEPT:
             // TODO: accepted an incoming call
             // TODO: show screen calling in Flutter
-            NavigationService.instance.pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
+            NavigationService.instance
+                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
             break;
           case Event.ACTION_CALL_DECLINE:
             // TODO: declined an incoming call
@@ -253,7 +253,8 @@ class HomePageState extends State<HomePage> {
 
   //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
   Future<void> requestHttp(content) async {
-    get(Uri.parse('https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
+    get(Uri.parse(
+        'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
 
   onEvent(event) {
