@@ -14,12 +14,12 @@ class CallingPage extends StatefulWidget {
 }
 
 class CallingPageState extends State<CallingPage> {
-  late CallKitParams? calling;
+  late CallKit? calling;
 
   @override
   Widget build(BuildContext context) {
     final params = jsonDecode(jsonEncode(ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>));
-    calling = CallKitParams.fromJson(params);
+    calling = CallKit.fromJson(params);
     debugPrint(calling?.toJson().toString());
 
     return Scaffold(
@@ -38,7 +38,7 @@ class CallingPageState extends State<CallingPage> {
                 ),
                 onPressed: () async {
                   if (calling != null) {
-                    FlutterCallkitIncoming.endCall(calling!.id!);
+                    FlutterCallkitIncoming.endCall(calling!.id);
                     calling = null;
                   }
                   NavigationService.instance.goBack();
@@ -61,6 +61,6 @@ class CallingPageState extends State<CallingPage> {
   @override
   void dispose() {
     super.dispose();
-    if (calling != null) FlutterCallkitIncoming.endCall(calling!.id!);
+    if (calling != null) FlutterCallkitIncoming.endCall(calling!.id);
   }
 }

@@ -63,6 +63,6 @@ Map<String, dynamic> _$CallKitToJson(CallKit instance) => <String, dynamic>{
       'textCallback': instance.textCallback,
       'extra': instance.extra,
       'headers': instance.headers,
-      'android': instance.android,
-      'ios': instance.ios,
+      'android': instance.android?.toJson(),
+      'ios': instance.ios?.toJson(),
     };
