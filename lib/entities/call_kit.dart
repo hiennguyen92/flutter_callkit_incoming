@@ -45,4 +45,24 @@ class CallKit {
   final IOSParams? ios;
 
   Map<String, dynamic> toJson() => _$CallKitToJson(this);
+
+  @override
+  String toString() =>
+      'CallKit(' +
+      'id: $id, ' +
+      'nameCaller: $nameCaller, ' +
+      'appName: $appName, ' +
+      'avatar: $avatar, ' +
+      'handle: $handle, ' +
+      'type: $type, ' +
+      'duration: $duration, ' +
+      'textAccept: $textAccept, ' +
+      'textDecline: $textDecline, ' +
+      'textMissedCall: $textMissedCall, ' +
+      'textCallback: $textCallback, ' +
+      'extra: $extra, ' +
+      'headers: $headers, ' +
+      'androidParams: $android, ' +
+      'iOSParams: $ios' +
+      ')';
 }
