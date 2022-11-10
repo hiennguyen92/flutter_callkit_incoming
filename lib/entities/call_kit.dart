@@ -3,12 +3,12 @@ import 'package:json_annotation/json_annotation.dart';
 import 'android_params.dart';
 import 'ios_params.dart';
 
-part 'call_kit_params.g.dart';
+part 'call_kit.g.dart';
 
-@JsonSerializable(explicitToJson: true)
-class CallKitParams {
-  const CallKitParams({
-    this.id,
+@JsonSerializable()
+class CallKit {
+  const CallKit({
+    required this.id,
     this.nameCaller,
     this.appName,
     this.avatar,
@@ -25,7 +25,10 @@ class CallKitParams {
     this.ios,
   });
 
-  final String? id;
+  factory CallKit.fromJson(Map<String, dynamic> json) =>
+      _$CallKitFromJson(json);
+
+  final String id;
   final String? nameCaller;
   final String? appName;
   final String? avatar;
@@ -41,7 +44,5 @@ class CallKitParams {
   final AndroidParams? android;
   final IOSParams? ios;
 
-  factory CallKitParams.fromJson(Map<String, dynamic> json) => _$CallKitParamsFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CallKitParamsToJson(this);
+  Map<String, dynamic> toJson() => _$CallKitToJson(this);
 }

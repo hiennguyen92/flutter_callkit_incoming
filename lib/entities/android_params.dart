@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'android_params.g.dart';
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class AndroidParams {
   const AndroidParams({
     this.isCustomNotification,

@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'ios_params.g.dart';
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class IOSParams {
   final String? iconName;
   final String? handleType;

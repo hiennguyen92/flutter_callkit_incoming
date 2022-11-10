@@ -1,10 +1,16 @@
-class CallEvent {
-  Event event;
-  dynamic body;
+import 'package:flutter_callkit_incoming/entities/call_kit.dart';
 
-  CallEvent(this.body, this.event);
+class CallEvent {
+  CallEvent({
+    required this.callKit,
+    required this.event,
+  });
+
+  final Event event;
+  final CallKit callKit;
+
   @override
-  String toString() => 'CallEvent( body: $body, event: $event)';
+  String toString() => 'CallEvent(event: $event, callkit: $callKit)';
 }
 
 enum Event {
