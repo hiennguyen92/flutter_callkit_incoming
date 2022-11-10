@@ -209,8 +209,10 @@ class HomePageState extends State<HomePage> {
           case Event.ACTION_CALL_ACCEPT:
             // TODO: accepted an incoming call
             // TODO: show screen calling in Flutter
-            NavigationService.instance
-                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
+            NavigationService.instance.pushNamedIfNotCurrent(
+              AppRoute.callingPage,
+              args: event.callKit,
+            );
             break;
           case Event.ACTION_CALL_DECLINE:
             // TODO: declined an incoming call

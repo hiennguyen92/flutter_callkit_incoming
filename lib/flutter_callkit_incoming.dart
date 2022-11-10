@@ -107,8 +107,12 @@ class FlutterCallkitIncoming {
     }
 
     final event = Event.values.firstWhere((e) => e.name == data['event']);
-    final body =
-        Map<String, dynamic>.from(data['body'] as Map<Object?, Object?>);
-    return CallEvent(body, event);
+    final callkit = CallKit.fromJson(
+        Map<String, dynamic>.from(data['body'] as Map<Object?, Object?>));
+
+    return CallEvent(
+      event: event,
+      callKit: callkit,
+    );
   }
 }
