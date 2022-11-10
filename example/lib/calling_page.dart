@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
@@ -18,8 +16,7 @@ class CallingPageState extends State<CallingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final params = jsonDecode(jsonEncode(ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>));
-    calling = CallKit.fromJson(params);
+    calling = ModalRoute.of(context)!.settings.arguments as CallKit?;
     debugPrint(calling?.toJson().toString());
 
     return Scaffold(
@@ -34,11 +31,12 @@ class CallingPageState extends State<CallingPage> {
               Text('Calling...'),
               TextButton(
                 style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () async {
                   if (calling != null) {
-                    FlutterCallkitIncoming.endCall(calling!.id);
+                    FlutterCallkitIncoming.instance.endCall(calling!.id);
                     calling = null;
                   }
                   NavigationService.instance.goBack();
@@ -54,13 +52,14 @@ class CallingPageState extends State<CallingPage> {
   }
 
   //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
-  Future<void> requestHttp(content) async {
-    get(Uri.parse('https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
+  Future<void> requestHttp(String content) async {
+    get(Uri.parse(
+        'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
 
   @override
   void dispose() {
     super.dispose();
-    if (calling != null) FlutterCallkitIncoming.endCall(calling!.id);
+    if (calling != null) FlutterCallkitIncoming.instance.endCall(calling!.id);
   }
 }

@@ -58,7 +58,7 @@ Future<void> showCallkitIncoming(String uuid) async {
       ringtonePath: 'system_ringtone_default',
     ),
   );
-  await FlutterCallkitIncoming.showCallkitIncoming(params);
+  await FlutterCallkitIncoming.instance.showCallkitIncoming(params);
 }
 
 void main() {
@@ -87,9 +87,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     checkAndNavigationCallingPage();
   }
 
-  getCurrentCall() async {
+  Future<CallKit?> getCurrentCall() async {
     //check current call from pushkit if possible
-    final calls = await FlutterCallkitIncoming.activeCalls();
+    final calls = await FlutterCallkitIncoming.instance.activeCalls();
     if (calls != null && calls.isNotEmpty) {
       print('DATA: $calls');
       _currentUuid = calls.first.id;
@@ -100,8 +100,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
-  checkAndNavigationCallingPage() async {
-    var currentCall = await getCurrentCall();
+  Future<void> checkAndNavigationCallingPage() async {
+    final currentCall = await getCurrentCall();
     if (currentCall != null) {
       NavigationService.instance
           .pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
@@ -123,7 +123,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  initFirebase() async {
+  Future<void> initFirebase() async {
     await Firebase.initializeApp();
     _firebaseMessaging = FirebaseMessaging.instance;
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -152,8 +152,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   Future<void> getDevicePushTokenVoIP() async {
-    var devicePushTokenVoIP =
-        await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    final devicePushTokenVoIP =
+        await FlutterCallkitIncoming.instance.getDevicePushTokenVoIP();
     print(devicePushTokenVoIP);
   }
 }

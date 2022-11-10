@@ -99,7 +99,7 @@ class HomePageState extends State<HomePage> {
 
   Future<CallKit?> initCurrentCall() async {
     //check current call from pushkit if possible
-    final calls = await FlutterCallkitIncoming.activeCalls();
+    final calls = await FlutterCallkitIncoming.instance.activeCalls();
     if (calls != null && calls.isNotEmpty) {
       print('DATA: $calls');
       _currentUuid = calls.first.id;
@@ -128,7 +128,7 @@ class HomePageState extends State<HomePage> {
         textCallback: 'Call back',
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
         headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
-        android: AndroidParams(
+        android: const AndroidParams(
           isCustomNotification: true,
           isShowLogo: false,
           isShowCallback: true,
@@ -157,13 +157,13 @@ class HomePageState extends State<HomePage> {
           ringtonePath: 'system_ringtone_default',
         ),
       );
-      await FlutterCallkitIncoming.showCallkitIncoming(params);
+      await FlutterCallkitIncoming.instance.showCallkitIncoming(params);
     });
   }
 
   Future<void> endCurrentCall() async {
     initCurrentCall();
-    await FlutterCallkitIncoming.endCall(_currentUuid!);
+    await FlutterCallkitIncoming.instance.endCall(_currentUuid!);
   }
 
   Future<void> startOutGoingCall() async {
@@ -176,27 +176,27 @@ class HomePageState extends State<HomePage> {
       extra: <String, dynamic>{'userId': '1a2b3c4d'},
       ios: IOSParams(handleType: 'number'),
     );
-    await FlutterCallkitIncoming.startCall(params);
+    await FlutterCallkitIncoming.instance.startCall(params);
   }
 
   Future<void> activeCalls() async {
-    var calls = await FlutterCallkitIncoming.activeCalls();
+    var calls = await FlutterCallkitIncoming.instance.activeCalls();
     print(calls);
   }
 
   Future<void> endAllCalls() async {
-    await FlutterCallkitIncoming.endAllCalls();
+    await FlutterCallkitIncoming.instance.endAllCalls();
   }
 
   Future<void> getDevicePushTokenVoIP() async {
     var devicePushTokenVoIP =
-        await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+        await FlutterCallkitIncoming.instance.getDevicePushTokenVoIP();
     print(devicePushTokenVoIP);
   }
 
   Future<void> listenerEvent(Function? callback) async {
     try {
-      FlutterCallkitIncoming.onEvent.listen((event) async {
+      FlutterCallkitIncoming.instance.onEvent.listen((event) async {
         print('HOME: $event');
         switch (event!.event) {
           case Event.ACTION_CALL_INCOMING:
@@ -254,15 +254,18 @@ class HomePageState extends State<HomePage> {
   }
 
   //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
-  Future<void> requestHttp(content) async {
+  Future<void> requestHttp(String content) async {
     get(Uri.parse(
         'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
 
-  onEvent(event) {
-    if (!mounted) return;
+  void onEvent(String event) {
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
-      textEvents += "${event.toString()}\n";
+      textEvents += "$event\n";
     });
   }
 }
