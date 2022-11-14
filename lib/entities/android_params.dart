@@ -17,6 +17,9 @@ class AndroidParams {
     this.missedCallNotificationChannelName,
   });
 
+  factory AndroidParams.fromJson(Map<String, dynamic> json) =>
+      _$AndroidParamsFromJson(json);
+
   final bool? isCustomNotification;
   final bool? isShowLogo;
   final bool? isShowCallback;
@@ -28,7 +31,21 @@ class AndroidParams {
   final String? incomingCallNotificationChannelName;
   final String? missedCallNotificationChannelName;
 
-  factory AndroidParams.fromJson(Map<String, dynamic> json) => _$AndroidParamsFromJson(json);
-
   Map<String, dynamic> toJson() => _$AndroidParamsToJson(this);
+
+  @override
+  String toString() =>
+      'AndroidParams(' +
+      'isCustomNotification: $isCustomNotification, ' +
+      'isShowLogo: $isShowLogo, ' +
+      'isShowCallback: $isShowCallback, ' +
+      'isShowMissedCallNotification: $isShowMissedCallNotification, ' +
+      'ringtonePath: $ringtonePath, ' +
+      'backgroundColor: $backgroundColor, ' +
+      'backgroundUrl: $backgroundUrl, ' +
+      'backgroundUrl: $backgroundUrl, ' +
+      'actionColor: $actionColor, ' +
+      'incomingCallNotificationChannelName: $incomingCallNotificationChannelName, ' +
+      'missedCallNotificationChannelName: $missedCallNotificationChannelName' +
+      ')';
 }
