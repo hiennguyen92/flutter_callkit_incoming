@@ -79,8 +79,7 @@ class FlutterCallkitIncoming {
   /// On iOS: return active calls from Callkit.
   /// On Android: only return last call
   Future<List<CallKit>?> activeCalls() async {
-    final jsonList =
-        await _channel.invokeMethod<void>("activeCalls") as List<Object?>?;
+    final jsonList = await _channel.invokeMethod<List<Object?>?>("activeCalls");
 
     if (jsonList == null) {
       return null;
@@ -100,7 +99,8 @@ class FlutterCallkitIncoming {
 
   /// Get latest action
   Future<CallEvent?> getLatestEvent() async {
-    final event = await _channel.invokeMethod<String>("getLatestEvent");
+    final event =
+        await _channel.invokeMethod<Map<Object?, Object?>?>("getLatestEvent");
     if (event != null) {
       return Future.value(_receiveCallEvent(event));
     } else {
