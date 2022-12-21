@@ -41,7 +41,8 @@ class CallKitParams {
   final AndroidParams? android;
   final IOSParams? ios;
 
-  factory CallKitParams.fromJson(Map<String, dynamic> json) => _$CallKitParamsFromJson(json);
+  factory CallKitParams.fromJson(Map<String, dynamic> json) =>
+      _$CallKitParamsFromJson(json);
 
   Map<String, dynamic> toJson() => _$CallKitParamsToJson(this);
 }

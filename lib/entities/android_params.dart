@@ -28,7 +28,8 @@ class AndroidParams {
   final String? incomingCallNotificationChannelName;
   final String? missedCallNotificationChannelName;
 
-  factory AndroidParams.fromJson(Map<String, dynamic> json) => _$AndroidParamsFromJson(json);
+  factory AndroidParams.fromJson(Map<String, dynamic> json) =>
+      _$AndroidParamsFromJson(json);
 
   Map<String, dynamic> toJson() => _$AndroidParamsToJson(this);
 }
