@@ -236,10 +236,10 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         }
       });
     ```
-  * Call from Native (iOS PushKit) 
+  * Call from Native (iOS/Android) 
 
     ```swift
-      //Swift
+      //Swift iOS
       var info = [String: Any?]()
       info["id"] = "44d915e1-5ff4-4bed-bf13-c423048ec97a"
       info["nameCaller"] = "Hien Nguyen"
@@ -247,6 +247,11 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       info["type"] = 1
       //... set more data
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
+    ```
+    
+    ```kotlin
+        //Kotlin/Java Android
+        FlutterCallkitIncomingPlugin.getInstance().showIncomingNotification(...)
     ```
 
     <br>
@@ -285,6 +290,11 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 
     ```
 
+    ```kotlin
+        //Kotlin/Java Android
+        FlutterCallkitIncomingPlugin.getInstance().showIncomingNotification(...)
+    ```
+
 4. Properties
 
     | Prop            | Description                                                             | Default     |
@@ -312,6 +322,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     | Prop                        | Description                                                             | Default          |
     | --------------------------- | ----------------------------------------------------------------------- | ---------------- |
     | **`isCustomNotification`**  | Using custom notifications.                                             | `false`          |
+    | **`isCustomSmallExNotification`**  | Using custom notification small on some devices clipped out in android.                                             | `false`          |
     |       **`isShowLogo`**      | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png` | `false`          |
     |       **`isShowMissedCallNotification`**      | Show missed call notification when timeout | `true`          |
     |       **`isShowCallback`**      | Show callback action from miss call notification. | `true`          |

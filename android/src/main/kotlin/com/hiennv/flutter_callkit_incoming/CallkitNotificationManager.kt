@@ -329,7 +329,7 @@ class CallkitNotificationManager(private val context: Context) {
 
 
     fun clearIncomingNotification(data: Bundle) {
-        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded())
+        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded(context))
         notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
     }
@@ -466,7 +466,7 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private fun getActivityPendingIntent(id: Int, data: Bundle): PendingIntent {
-        val intent = CallkitIncomingActivity.getIntent(data)
+        val intent = CallkitIncomingActivity.getIntent(context, data)
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
     }
 

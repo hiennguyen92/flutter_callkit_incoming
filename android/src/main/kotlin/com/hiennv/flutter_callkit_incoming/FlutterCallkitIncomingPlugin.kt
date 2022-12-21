@@ -37,9 +37,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
         private val eventHandler = EventCallbackHandler()
 
-        fun sendEvent(event: String, body: Map<String, Any>) {
-            eventHandler.send(event, body)
-        }
 
         fun sharePluginWithRegister(
             @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding,
@@ -48,7 +45,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             initSharedInstance(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger, handler)
         }
 
-        fun initSharedInstance(
+        private fun initSharedInstance(
             @NonNull context: Context,
             @NonNull binaryMessenger: BinaryMessenger,
             @Nullable handler: MethodCallHandler?
@@ -131,6 +128,10 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             )
         }
         removeAllCalls(context)
+    }
+
+    public fun sendEventCustom(event: String, body: Map<String, Any>) {
+        eventHandler.send(event, body)
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {

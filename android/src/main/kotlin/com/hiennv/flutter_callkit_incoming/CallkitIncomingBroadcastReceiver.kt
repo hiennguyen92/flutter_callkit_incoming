@@ -58,43 +58,43 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
         fun getIntentIncoming(context: Context, data: Bundle?) =
                 Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_INCOMING
+                    action = "${context.packageName}.${ACTION_CALL_INCOMING}"
                     putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
                 }
 
         fun getIntentStart(context: Context, data: Bundle?) =
                 Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_START
+                    action = "${context.packageName}.${ACTION_CALL_START}"
                     putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
                 }
 
         fun getIntentAccept(context: Context, data: Bundle?) =
                 Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_ACCEPT
+                    action = "${context.packageName}.${ACTION_CALL_ACCEPT}"
                     putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
                 }
 
         fun getIntentDecline(context: Context, data: Bundle?) =
                 Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_DECLINE
+                    action = "${context.packageName}.${ACTION_CALL_DECLINE}"
                     putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
                 }
 
         fun getIntentEnded(context: Context, data: Bundle?) =
                 Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_ENDED
+                    action = "${context.packageName}.${ACTION_CALL_ENDED}"
                     putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
                 }
 
         fun getIntentTimeout(context: Context, data: Bundle?) =
                 Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_TIMEOUT
+                    action = "${context.packageName}.${ACTION_CALL_TIMEOUT}"
                     putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
                 }
 
         fun getIntentCallback(context: Context, data: Bundle?) =
                 Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_CALLBACK
+                    action = "${context.packageName}.${ACTION_CALL_CALLBACK}"
                     putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
                 }
     }
@@ -106,7 +106,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA) ?: return
         when (action) {
-            ACTION_CALL_INCOMING -> {
+            "${context.packageName}.${ACTION_CALL_INCOMING}" -> {
                 try {
                     callkitNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(ACTION_CALL_INCOMING, data)
@@ -122,7 +122,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_START -> {
+            "${context.packageName}.${ACTION_CALL_START}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_START, data)
                     addCall(context, Data.fromBundle(data), true)
@@ -130,7 +130,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_ACCEPT -> {
+            "${context.packageName}.${ACTION_CALL_ACCEPT}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -140,7 +140,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_DECLINE -> {
+            "${context.packageName}.${ACTION_CALL_DECLINE}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_DECLINE, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -150,7 +150,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_ENDED -> {
+            "${context.packageName}.${ACTION_CALL_ENDED}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_ENDED, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -160,7 +160,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_TIMEOUT -> {
+            "${context.packageName}.${ACTION_CALL_TIMEOUT}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_TIMEOUT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -172,7 +172,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_CALLBACK -> {
+            "${context.packageName}.${ACTION_CALL_CALLBACK}" -> {
                 try {
                     callkitNotificationManager.clearMissCallNotification(data)
                     sendEventFlutter(ACTION_CALL_CALLBACK, data)
