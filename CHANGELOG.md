@@ -1,4 +1,4 @@
-## 1.0.3
+## 1.0.3+1
 
 * Dart class models instead using dynamic types and Maps (thank @icodelifee - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/180)
 * Allow to call from native Android (thank @fabiocody - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/185)
@@ -6,6 +6,10 @@
 * Adding the feature to change template of notification to small `isCustomSmallExNotification` (thank @anocean2 - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/196)
 * Fixed ringtone sound not playing in Release mode on Android (thank @mschudt - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/204)
 * Fixed some bugs.
+
+## 1.0.3
+
+* REMOVED
 
 ## 1.0.2+2
 
