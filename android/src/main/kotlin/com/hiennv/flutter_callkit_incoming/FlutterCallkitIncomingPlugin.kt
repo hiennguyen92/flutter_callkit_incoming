@@ -37,6 +37,9 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
         private val eventHandler = EventCallbackHandler()
 
+        fun sendEvent(event: String, body: Map<String, Any>) {
+            eventHandler.send(event, body)
+        }
 
         fun sharePluginWithRegister(
             @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding,
