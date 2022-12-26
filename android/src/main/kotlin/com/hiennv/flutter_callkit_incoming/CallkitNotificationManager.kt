@@ -27,6 +27,7 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ID
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_ACCEPT
@@ -132,13 +133,17 @@ class CallkitNotificationManager(private val context: Context) {
         notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
         val isCustomNotification = data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
+        val isCustomSmallExNotification = data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION, false)
         if (isCustomNotification) {
             notificationViews =
                     RemoteViews(context.packageName, R.layout.layout_custom_notification)
             initNotificationViews(notificationViews!!, data)
 
-
-            if (Build.MANUFACTURER.equals("Samsung", ignoreCase = true) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if ((Build.MANUFACTURER.equals(
+                    "Samsung",
+                    ignoreCase = true
+                ) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) || isCustomSmallExNotification
+            ) {
                 notificationSmallViews =
                         RemoteViews(context.packageName, R.layout.layout_custom_small_ex_notification)
                 initNotificationViews(notificationSmallViews!!, data)
@@ -324,7 +329,7 @@ class CallkitNotificationManager(private val context: Context) {
 
 
     fun clearIncomingNotification(data: Bundle) {
-        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded())
+        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded(context))
         notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
     }
@@ -361,8 +366,8 @@ class CallkitNotificationManager(private val context: Context) {
                 channelCall.setSound(null, null)
             } else {
                 channelCall = NotificationChannel(
-                        incomingCallChannelName,
                         NOTIFICATION_CHANNEL_ID_INCOMING,
+                        incomingCallChannelName,
                         NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     description = ""
@@ -461,7 +466,7 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private fun getActivityPendingIntent(id: Int, data: Bundle): PendingIntent {
-        val intent = CallkitIncomingActivity.getIntent(data)
+        val intent = CallkitIncomingActivity.getIntent(context, data)
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
     }
 
