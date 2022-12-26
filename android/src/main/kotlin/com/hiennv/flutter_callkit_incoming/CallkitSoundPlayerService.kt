@@ -101,7 +101,12 @@ class CallkitSoundPlayerService : Service() {
         } else {
             mediaPlayer?.setAudioStreamType(AudioManager.STREAM_RING)
         }
-        mediaPlayer?.setDataSource(applicationContext, uri)
+        val assetFileDescriptor = applicationContext.getContentResolver().openAssetFileDescriptor(uri, "r")
+        if (assetFileDescriptor != null) {
+            mediaPlayer?.setDataSource(assetFileDescriptor)
+        } else {
+            mediaPlayer?.setDataSource(applicationContext, uri)
+        }
         mediaPlayer?.prepare()
         mediaPlayer?.isLooping = true
         mediaPlayer?.start()
