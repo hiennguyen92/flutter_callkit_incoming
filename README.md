@@ -64,84 +64,82 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
   * Received an incoming call
     ```dart
       this._currentUuid = _uuid.v4();
-      var params = <String, dynamic>{
-        'id': _currentUuid,
-        'nameCaller': 'Hien Nguyen',
-        'appName': 'Callkit',
-        'avatar': 'https://i.pravatar.cc/100',
-        'handle': '0123456789',
-        'type': 0,
-        'textAccept': 'Accept',
-        'textDecline': 'Decline',
-        'textMissedCall': 'Missed call',
-        'textCallback': 'Call back',
-        'duration': 30000,
-        'extra': <String, dynamic>{'userId': '1a2b3c4d'},
-        'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
-        'android': <String, dynamic>{
-          'isCustomNotification': true,
-          'isShowLogo': false,
-          'isShowCallback': false,
-          'isShowMissedCallNotification': true,
-          'ringtonePath': 'system_ringtone_default',
-          'backgroundColor': '#0955fa',
-          'backgroundUrl': 'https://i.pravatar.cc/500',
-          'actionColor': '#4CAF50',
-          'incomingCallNotificationChannelName': "Incoming Call",
-          'missedCallNotificationChannelName': "Missed Call"
-        },
-        'ios': <String, dynamic>{
-          'iconName': 'CallKitLogo',
-          'handleType': 'generic',
-          'supportsVideo': true,
-          'maximumCallGroups': 2,
-          'maximumCallsPerCallGroup': 1,
-          'audioSessionMode': 'default',
-          'audioSessionActive': true,
-          'audioSessionPreferredSampleRate': 44100.0,
-          'audioSessionPreferredIOBufferDuration': 0.005,
-          'supportsDTMF': true,
-          'supportsHolding': true,
-          'supportsGrouping': false,
-          'supportsUngrouping': false,
-          'ringtonePath': 'system_ringtone_default'
-        }
-      };
-      await FlutterCallkitIncoming.showCallkitIncoming(params);
+      CallKitParams callKitParams = CallKitParams(
+        id: _currentUuid,
+        nameCaller: 'Hien Nguyen',
+        appName: 'Callkit',
+        avatar: 'https://i.pravatar.cc/100',
+        handle: '0123456789',
+        type: 0,
+        textAccept: 'Accept',
+        textDecline: 'Decline',
+        textMissedCall: 'Missed call',
+        textCallback: 'Call back',
+        duration: 30000,
+        extra: <String, dynamic>{'userId': '1a2b3c4d'},
+        headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
+        android: const AndroidParams(
+            isCustomNotification: true,
+            isShowLogo: false,
+            isShowCallback: false,
+            isShowMissedCallNotification: true,
+            ringtonePath: 'system_ringtone_default',
+            backgroundColor: '#0955fa',
+            backgroundUrl: 'https://i.pravatar.cc/500',
+            actionColor: '#4CAF50',
+            incomingCallNotificationChannelName: "Incoming Call",
+            missedCallNotificationChannelName: "Missed Call"),
+        ios: IOSParams(
+          iconName: 'CallKitLogo',
+          handleType: 'generic',
+          supportsVideo: true,
+          maximumCallGroups: 2,
+          maximumCallsPerCallGroup: 1,
+          audioSessionMode: 'default',
+          audioSessionActive: true,
+          audioSessionPreferredSampleRate: 44100.0,
+          audioSessionPreferredIOBufferDuration: 0.005,
+          supportsDTMF: true,
+          supportsHolding: true,
+          supportsGrouping: false,
+          supportsUngrouping: false,
+          ringtonePath: 'system_ringtone_default',
+        ),
+      );
+      await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
     ```
   * Show miss call notification
     ```dart
       this._currentUuid = _uuid.v4();
-      var params = <String, dynamic>{
-        'id': this._currentUuid,
-        'nameCaller': 'Hien Nguyen',
-        'handle': '0123456789',
-        'type': 1,
-        'textMissedCall': 'Missed call',
-        'textCallback': 'Call back',
-        'extra': <String, dynamic>{'userId': '1a2b3c4d'},
-      };
+      CallKitParams params = CallKitParams(
+        id: _currentUuid,
+        nameCaller: 'Hien Nguyen',
+        handle: '0123456789',
+        type: 1,
+        textMissedCall: 'Missed call',
+        textCallback: 'Call back',
+        extra: <String, dynamic>{'userId': '1a2b3c4d'},
+      );
       await FlutterCallkitIncoming.showMissCallNotification(params);
     ```
 
   * Started an outgoing call
     ```dart
       this._currentUuid = _uuid.v4();
-      var params = <String, dynamic>{
-        'id': this._currentUuid,
-        'nameCaller': 'Hien Nguyen',
-        'handle': '0123456789',
-        'type': 1,
-        'extra': <String, dynamic>{'userId': '1a2b3c4d'},
-        'ios': <String, dynamic>{'handleType': 'generic'}
-      };
+      CallKitParams params = CallKitParams(
+        id: this._currentUuid,
+        nameCaller: 'Hien Nguyen',
+        handle: '0123456789',
+        type: 1,
+        extra: <String, dynamic>{'userId': '1a2b3c4d'},
+        ios: IOSParams(handleType: 'generic')
+      );
       await FlutterCallkitIncoming.startCall(params);
     ```
 
   * Ended an incoming/outgoing call
     ```dart
-      var params = <String, dynamic>{'id': this._currentUuid};
-      await FlutterCallkitIncoming.endCall(params);
+      await FlutterCallkitIncoming.endCall(this._currentUuid);
     ```
 
   * Ended all calls
