@@ -2,9 +2,13 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'ios_params.g.dart';
 
+/// Object config for iOS.
 @JsonSerializable(explicitToJson: true)
 class IOSParams {
+  /// App's Icon. using for display inside Callkit(iOS)
   final String? iconName;
+
+  /// Type handle call `generic`, `number`, `email`
   final String? handleType;
   final bool? supportsVideo;
   final int? maximumCallGroups;
@@ -17,6 +21,8 @@ class IOSParams {
   final bool? supportsHolding;
   final bool? supportsGrouping;
   final bool? supportsUngrouping;
+
+  /// Add file to root project xcode /ios/Runner/Ringtone.caf and Copy Bundle Resources(Build Phases) -> value: "Ringtone.caf"
   final String? ringtonePath;
 
   IOSParams({

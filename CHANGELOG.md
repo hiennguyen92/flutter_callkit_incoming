@@ -1,3 +1,12 @@
+## 1.0.3+3
+
+* Update README.md
+* Fixed some bugs.
+
+## 1.0.3+2
+
+* REMOVED
+
 ## 1.0.3+1
 
 * Dart class models instead using dynamic types and Maps (thank @icodelifee - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/180)

@@ -5,6 +5,7 @@ import 'ios_params.dart';
 
 part 'call_kit_params.g.dart';
 
+/// Object config for General.
 @JsonSerializable(explicitToJson: true)
 class CallKitParams {
   const CallKitParams({
