@@ -1,3 +1,4 @@
+/// Object CallEvent.
 class CallEvent {
   Event event;
   dynamic body;
@@ -23,7 +24,7 @@ enum Event {
   ACTION_CALL_TOGGLE_AUDIO_SESSION,
 }
 
-// using extension for backward compatibility Dart SDK 2.17.0 and lower
+/// Using extension for backward compatibility Dart SDK 2.17.0 and lower
 extension EventX on Event {
   String get name {
     switch (this) {

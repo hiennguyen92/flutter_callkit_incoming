@@ -136,16 +136,20 @@ class CallkitSoundPlayerService : Service() {
             }
         }
     } catch (e: Exception) {
-        if (fileName.equals("system_ringtone_default", true)) {
-            RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-            )
-        } else {
-            RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-            )
+        try {
+            if (fileName.equals("system_ringtone_default", true)) {
+                RingtoneManager.getActualDefaultRingtoneUri(
+                        this@CallkitSoundPlayerService,
+                        RingtoneManager.TYPE_RINGTONE
+                )
+            } else {
+                RingtoneManager.getActualDefaultRingtoneUri(
+                        this@CallkitSoundPlayerService,
+                        RingtoneManager.TYPE_RINGTONE
+                )
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 }

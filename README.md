@@ -370,8 +370,8 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
   <br>
 
 7. Todo
-  *
-  *
+  * Run background
+  * Simplify the setup process
 
     <br>
 
