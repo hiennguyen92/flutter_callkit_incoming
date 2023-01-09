@@ -11,8 +11,10 @@ import 'entities/entities.dart';
 /// * endAllCalls()
 
 class FlutterCallkitIncoming {
-  static const MethodChannel _channel = const MethodChannel('flutter_callkit_incoming');
-  static const EventChannel _eventChannel = const EventChannel('flutter_callkit_incoming_events');
+  static const MethodChannel _channel =
+      const MethodChannel('flutter_callkit_incoming');
+  static const EventChannel _eventChannel =
+      const EventChannel('flutter_callkit_incoming_events');
 
   /// Listen to event callback from [FlutterCallkitIncoming].
   ///
@@ -31,7 +33,8 @@ class FlutterCallkitIncoming {
   /// Event.ACTION_CALL_TOGGLE_AUDIO_SESSION - only iOS
   /// Event.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP - only iOS
   /// }
-  static Stream<CallEvent?> get onEvent => _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
+  static Stream<CallEvent?> get onEvent =>
+      _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
 
   /// Show Callkit Incoming.
   /// On iOS, using Callkit. On Android, using a custom UI.

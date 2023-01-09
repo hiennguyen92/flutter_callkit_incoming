@@ -105,7 +105,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   checkAndNavigationCallingPage() async {
     var currentCall = await getCurrentCall();
     if (currentCall != null) {
-      NavigationService.instance.pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
+      NavigationService.instance
+          .pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
     }
   }
 
@@ -146,12 +147,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       onGenerateRoute: AppRoute.generateRoute,
       initialRoute: AppRoute.homePage,
       navigatorKey: NavigationService.instance.navigationKey,
-      navigatorObservers: <NavigatorObserver>[NavigationService.instance.routeObserver],
+      navigatorObservers: <NavigatorObserver>[
+        NavigationService.instance.routeObserver
+      ],
     );
   }
 
   Future<void> getDevicePushTokenVoIP() async {
-    var devicePushTokenVoIP = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    var devicePushTokenVoIP =
+        await FlutterCallkitIncoming.getDevicePushTokenVoIP();
     print(devicePushTokenVoIP);
   }
 }

@@ -5,6 +5,7 @@ import 'ios_params.dart';
 
 part 'call_kit_params.g.dart';
 
+/// Object config for General.
 @JsonSerializable(explicitToJson: true)
 class CallKitParams {
   const CallKitParams({
@@ -41,7 +42,8 @@ class CallKitParams {
   final AndroidParams? android;
   final IOSParams? ios;
 
-  factory CallKitParams.fromJson(Map<String, dynamic> json) => _$CallKitParamsFromJson(json);
+  factory CallKitParams.fromJson(Map<String, dynamic> json) =>
+      _$CallKitParamsFromJson(json);
 
   Map<String, dynamic> toJson() => _$CallKitParamsToJson(this);
 }

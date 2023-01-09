@@ -18,7 +18,8 @@ class CallingPageState extends State<CallingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final params = jsonDecode(jsonEncode(ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>));
+    final params = jsonDecode(jsonEncode(
+        ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>));
     calling = CallKitParams.fromJson(params);
     debugPrint(calling?.toJson().toString());
 
@@ -34,7 +35,8 @@ class CallingPageState extends State<CallingPage> {
               Text('Calling...'),
               TextButton(
                 style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () async {
                   if (calling != null) {
@@ -55,7 +57,8 @@ class CallingPageState extends State<CallingPage> {
 
   //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
   Future<void> requestHttp(content) async {
-    get(Uri.parse('https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
+    get(Uri.parse(
+        'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
 
   @override
