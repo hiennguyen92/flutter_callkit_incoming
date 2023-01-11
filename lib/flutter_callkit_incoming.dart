@@ -19,9 +19,9 @@ class FlutterCallkitIncoming {
       _instance ??= FlutterCallkitIncoming._();
 
   static const MethodChannel _channel =
-      MethodChannel('flutter_callkit_incoming');
+      const MethodChannel('flutter_callkit_incoming');
   static const EventChannel _eventChannel =
-      EventChannel('flutter_callkit_incoming_events');
+      const EventChannel('flutter_callkit_incoming_events');
 
   /// Listen to event callback from [FlutterCallkitIncoming].
   ///
