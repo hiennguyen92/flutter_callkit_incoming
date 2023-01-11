@@ -2,8 +2,29 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'ios_params.g.dart';
 
-@JsonSerializable()
+/// Object config for iOS.
+@JsonSerializable(explicitToJson: true)
 class IOSParams {
+  /// App's Icon. using for display inside Callkit(iOS)
+  final String? iconName;
+
+  /// Type handle call `generic`, `number`, `email`
+  final String? handleType;
+  final bool? supportsVideo;
+  final int? maximumCallGroups;
+  final int? maximumCallsPerCallGroup;
+  final String? audioSessionMode;
+  final bool? audioSessionActive;
+  final double? audioSessionPreferredSampleRate;
+  final double? audioSessionPreferredIOBufferDuration;
+  final bool? supportsDTMF;
+  final bool? supportsHolding;
+  final bool? supportsGrouping;
+  final bool? supportsUngrouping;
+
+  /// Add file to root project xcode /ios/Runner/Ringtone.caf and Copy Bundle Resources(Build Phases) -> value: "Ringtone.caf"
+  final String? ringtonePath;
+
   IOSParams({
     this.iconName,
     this.handleType,
@@ -23,21 +44,6 @@ class IOSParams {
 
   factory IOSParams.fromJson(Map<String, dynamic> json) =>
       _$IOSParamsFromJson(json);
-
-  final String? iconName;
-  final String? handleType;
-  final bool? supportsVideo;
-  final int? maximumCallGroups;
-  final int? maximumCallsPerCallGroup;
-  final String? audioSessionMode;
-  final bool? audioSessionActive;
-  final double? audioSessionPreferredSampleRate;
-  final double? audioSessionPreferredIOBufferDuration;
-  final bool? supportsDTMF;
-  final bool? supportsHolding;
-  final bool? supportsGrouping;
-  final bool? supportsUngrouping;
-  final String? ringtonePath;
 
   Map<String, dynamic> toJson() => _$IOSParamsToJson(this);
 
