@@ -39,6 +39,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKIT_TEXT_DECLINE = "EXTRA_CALLKIT_TEXT_DECLINE"
         const val EXTRA_CALLKIT_TEXT_MISSED_CALL = "EXTRA_CALLKIT_TEXT_MISSED_CALL"
         const val EXTRA_CALLKIT_TEXT_CALLBACK = "EXTRA_CALLKIT_TEXT_CALLBACK"
+        const val EXTRA_CALLKIT_DEEP_LINK = "EXTRA_CALLKIT_DEEP_LINK"
         const val EXTRA_CALLKIT_EXTRA = "EXTRA_CALLKIT_EXTRA"
         const val EXTRA_CALLKIT_HEADERS = "EXTRA_CALLKIT_HEADERS"
         const val EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION = "EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION"
@@ -111,7 +112,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     callkitNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
-
                     if (callkitNotificationManager.incomingChannelEnabled()) {
                         val soundPlayerServiceIntent =
                             Intent(context, CallkitSoundPlayerService::class.java)

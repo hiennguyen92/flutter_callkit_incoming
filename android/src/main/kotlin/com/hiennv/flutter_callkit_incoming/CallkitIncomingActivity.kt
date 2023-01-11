@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -281,6 +282,7 @@ class CallkitIncomingActivity : Activity() {
             intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
         if (intent != null) {
+            intent.data = data?.getParcelable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DEEP_LINK);
             val intentTransparent = TransparentActivity.getIntentAccept(this@CallkitIncomingActivity, data)
             startActivities(arrayOf(intent, intentTransparent))
         } else {

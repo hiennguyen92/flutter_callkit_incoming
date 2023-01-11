@@ -19,6 +19,7 @@ CallKitParams _$CallKitParamsFromJson(Map<String, dynamic> json) =>
       textDecline: json['textDecline'] as String?,
       textMissedCall: json['textMissedCall'] as String?,
       textCallback: json['textCallback'] as String?,
+      deeplink: json['deeplink'] as String?,
       extra: json['extra'] as Map<String, dynamic>?,
       headers: json['headers'] as Map<String, dynamic>?,
       android: json['android'] == null
@@ -42,6 +43,7 @@ Map<String, dynamic> _$CallKitParamsToJson(CallKitParams instance) =>
       'textDecline': instance.textDecline,
       'textMissedCall': instance.textMissedCall,
       'textCallback': instance.textCallback,
+      'deeplink': instance.deeplink,
       'extra': instance.extra,
       'headers': instance.headers,
       'android': instance.android?.toJson(),

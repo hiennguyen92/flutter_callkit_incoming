@@ -343,11 +343,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     
-    
-    
-    
-    
-    
     public func providerDidReset(_ provider: CXProvider) {
         if(self.callManager == nil){ return }
         for call in self.callManager!.calls{

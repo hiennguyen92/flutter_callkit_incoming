@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 
@@ -141,7 +142,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         try {
             when (call.method) {
                 "showCallkitIncoming" -> {
-                    val data = Data(call.arguments() ?: HashMap<String, Any?>())
+                    val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
                     //send BroadcastReceiver
                     context?.sendBroadcast(
@@ -153,13 +154,13 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success("OK")
                 }
                 "showMissCallNotification" -> {
-                    val data = Data(call.arguments() ?: HashMap<String, Any?>())
+                    val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
                     callkitNotificationManager?.showMissCallNotification(data.toBundle())
                     result.success("OK")
                 }
                 "startCall" -> {
-                    val data = Data(call.arguments() ?: HashMap<String, Any?>())
+                    val data = Data(call.arguments() ?: HashMap())
                     context?.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentStart(
                             requireNotNull(context),
@@ -169,7 +170,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success("OK")
                 }
                 "endCall" -> {
-                    val data = Data(call.arguments() ?: HashMap<String, Any?>())
+                    val data = Data(call.arguments() ?: HashMap())
                     context?.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentEnded(
                             requireNotNull(context),
