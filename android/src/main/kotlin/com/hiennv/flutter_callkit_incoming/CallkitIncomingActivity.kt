@@ -81,19 +81,16 @@ class CallkitIncomingActivity : Activity() {
     private var endedCallkitIncomingBroadcastReceiver = EndedCallkitIncomingBroadcastReceiver()
 
     private lateinit var ivBackground: ImageView
-    private lateinit var llBackgroundAnimation: RippleRelativeLayout
 
     private lateinit var tvNameCaller: TextView
     private lateinit var tvNumber: TextView
     private lateinit var ivLogo: ImageView
-    private lateinit var ivAvatar: CircleImageView
+    private lateinit var ivAvatar: ImageView
 
     private lateinit var llAction: LinearLayout
     private lateinit var ivAcceptCall: ImageView
-    private lateinit var tvAccept: TextView
 
     private lateinit var ivDeclineCall: ImageView
-    private lateinit var tvDecline: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -191,11 +188,6 @@ class CallkitIncomingActivity : Activity() {
 
         finishTimeout(data, duration)
 
-        val textAccept = data?.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
-        tvAccept.text = if (TextUtils.isEmpty(textAccept)) getString(R.string.text_accept) else textAccept
-        val textDecline = data?.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
-        tvDecline.text = if (TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
-
         val backgroundColor = data?.getString(EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
         try {
             ivBackground.setBackgroundColor(Color.parseColor(backgroundColor))
@@ -235,10 +227,6 @@ class CallkitIncomingActivity : Activity() {
 
     private fun initView() {
         ivBackground = findViewById(R.id.ivBackground)
-        llBackgroundAnimation = findViewById(R.id.llBackgroundAnimation)
-        llBackgroundAnimation.layoutParams.height =
-                Utils.getScreenWidth() + Utils.getStatusBarHeight(this@CallkitIncomingActivity)
-        llBackgroundAnimation.startRippleAnimation()
 
         tvNameCaller = findViewById(R.id.tvNameCaller)
         tvNumber = findViewById(R.id.tvNumber)
@@ -252,10 +240,8 @@ class CallkitIncomingActivity : Activity() {
         llAction.layoutParams = params
 
         ivAcceptCall = findViewById(R.id.ivAcceptCall)
-        tvAccept = findViewById(R.id.tvAccept)
         ivDeclineCall = findViewById(R.id.ivDeclineCall)
-        tvDecline = findViewById(R.id.tvDecline)
-        animateAcceptCall()
+        //animateAcceptCall()
 
         ivAcceptCall.setOnClickListener {
             onAcceptClick()

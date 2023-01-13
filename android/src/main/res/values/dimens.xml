@@ -11,8 +11,10 @@
     <dimen name="base_margin_x4_8">48dp</dimen>
     <dimen name="base_margin_x5">50dp</dimen>
     <dimen name="base_margin_x6">60dp</dimen>
+    <dimen name="base_margin_x10">100dp</dimen>
+    <dimen name="base_margin_x20">200dp</dimen>
 
-    <dimen name="base_margin_revert_x5">-50dp</dimen>
+    <dimen name="base_margin_revert_x5">-10dp</dimen>
     <dimen name="size_avatar">120dp</dimen>
     <dimen name="size_button">60dp</dimen>
     <dimen name="size_button_x2">120dp</dimen>
