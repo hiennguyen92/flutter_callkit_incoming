@@ -63,12 +63,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <ImageView
+                    <com.hiennv.flutter_callkit_incoming.widgets.TextViewWithImageLoader
                         android:id="@+id/ivAvatar"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/ic_default_avatar" />
+                        android:layout_width="550px"
+                        android:layout_height="550px"
+                        android:background="@drawable/image"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        tools:text="test" />
+
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -113,15 +117,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginTop="140dp"
+            android:layout_marginTop="100dp"
             android:fitsSystemWindows="true"
             android:orientation="horizontal">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="120dp"
                 android:layout_height="60dp"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
                 android:layout_marginLeft="40dp"
                 app:cardCornerRadius="8dp">
 
@@ -133,7 +135,6 @@
                         android:id="@+id/ivDeclineCall"
                         android:layout_width="120dp"
                         android:layout_height="60dp"
-                        android:layout_centerInParent="true"
                         android:background="@drawable/reject"
                         android:padding="@dimen/base_margin_x1_5"
                         tools:ignore="ContentDescription" />
@@ -149,8 +150,6 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="120dp"
                 android:layout_height="60dp"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
                 android:layout_marginRight="40dp"
                 app:cardCornerRadius="8dp">
 
@@ -162,7 +161,6 @@
                         android:id="@+id/ivAcceptCall"
                         android:layout_width="120dp"
                         android:layout_height="60dp"
-                        android:layout_centerInParent="true"
                         android:background="@drawable/accept"
                         android:padding="@dimen/base_margin_x1_5"
                         tools:ignore="ContentDescription" />
