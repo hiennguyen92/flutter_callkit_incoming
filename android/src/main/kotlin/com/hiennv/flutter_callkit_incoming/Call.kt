@@ -26,6 +26,7 @@ data class Data(val args: Map<String, Any?>) {
             (args["headers"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
     var from: String = ""
 
+    var nameCallerDetails: String = (args["nameCallerDetails"] as? String) ?: ""
     var isCustomNotification: Boolean = false
     var isShowLogo: Boolean = false
     var isShowCallback: Boolean = true
@@ -42,6 +43,7 @@ data class Data(val args: Map<String, Any?>) {
     init {
         val android: HashMap<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         if (android != null) {
+            nameCallerDetails = (android["nameCallerDetails"] as? String) ?: ""
             isCustomNotification = (android["isCustomNotification"] as? Boolean) ?: false
             isShowLogo = (android["isShowLogo"] as? Boolean) ?: false
             isShowCallback = (android["isShowCallback"] as? Boolean) ?: true
@@ -53,6 +55,7 @@ data class Data(val args: Map<String, Any?>) {
             incomingCallNotificationChannelName = android["incomingCallNotificationChannelName"] as? String
             missedCallNotificationChannelName = android["missedCallNotificationChannelName"] as? String
         } else {
+            nameCallerDetails = (args["nameCallerDetails"] as? String) ?: ""
             isCustomNotification = (args["isCustomNotification"] as? Boolean) ?: false
             isShowLogo = (args["isShowLogo"] as? Boolean) ?: false
             isShowCallback = (args["isShowCallback"] as? Boolean) ?: true
@@ -79,6 +82,8 @@ data class Data(val args: Map<String, Any?>) {
         val bundle = Bundle()
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ID, id)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_NAME_CALLER, nameCaller)
+                bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_NAME_CALLER_DETAILS, nameCallerDetails)
+
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HANDLE, handle)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_AVATAR, avatar)
         bundle.putInt(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TYPE, type)
@@ -134,6 +139,8 @@ data class Data(val args: Map<String, Any?>) {
             data.id = bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ID, "")
             data.nameCaller =
                     bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_NAME_CALLER, "")
+                      data.nameCallerDetails =
+                    bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_NAME_CALLER_DETAILS, "")
             data.appName =
                     bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_APP_NAME, "")
             data.handle =

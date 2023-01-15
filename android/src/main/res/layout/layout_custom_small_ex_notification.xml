@@ -8,16 +8,35 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical">
 
-        <ImageView
-            android:id="@+id/ivAvatar"
-            android:layout_width="@dimen/base_margin_x4"
-            android:layout_height="@dimen/base_margin_x4"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_default_avatar"
-            android:visibility="visible" />
+        <RelativeLayout
+            android:layout_width="@dimen/base_margin_x4_8"
+            android:layout_height="@dimen/base_margin_x4_8"
+            android:clipChildren="false">
+
+            <TextView
+                android:id="@+id/ivAvatarPlaceholder"
+                android:layout_width="@dimen/base_margin_x4_8"
+                android:layout_height="@dimen/base_margin_x4_8"
+                android:background="#8D929B"
+                android:gravity="center"
+                android:text=""
+                android:textColor="@android:color/white"
+                tools:ignore="TextContrastCheck" />
+
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="@dimen/base_margin_x4_8"
+                android:layout_height="@dimen/base_margin_x4_8"
+                android:background="#8D929B"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:visibility="invisible"
+                />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="@dimen/base_margin_half"
@@ -33,8 +52,8 @@
                 android:id="@+id/tvNameCaller"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
                 android:maxLines="1"
+                android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
                 android:textSize="@dimen/size_text_action" />
 
@@ -43,12 +62,10 @@
                 android:id="@+id/tvNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
                 android:maxLines="1"
+                android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
                 android:textSize="@dimen/size_text_action" />
-
-
 
 
         </LinearLayout>
@@ -88,11 +105,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/base_margin_half"
                     android:layout_marginRight="@dimen/base_margin_half"
-                    android:visibility="gone"
                     android:gravity="center"
                     android:text="@string/text_decline"
                     android:textAllCaps="false"
-                    android:textColor="@color/action_text" />
+                    android:textColor="@color/action_text"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
@@ -129,9 +146,9 @@
                     android:layout_marginRight="@dimen/base_margin_half"
                     android:gravity="center"
                     android:text="@string/text_accept"
-                    android:visibility="gone"
                     android:textAllCaps="false"
-                    android:textColor="@color/action_text" />
+                    android:textColor="@color/action_text"
+                    android:visibility="gone" />
 
             </LinearLayout>
 

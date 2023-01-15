@@ -30,6 +30,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
         const val EXTRA_CALLKIT_ID = "EXTRA_CALLKIT_ID"
         const val EXTRA_CALLKIT_NAME_CALLER = "EXTRA_CALLKIT_NAME_CALLER"
+        const val EXTRA_CALLKIT_NAME_CALLER_DETAILS = "EXTRA_CALLKIT_NAME_CALLER_DETAILS"
         const val EXTRA_CALLKIT_APP_NAME = "EXTRA_CALLKIT_APP_NAME"
         const val EXTRA_CALLKIT_HANDLE = "EXTRA_CALLKIT_HANDLE"
         const val EXTRA_CALLKIT_TYPE = "EXTRA_CALLKIT_TYPE"
@@ -199,6 +200,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val forwardData = mapOf(
                 "id" to data.getString(EXTRA_CALLKIT_ID, ""),
                 "nameCaller" to data.getString(EXTRA_CALLKIT_NAME_CALLER, ""),
+                                "nameCallerDetails" to data.getString(EXTRA_CALLKIT_NAME_CALLER_DETAILS, ""),
+
                 "avatar" to data.getString(EXTRA_CALLKIT_AVATAR, ""),
                 "number" to data.getString(EXTRA_CALLKIT_HANDLE, ""),
                 "type" to data.getInt(EXTRA_CALLKIT_TYPE, 0),

@@ -26,8 +26,8 @@ import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Comp
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_INCOMING_DATA
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_SHOW_LOGO
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER_DETAILS
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
-import com.hiennv.flutter_callkit_incoming.widgets.TextViewWithImageLoader
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import okhttp3.OkHttpClient
@@ -69,8 +69,10 @@ class CallkitIncomingActivity : Activity() {
     private lateinit var ivBackground: ImageView
     private lateinit var tvNameCaller: TextView
     private lateinit var tvNumber: TextView
+    private lateinit var tvNameCallerDetails: TextView
     private lateinit var ivLogo: ImageView
-    private lateinit var ivAvatar: TextViewWithImageLoader
+    private lateinit var ivAvatarPlaceholder: TextView
+    private lateinit var ivAvatar: ImageView
     private lateinit var llAction: LinearLayout
     private lateinit var ivAcceptCall: ImageView
     private lateinit var ivDeclineCall: ImageView
@@ -147,6 +149,7 @@ class CallkitIncomingActivity : Activity() {
 
         tvNameCaller.text = data?.getString(EXTRA_CALLKIT_NAME_CALLER, "")
         tvNumber.text = data?.getString(EXTRA_CALLKIT_HANDLE, "")
+        tvNameCallerDetails.text = data?.getString(EXTRA_CALLKIT_NAME_CALLER_DETAILS, "")
 
         val isShowLogo = data?.getBoolean(EXTRA_CALLKIT_IS_SHOW_LOGO, false)
         ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
@@ -156,16 +159,15 @@ class CallkitIncomingActivity : Activity() {
             ?.reduce { acc, s -> acc + s }
         if (temp?.length!! < 2) temp =
             data?.getString(EXTRA_CALLKIT_NAME_CALLER, "")?.substring(0, 2)
-        ivAvatar.text = temp
+        ivAvatarPlaceholder.text = temp
         if (avatarUrl != null && avatarUrl.isNotEmpty() && avatarUrl != "null") {
-            ivAvatar.visibility = View.VISIBLE
-            ivAvatar.setupImageLoader(550, 550, TextViewWithImageLoader.Direction.TOP)
             val headers = data.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
             getPicassoInstance(this@CallkitIncomingActivity, headers)
                 .load(avatarUrl)
-                .placeholder(R.drawable.ic_default_avatar)
                 .error(R.drawable.ic_default_avatar)
                 .into(ivAvatar)
+            ivAvatar.visibility = View.VISIBLE
+
         }
 
         val callType = data?.getInt(EXTRA_CALLKIT_TYPE, 0) ?: 0
@@ -224,8 +226,11 @@ class CallkitIncomingActivity : Activity() {
 
         tvNameCaller = findViewById(R.id.tvNameCaller)
         tvNumber = findViewById(R.id.tvNumber)
+        tvNameCallerDetails = findViewById(R.id.tvNameCallerDetails)
+
         ivLogo = findViewById(R.id.ivLogo)
         ivAvatar = findViewById(R.id.ivAvatar)
+        ivAvatarPlaceholder = findViewById(R.id.ivAvatarPlaceholder)
 
         llAction = findViewById(R.id.llAction)
 

@@ -34,13 +34,34 @@
         </LinearLayout>
 
 
-        <ImageView
-            android:id="@+id/ivAvatar"
+        <RelativeLayout
             android:layout_width="@dimen/base_margin_x4_8"
             android:layout_height="@dimen/base_margin_x4_8"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_default_avatar"
-            android:visibility="visible" />
+            android:clipChildren="false">
+
+            <TextView
+                android:id="@+id/ivAvatarPlaceholder"
+                android:layout_width="@dimen/base_margin_x4_8"
+                android:layout_height="@dimen/base_margin_x4_8"
+                android:background="#8D929B"
+                android:gravity="center"
+                android:text=""
+                android:textColor="@android:color/white"
+                tools:ignore="TextContrastCheck" />
+
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="@dimen/base_margin_x4_8"
+                android:layout_height="@dimen/base_margin_x4_8"
+                android:background="#8D929B"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:visibility="invisible"
+                 />
+        </RelativeLayout>
+
+
     </LinearLayout>
 
     <LinearLayout
@@ -64,8 +85,8 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/base_margin_half"
                 android:layout_marginLeft="@dimen/base_margin_half"
+                android:layout_marginRight="@dimen/base_margin_half"
                 android:src="@drawable/ic_decline"
                 android:tint="@android:color/white"
                 app:tint="@android:color/white"
@@ -76,11 +97,11 @@
                 style="@style/Widget.Compat.NotificationActionText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/base_margin_half"
+                android:layout_marginRight="@dimen/base_margin_half"
                 android:gravity="center"
                 android:text="@string/text_decline"
                 android:textAllCaps="false"
-                android:layout_marginRight="@dimen/base_margin_half"
-                android:layout_marginLeft="@dimen/base_margin_half"
                 android:textColor="@color/action_text" />
 
         </LinearLayout>
@@ -103,8 +124,8 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/base_margin_half"
                 android:layout_marginLeft="@dimen/base_margin_half"
+                android:layout_marginRight="@dimen/base_margin_half"
                 android:src="@drawable/ic_accept"
                 android:tint="@android:color/white"
                 app:tint="@android:color/white"
@@ -115,11 +136,11 @@
                 style="@style/Widget.Compat.NotificationActionText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/base_margin_half"
+                android:layout_marginRight="@dimen/base_margin_half"
                 android:gravity="center"
                 android:text="@string/text_accept"
                 android:textAllCaps="false"
-                android:layout_marginRight="@dimen/base_margin_half"
-                android:layout_marginLeft="@dimen/base_margin_half"
                 android:textColor="@color/action_text" />
 
         </LinearLayout>
