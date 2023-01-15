@@ -21,7 +21,6 @@ data class Data(val args: Map<String, Any?>) {
     var textDecline: String = (args["textDecline"] as? String) ?: ""
     var textMissedCall: String = (args["textMissedCall"] as? String) ?: ""
     var textCallback: String = (args["textCallback"] as? String) ?: ""
-    var deeplink: Uri? = (args["deeplink"] as? String)?.let(Uri::parse)
     var extra: HashMap<String, Any?> =
             (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
     var headers: HashMap<String, Any?> =
@@ -93,7 +92,6 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_DECLINE, textDecline)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_MISSED_CALL, textMissedCall)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_CALLBACK, textCallback)
-        bundle.putParcelable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DEEP_LINK, deeplink)
         bundle.putSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA, extra)
         bundle.putSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS, headers)
         bundle.putBoolean(
@@ -156,8 +154,6 @@ data class Data(val args: Map<String, Any?>) {
                     bundle.getLong(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION, 30000L)
             data.textAccept =
                     bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_ACCEPT, "")
-            data.deeplink =
-                    bundle.getParcelable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DEEP_LINK)
             data.textDecline =
                     bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TEXT_DECLINE, "")
             data.textMissedCall =

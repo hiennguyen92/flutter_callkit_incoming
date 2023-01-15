@@ -282,7 +282,6 @@ class CallkitIncomingActivity : Activity() {
             intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
         if (intent != null) {
-            intent.data = data?.getParcelable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DEEP_LINK);
             val intentTransparent = TransparentActivity.getIntentAccept(this@CallkitIncomingActivity, data)
             startActivities(arrayOf(intent, intentTransparent))
         } else {

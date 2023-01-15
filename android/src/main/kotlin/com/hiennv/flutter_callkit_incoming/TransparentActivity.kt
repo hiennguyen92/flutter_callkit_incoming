@@ -50,7 +50,6 @@ class TransparentActivity : Activity() {
                 if(isTaskRoot) {
                     val intent = packageManager.getLaunchIntentForPackage(packageName)?.cloneFilter()
                     intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    intent?.data = data?.getParcelable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DEEP_LINK);
                     startActivity(intent)
                 }
             }

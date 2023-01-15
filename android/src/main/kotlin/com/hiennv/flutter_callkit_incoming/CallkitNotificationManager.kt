@@ -22,7 +22,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ACTION_COLOR
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DEEP_LINK
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_HANDLE
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ID
@@ -405,7 +404,6 @@ class CallkitNotificationManager(private val context: Context) {
     private fun getAcceptPendingIntent(id: Int, data: Bundle): PendingIntent {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
         intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        intent?.data = data.getParcelable(EXTRA_CALLKIT_DEEP_LINK);
         if (intent != null) {
             val intentTransparent = TransparentActivity.getIntentAccept(context, data)
             return PendingIntent.getActivities(

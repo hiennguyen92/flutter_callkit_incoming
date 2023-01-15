@@ -20,7 +20,6 @@ class CallKitParams {
     this.textDecline,
     this.textMissedCall,
     this.textCallback,
-    this.deeplink,
     this.extra,
     this.headers,
     this.android,
@@ -38,7 +37,6 @@ class CallKitParams {
   final String? textDecline;
   final String? textMissedCall;
   final String? textCallback;
-  final String? deeplink;
   final Map<String, dynamic>? extra;
   final Map<String, dynamic>? headers;
   final AndroidParams? android;
