@@ -50,6 +50,8 @@ class TransparentActivity : Activity() {
                 if(isTaskRoot) {
                     val intent = packageManager.getLaunchIntentForPackage(packageName)?.cloneFilter()
                     intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
+                    intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_ACTION, "ACCEPT")
                     startActivity(intent)
                 }
             }

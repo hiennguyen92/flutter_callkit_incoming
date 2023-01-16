@@ -281,6 +281,8 @@ class CallkitIncomingActivity : Activity() {
         } else {
             intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
+        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
+        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_ACTION, "ACCEPT")
         if (intent != null) {
             val intentTransparent = TransparentActivity.getIntentAccept(this@CallkitIncomingActivity, data)
             startActivities(arrayOf(intent, intentTransparent))

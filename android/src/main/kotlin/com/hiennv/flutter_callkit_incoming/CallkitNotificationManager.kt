@@ -404,6 +404,8 @@ class CallkitNotificationManager(private val context: Context) {
     private fun getAcceptPendingIntent(id: Int, data: Bundle): PendingIntent {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
         intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
+        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_ACTION, "ACCEPT")
         if (intent != null) {
             val intentTransparent = TransparentActivity.getIntentAccept(context, data)
             return PendingIntent.getActivities(
@@ -446,6 +448,8 @@ class CallkitNotificationManager(private val context: Context) {
     private fun getCallbackPendingIntent(id: Int, data: Bundle): PendingIntent {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
         intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
+        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_ACTION, "CALLBACK")
         if (intent != null) {
             val intentTransparent = TransparentActivity.getIntentCallback(context, data)
             return PendingIntent.getActivities(
