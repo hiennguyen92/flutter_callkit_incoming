@@ -157,7 +157,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="120dp"
                 android:layout_height="60dp"
-                android:layout_marginLeft="60dp"
+                android:layout_marginLeft="70dp"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -183,7 +183,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="120dp"
                 android:layout_height="60dp"
-                android:layout_marginRight="60dp"
+                android:layout_marginRight="70dp"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
