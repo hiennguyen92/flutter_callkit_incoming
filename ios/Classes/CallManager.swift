@@ -59,13 +59,13 @@ class CallManager: NSObject {
         }
     }
     
-    func activeCalls() -> [[String: Any?]] {
+    func activeCalls() -> [[String: Any]] {
         let calls = callController.callObserver.calls
-        var json = [[String: Any?]]()
+        var json = [[String: Any]]()
         for call in calls {
             let callItem = self.callWithUUID(uuid: call.uuid)
             if(callItem != nil){
-                let item: [String: Any?] = callItem!.data.toJSON()
+                let item: [String: Any] = callItem!.data.toJSON()
                 json.append(item)
             }else {
                 let item: [String: String] = ["id": call.uuid.uuidString]

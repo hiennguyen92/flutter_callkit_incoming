@@ -226,8 +226,8 @@ public class Call: NSObject {
         }
     }
     
-    func toJSON() -> [String: Any?] {
-        let ios = [
+    public func toJSON() -> [String: Any] {
+        let ios: [String : Any] = [
             "iconName": iconName,
             "handleType": handleType,
             "supportsVideo": supportsVideo,
@@ -243,8 +243,8 @@ public class Call: NSObject {
             "audioSessionActive": audioSessionActive,
             "audioSessionPreferredSampleRate": audioSessionPreferredSampleRate,
             "audioSessionPreferredIOBufferDuration": audioSessionPreferredIOBufferDuration
-        ] as [String : Any?]
-        let map = [
+        ]
+        let map: [String : Any] = [
             "uuid": uuid,
             "id": uuid,
             "nameCaller": nameCaller,
@@ -255,7 +255,7 @@ public class Call: NSObject {
             "duration": duration,
             "extra": extra,
             "ios": ios
-        ] as [String : Any?]
+        ]
         return map
     }
     
