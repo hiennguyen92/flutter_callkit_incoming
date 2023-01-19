@@ -113,9 +113,35 @@ class FlutterCallkitIncoming {
       return null;
     }
 
-    final event = Event.values.firstWhere((e) => e.name == data['event']);
-    final callkit = CallKit.fromJson(
-        Map<String, dynamic>.from(data['body'] as Map<Object?, Object?>));
+    final Event? event = Event.values.firstWhere((e) => e.name == data['event'],
+        orElse: null);
+    if (event == null) {
+      return null;
+    }
+
+    final CallKit? callkit;
+
+    switch (event) {
+      case Event.ACTION_CALL_INCOMING:
+      case Event.ACTION_CALL_START:
+      case Event.ACTION_CALL_ACCEPT:
+      case Event.ACTION_CALL_DECLINE:
+      case Event.ACTION_CALL_ENDED:
+      case Event.ACTION_CALL_TIMEOUT:
+      case Event.ACTION_CALL_CALLBACK:
+        callkit = CallKit.fromJson(
+            Map<String, dynamic>.from(data['body'] as Map<Object?, Object?>));
+        break;
+      case Event.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+      case Event.ACTION_CALL_TOGGLE_HOLD:
+      case Event.ACTION_CALL_TOGGLE_MUTE:
+      case Event.ACTION_CALL_TOGGLE_DMTF:
+      case Event.ACTION_CALL_TOGGLE_GROUP:
+      case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+      // Don't parse callkit
+        callkit = null;
+        break;
+    }
 
     return CallEvent(
       event: event,

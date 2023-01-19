@@ -3,12 +3,12 @@ import 'package:flutter_callkit_incoming/entities/call_kit.dart';
 /// Object CallEvent.
 class CallEvent {
   CallEvent({
-    required this.callKit,
     required this.event,
+    this.callKit,
   });
 
   final Event event;
-  final CallKit callKit;
+  final CallKit? callKit;
 
   @override
   String toString() => 'CallEvent(event: $event, callkit: $callKit)';
