@@ -21,7 +21,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     static let ACTION_CALL_TOGGLE_GROUP = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP"
     static let ACTION_CALL_TOGGLE_AUDIO_SESSION = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION"
     
-    @objc public static var sharedInstance: SwiftFlutterCallkitIncomingPlugin!
+    @objc public private(set) static var sharedInstance: SwiftFlutterCallkitIncomingPlugin!
     
     private var streamHandlers: WeakArray<EventCallbackHandler> = WeakArray([])
     

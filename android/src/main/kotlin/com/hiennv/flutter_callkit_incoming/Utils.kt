@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import com.google.gson.Gson
+import java.lang.ref.WeakReference
 
 class Utils {
 
@@ -63,5 +64,11 @@ class Utils {
             context.startActivity(intent)
         }
 
+        fun <T, C: MutableCollection<WeakReference<T>>> C.reapCollection(): C {
+            this.removeAll {
+                it.get() == null
+            }
+            return this
+        }
     }
 }
