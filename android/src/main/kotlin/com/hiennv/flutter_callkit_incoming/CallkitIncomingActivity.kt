@@ -171,9 +171,6 @@ class CallkitIncomingActivity : Activity() {
         }
 
         val callType = data?.getInt(EXTRA_CALLKIT_TYPE, 0) ?: 0
-        if (callType > 0) {
-            ivAcceptCall.setImageResource(R.drawable.ic_video)
-        }
         val duration = data?.getLong(EXTRA_CALLKIT_DURATION, 0L) ?: 0L
         wakeLockRequest(duration)
 
