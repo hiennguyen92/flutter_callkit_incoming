@@ -48,6 +48,13 @@ class CallManager: NSObject {
         self.requestCall(callTransaction, action: "muteCall")
     }
     
+    func holdCall(call: Call, onHold: Bool) {
+        let muteAction = CXSetHeldCallAction(call: call.uuid, onHold: onHold)
+        let callTransaction = CXTransaction()
+        callTransaction.addAction(muteAction)
+        self.requestCall(callTransaction, action: "holdCall")
+    }
+    
     func endCall(call: Call) {
         let endCallAction = CXEndCallAction(call: call.uuid)
         let callTransaction = CXTransaction()

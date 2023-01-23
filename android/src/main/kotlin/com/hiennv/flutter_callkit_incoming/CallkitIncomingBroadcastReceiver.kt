@@ -22,6 +22,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED"
         const val ACTION_CALL_TOGGLE_MUTE =
             "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE"
+        const val ACTION_CALL_TOGGLE_HOLD =
+            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD"
         const val ACTION_CALL_TIMEOUT =
                 "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT"
         const val ACTION_CALL_CALLBACK =
