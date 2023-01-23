@@ -120,6 +120,21 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 }
                 result("OK")
                 break
+            case "muteCall":
+                guard let args = call.arguments as? [String: Any] ,
+                      let isMuted = args["isMuted"] as? Bool else {
+                    result("OK")
+                    return
+                }
+                
+                if(self.isFromPushKit){
+                    self.muteCall(self.data!, isMuted: isMuted)
+                }else{
+                    self.data = Data(args: args)
+                    self.muteCall(self.data!, isMuted: isMuted)
+                }
+                result("OK")
+                break
             case "activeCalls":
                 result(self.callManager.activeCalls())
                 break;
@@ -194,6 +209,18 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         initCallkitProvider(data)
         self.callManager.startCall(data)
+    }
+    
+    @objc public func muteCall(_ data: Data, isMuted: Bool) {
+        var call: Call? = nil
+        if(self.isFromPushKit){
+            call = Call(uuid: UUID(uuidString: self.data!.uuid)!, data: data)
+            self.isFromPushKit = false
+            self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
+        }else {
+            call = Call(uuid: UUID(uuidString: data.uuid)!, data: data)
+        }
+        self.callManager.muteCall(call: call!, isMuted: isMuted)
     }
     
     @objc public func endCall(_ data: Data) {

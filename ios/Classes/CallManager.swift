@@ -41,6 +41,13 @@ class CallManager: NSObject {
         })
     }
     
+    func muteCall(call: Call, isMuted: Bool) {
+        let muteAction = CXSetMutedCallAction(call: call.uuid, muted: isMuted)
+        let callTransaction = CXTransaction()
+        callTransaction.addAction(muteAction)
+        self.requestCall(callTransaction, action: "muteCall")
+    }
+    
     func endCall(call: Call) {
         let endCallAction = CXEndCallAction(call: call.uuid)
         let callTransaction = CXTransaction()

@@ -166,6 +166,16 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     )
                     result.success("OK")
                 }
+                "muteCall" -> {
+                    val map = buildMap {
+                        val args = call.arguments
+                        if (args is Map<*, *>) {
+                            putAll(args as Map<String, Any>)
+                        }
+                    }
+                    sendEvent(CallkitIncomingBroadcastReceiver.ACTION_CALL_TOGGLE_MUTE, map);
+                    result.success("OK")
+                }
                 "endCall" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     context?.sendBroadcast(
