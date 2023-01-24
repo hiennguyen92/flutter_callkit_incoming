@@ -1,5 +1,32 @@
 import 'package:flutter_callkit_incoming/entities/call_kit.dart';
 
+const ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP =
+    'com.hiennv.flutter_callkit_incoming.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP';
+const ACTION_CALL_INCOMING =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING';
+const ACTION_CALL_START =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_START';
+const ACTION_CALL_ACCEPT =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT';
+const ACTION_CALL_DECLINE =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE';
+const ACTION_CALL_ENDED =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED';
+const ACTION_CALL_TIMEOUT =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT';
+const ACTION_CALL_CALLBACK =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK';
+const ACTION_CALL_TOGGLE_HOLD =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD';
+const ACTION_CALL_TOGGLE_MUTE =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE';
+const ACTION_CALL_TOGGLE_DMTF =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_DMTF';
+const ACTION_CALL_TOGGLE_GROUP =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP';
+const ACTION_CALL_TOGGLE_AUDIO_SESSION =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION';
+
 /// Object CallEvent.
 class CallEvent {
   CallEvent._();
@@ -31,7 +58,8 @@ class CallEvent {
   factory CallEvent.toggleGroup(String id, String callUUIDToGroupWith) =
       CallActionToggleGroup;
 
-  factory CallEvent.toggleAudioSession(bool isActivate) = CallActionToggleAudioSession;
+  factory CallEvent.toggleAudioSession(bool isActivate) =
+      CallActionToggleAudioSession;
 }
 
 class CallActionIncoming extends CallEvent {
@@ -176,54 +204,4 @@ enum DTMFActionType {
   singleTone,
   softPause,
   hardPause,
-}
-
-enum Event {
-  ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP,
-  ACTION_CALL_INCOMING,
-  ACTION_CALL_START,
-  ACTION_CALL_ACCEPT,
-  ACTION_CALL_DECLINE,
-  ACTION_CALL_ENDED,
-  ACTION_CALL_TIMEOUT,
-  ACTION_CALL_CALLBACK,
-  ACTION_CALL_TOGGLE_HOLD,
-  ACTION_CALL_TOGGLE_MUTE,
-  ACTION_CALL_TOGGLE_DMTF,
-  ACTION_CALL_TOGGLE_GROUP,
-  ACTION_CALL_TOGGLE_AUDIO_SESSION,
-}
-
-/// Using extension for backward compatibility Dart SDK 2.17.0 and lower
-extension EventX on Event {
-  String get name {
-    switch (this) {
-      case Event.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
-        return 'com.hiennv.flutter_callkit_incoming.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP';
-      case Event.ACTION_CALL_INCOMING:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING';
-      case Event.ACTION_CALL_START:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_START';
-      case Event.ACTION_CALL_ACCEPT:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT';
-      case Event.ACTION_CALL_DECLINE:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE';
-      case Event.ACTION_CALL_ENDED:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED';
-      case Event.ACTION_CALL_TIMEOUT:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT';
-      case Event.ACTION_CALL_CALLBACK:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK';
-      case Event.ACTION_CALL_TOGGLE_HOLD:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD';
-      case Event.ACTION_CALL_TOGGLE_MUTE:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE';
-      case Event.ACTION_CALL_TOGGLE_DMTF:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_DMTF';
-      case Event.ACTION_CALL_TOGGLE_GROUP:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP';
-      case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION';
-    }
-  }
 }
