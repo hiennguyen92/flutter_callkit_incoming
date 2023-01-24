@@ -198,54 +198,30 @@ class HomePageState extends State<HomePage> {
     try {
       FlutterCallkitIncoming.instance.onEvent.listen((event) async {
         print('HOME: $event');
-        switch (event!.event) {
-          case Event.ACTION_CALL_INCOMING:
-            // TODO: received an incoming call
-            break;
-          case Event.ACTION_CALL_START:
-            // TODO: started an outgoing call
-            // TODO: show screen calling in Flutter
-            break;
-          case Event.ACTION_CALL_ACCEPT:
-            // TODO: accepted an incoming call
-            // TODO: show screen calling in Flutter
-            NavigationService.instance.pushNamedIfNotCurrent(
-              AppRoute.callingPage,
-              args: event.callKit,
-            );
-            break;
-          case Event.ACTION_CALL_DECLINE:
-            // TODO: declined an incoming call
-            await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
-            break;
-          case Event.ACTION_CALL_ENDED:
-            // TODO: ended an incoming/outgoing call
-            break;
-          case Event.ACTION_CALL_TIMEOUT:
-            // TODO: missed an incoming call
-            break;
-          case Event.ACTION_CALL_CALLBACK:
-            // TODO: only Android - click action `Call back` from missed call notification
-            break;
-          case Event.ACTION_CALL_TOGGLE_HOLD:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_MUTE:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_DMTF:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_GROUP:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
-            // TODO: only iOS
-            break;
+
+        if (event is CallActionIncoming) {
+          // TODO: received an incoming call
+        } else if (event is CallActionStart) {
+          // TODO: started an outgoing call
+          // TODO: show screen calling in Flutter
+        } else if (event is CallActionAccept) {
+          // TODO: accepted an incoming call
+          // TODO: show screen calling in Flutter
+          NavigationService.instance.pushNamedIfNotCurrent(
+            AppRoute.callingPage,
+            args: event.callKit,
+          );
+        } else if (event is CallActionDecline) {
+          // TODO: declined an incoming call
+          await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
+        } else if (event is CallActionEnded) {
+          // TODO: ended an incoming/outgoing call
+        } else if (event is CallActionTimeout) {
+          // TODO: missed an incoming call
+        } else if (event is CallActionCallback) {
+          // TODO: only Android - click action `Call back` from missed call notification
         }
+
         if (callback != null) {
           callback(event.toString());
         }
