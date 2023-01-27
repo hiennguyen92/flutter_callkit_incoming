@@ -1,22 +1,18 @@
 package com.hiennv.flutter_callkit_incoming
 
-import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.KeyguardManager
-import android.app.KeyguardManager.KeyguardLock
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
@@ -42,8 +38,8 @@ import okhttp3.OkHttpClient
 import com.squareup.picasso.OkHttp3Downloader
 import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
-import android.os.PowerManager.WakeLock
 import android.text.TextUtils
+import android.util.Log
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_ACCEPT
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_DECLINE
 
@@ -52,28 +48,30 @@ class CallkitIncomingActivity : Activity() {
 
     companion object {
 
-        const val ACTION_ENDED_CALL_INCOMING =
+        private const val ACTION_ENDED_CALL_INCOMING =
                 "com.hiennv.flutter_callkit_incoming.ACTION_ENDED_CALL_INCOMING"
 
         fun getIntent(context: Context, data: Bundle) = Intent(ACTION_CALL_INCOMING).apply {
             action = "${context.packageName}.${ACTION_CALL_INCOMING}"
             putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
-            flags =
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
-        fun getIntentEnded(context: Context) =
-                Intent("${context.packageName}.${ACTION_ENDED_CALL_INCOMING}")
-
+        fun getIntentEnded(context: Context, isAccepted: Boolean): Intent {
+            val intent = Intent("${context.packageName}.${ACTION_ENDED_CALL_INCOMING}")
+            intent.putExtra("ACCEPTED", isAccepted)
+            return intent
+        }
     }
 
     inner class EndedCallkitIncomingBroadcastReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
+        override fun onReceive(context: Context, intent: Intent) {
             if (!isFinishing) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    finishAndRemoveTask()
+                val isAccepted = intent.getBooleanExtra("ACCEPTED", false)
+                if (isAccepted) {
+                    finishDelayed()
                 } else {
-                    finish()
+                    finishTask()
                 }
             }
         }
@@ -96,6 +94,7 @@ class CallkitIncomingActivity : Activity() {
     private lateinit var ivDeclineCall: ImageView
     private lateinit var tvDecline: TextView
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -225,11 +224,7 @@ class CallkitIncomingActivity : Activity() {
         val timeOut = duration - abs(currentSystemTime - timeStartCall)
         Handler(Looper.getMainLooper()).postDelayed({
             if (!isFinishing) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    finishAndRemoveTask()
-                } else {
-                    finish()
-                }
+                finishTask()
             }
         }, timeOut)
     }
@@ -275,37 +270,35 @@ class CallkitIncomingActivity : Activity() {
 
     private fun onAcceptClick() {
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
-        val intent = packageManager.getLaunchIntentForPackage(packageName)?.cloneFilter()
-        if (isTaskRoot) {
-            intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        } else {
-            intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }
-        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
-        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_ACTION, "ACCEPT")
-        if (intent != null) {
-            val intentTransparent = TransparentActivity.getIntentAccept(this@CallkitIncomingActivity, data)
-            startActivities(arrayOf(intent, intentTransparent))
-        } else {
-            val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(this@CallkitIncomingActivity, data)
-            sendBroadcast(acceptIntent)
-        }
+
+        val acceptIntent = TransparentActivity.getIntent(this, data)
+        startActivity(acceptIntent)
+
+        dismissKeyguard()
+        finish()
+    }
+
+    private fun dismissKeyguard() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
             keyguardManager.requestDismissKeyguard(this, null)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            finishAndRemoveTask()
-        } else {
-            finish()
         }
     }
 
     private fun onDeclineClick() {
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
-        val intent =
-                CallkitIncomingBroadcastReceiver.getIntentDecline(this@CallkitIncomingActivity, data)
+        val intent = CallkitIncomingBroadcastReceiver.getIntentDecline(this@CallkitIncomingActivity, data)
         sendBroadcast(intent)
+        finishTask()
+    }
+
+    private fun finishDelayed() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            finishTask()
+        }, 1000)
+    }
+
+    private fun finishTask() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             finishAndRemoveTask()
         } else {
@@ -334,6 +327,4 @@ class CallkitIncomingActivity : Activity() {
     }
 
     override fun onBackPressed() {}
-
-
 }

@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
     companion object {
+        private const val TAG = "CallkitIncomingReceiver"
 
         const val ACTION_CALL_INCOMING =
                 "com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING"
@@ -122,7 +124,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                         context.startService(soundPlayerServiceIntent)
                     }
                 } catch (error: Exception) {
-                    error.printStackTrace()
+                    Log.e(TAG, null, error)
                 }
             }
             "${context.packageName}.${ACTION_CALL_START}" -> {
@@ -130,37 +132,37 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     sendEventFlutter(ACTION_CALL_START, data)
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
-                    error.printStackTrace()
+                    Log.e(TAG, null, error)
                 }
             }
             "${context.packageName}.${ACTION_CALL_ACCEPT}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data)
+                    callkitNotificationManager.clearIncomingNotification(data, true)
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
-                    error.printStackTrace()
+                    Log.e(TAG, null, error)
                 }
             }
             "${context.packageName}.${ACTION_CALL_DECLINE}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_DECLINE, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data)
+                    callkitNotificationManager.clearIncomingNotification(data, false)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
-                    error.printStackTrace()
+                    Log.e(TAG, null, error)
                 }
             }
             "${context.packageName}.${ACTION_CALL_ENDED}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_ENDED, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data)
+                    callkitNotificationManager.clearIncomingNotification(data, false)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
-                    error.printStackTrace()
+                    Log.e(TAG, null, error)
                 }
             }
             "${context.packageName}.${ACTION_CALL_TIMEOUT}" -> {
@@ -172,7 +174,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     }
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
-                    error.printStackTrace()
+                    Log.e(TAG, null, error)
                 }
             }
             "${context.packageName}.${ACTION_CALL_CALLBACK}" -> {
@@ -184,13 +186,12 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                         context.sendBroadcast(closeNotificationPanel)
                     }
                 } catch (error: Exception) {
-                    error.printStackTrace()
+                    Log.e(TAG, null, error)
                 }
             }
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun sendEventFlutter(event: String, data: Bundle) {
         val android = mapOf(
             "isCustomNotification" to data.getBoolean(EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false),
@@ -222,7 +223,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 "textDecline" to data.getString(EXTRA_CALLKIT_TEXT_DECLINE, ""),
                 "textMissedCall" to data.getString(EXTRA_CALLKIT_TEXT_MISSED_CALL, ""),
                 "textCallback" to data.getString(EXTRA_CALLKIT_TEXT_CALLBACK, ""),
-                "extra" to data.getSerializable(EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>,
+                "extra" to data.getSerializable(EXTRA_CALLKIT_EXTRA)!!,
                 "android" to android
         )
         FlutterCallkitIncomingPlugin.sendEvent(event, forwardData)

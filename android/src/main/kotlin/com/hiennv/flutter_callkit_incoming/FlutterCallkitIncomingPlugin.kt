@@ -24,7 +24,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     companion object {
 
         const val EXTRA_CALLKIT_CALL_DATA = "EXTRA_CALLKIT_CALL_DATA"
-        const val EXTRA_CALLKIT_CALL_ACTION = "EXTRA_CALLKIT_CALL_ACTION"
 
         @SuppressLint("StaticFieldLeak")
         private lateinit var instance: FlutterCallkitIncomingPlugin

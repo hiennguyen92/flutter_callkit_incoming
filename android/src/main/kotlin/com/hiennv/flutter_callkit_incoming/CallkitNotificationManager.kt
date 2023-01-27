@@ -328,8 +328,8 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
 
-    fun clearIncomingNotification(data: Bundle) {
-        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded(context))
+    fun clearIncomingNotification(data: Bundle, isAccepted: Boolean) {
+        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded(context, isAccepted))
         notificationId = data.getString(EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
     }
@@ -402,71 +402,23 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private fun getAcceptPendingIntent(id: Int, data: Bundle): PendingIntent {
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
-        intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
-        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_ACTION, "ACCEPT")
-        if (intent != null) {
-            val intentTransparent = TransparentActivity.getIntentAccept(context, data)
-            return PendingIntent.getActivities(
-                    context,
-                    id,
-                    arrayOf(intent, intentTransparent),
-                    getFlagPendingIntent()
-            )
-        } else {
-            val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(context, data)
-            return PendingIntent.getBroadcast(
-                    context,
-                    id,
-                    acceptIntent,
-                    getFlagPendingIntent()
-            )
-        }
+        val intentTransparent = TransparentActivity.getIntent(context, data)
+        return PendingIntent.getActivity(context, id, intentTransparent, getFlagPendingIntent())
     }
 
     private fun getDeclinePendingIntent(id: Int, data: Bundle): PendingIntent {
         val declineIntent = CallkitIncomingBroadcastReceiver.getIntentDecline(context, data)
-        return PendingIntent.getBroadcast(
-                context,
-                id,
-                declineIntent,
-                getFlagPendingIntent()
-        )
+        return PendingIntent.getBroadcast(context, id, declineIntent, getFlagPendingIntent())
     }
 
     private fun getTimeOutPendingIntent(id: Int, data: Bundle): PendingIntent {
         val timeOutIntent = CallkitIncomingBroadcastReceiver.getIntentTimeout(context, data)
-        return PendingIntent.getBroadcast(
-                context,
-                id,
-                timeOutIntent,
-                getFlagPendingIntent()
-        )
+        return PendingIntent.getBroadcast(context, id, timeOutIntent, getFlagPendingIntent())
     }
 
     private fun getCallbackPendingIntent(id: Int, data: Bundle): PendingIntent {
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
-        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
-        intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_ACTION, "CALLBACK")
-        if (intent != null) {
-            val intentTransparent = TransparentActivity.getIntentCallback(context, data)
-            return PendingIntent.getActivities(
-                    context,
-                    id,
-                    arrayOf(intent, intentTransparent),
-                    getFlagPendingIntent()
-            )
-        } else {
-            val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentCallback(context, data)
-            return PendingIntent.getBroadcast(
-                    context,
-                    id,
-                    acceptIntent,
-                    getFlagPendingIntent()
-            )
-        }
+        val intentTransparent = CallkitIncomingBroadcastReceiver.getIntentCallback(context, data)
+        return PendingIntent.getBroadcast(context, id, intentTransparent, getFlagPendingIntent())
     }
 
     private fun getActivityPendingIntent(id: Int, data: Bundle): PendingIntent {
@@ -475,8 +427,7 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private fun getAppPendingIntent(id: Int, data: Bundle): PendingIntent {
-        val intent: Intent? = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        intent?.putExtra(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_INCOMING_DATA, data)
+        val intent: Intent? = AppUtils.getAppIntent(context, data)
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
     }
 
