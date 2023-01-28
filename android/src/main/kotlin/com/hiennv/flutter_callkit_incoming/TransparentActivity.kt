@@ -4,13 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 
 class TransparentActivity : Activity() {
 
     companion object {
-        fun getIntent(context: Context, data: Bundle?): Intent {
+        fun getIntent(context: Context, action: String, data: Bundle?): Intent {
             val intent = Intent(context, TransparentActivity::class.java)
+            intent.action = action
             intent.putExtra("data", data)
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
@@ -29,10 +29,10 @@ class TransparentActivity : Activity() {
 
         val data = intent.getBundleExtra("data")
 
-        val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(this, data)
+        val acceptIntent = CallkitIncomingBroadcastReceiver.getIntent(this, intent.action!!, data)
         sendBroadcast(acceptIntent)
 
-        val activityIntent = AppUtils.getAppIntentAccept(this, data)
+        val activityIntent = AppUtils.getAppIntent(this, intent.action, data)
         startActivity(activityIntent)
 
         finish()

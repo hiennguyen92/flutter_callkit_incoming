@@ -172,7 +172,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             putAll(args as Map<String, Any>)
                         }
                     }
-                    sendEvent(CallkitIncomingBroadcastReceiver.ACTION_CALL_TOGGLE_MUTE, map);
+                    sendEvent(CallkitConstants.ACTION_CALL_TOGGLE_MUTE, map);
                     result.success("OK")
                 }
                 "holdCall" -> {
@@ -182,7 +182,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             putAll(args as Map<String, Any>)
                         }
                     }
-                    sendEvent(CallkitIncomingBroadcastReceiver.ACTION_CALL_TOGGLE_HOLD, map);
+                    sendEvent(CallkitConstants.ACTION_CALL_TOGGLE_HOLD, map);
                     result.success("OK")
                 }
                 "endCall" -> {

@@ -19,17 +19,6 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.ACTION_CALL_INCOMING
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_AVATAR
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND_URL
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_BACKGROUND_COLOR
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DURATION
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_INCOMING_DATA
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_NAME_CALLER
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_HANDLE
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_HEADERS
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_IS_SHOW_LOGO
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TYPE
 import com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
@@ -40,8 +29,6 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.text.TextUtils
 import android.util.Log
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_ACCEPT
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_TEXT_DECLINE
 
 
 class CallkitIncomingActivity : Activity() {
@@ -51,9 +38,9 @@ class CallkitIncomingActivity : Activity() {
         private const val ACTION_ENDED_CALL_INCOMING =
                 "com.hiennv.flutter_callkit_incoming.ACTION_ENDED_CALL_INCOMING"
 
-        fun getIntent(context: Context, data: Bundle) = Intent(ACTION_CALL_INCOMING).apply {
-            action = "${context.packageName}.${ACTION_CALL_INCOMING}"
-            putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
+        fun getIntent(context: Context, data: Bundle) = Intent(CallkitConstants.ACTION_CALL_INCOMING).apply {
+            action = "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}"
+            putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
@@ -162,19 +149,19 @@ class CallkitIncomingActivity : Activity() {
 
 
     private fun incomingData(intent: Intent) {
-        val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
+        val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
         if (data == null) finish()
 
-        tvNameCaller.text = data?.getString(EXTRA_CALLKIT_NAME_CALLER, "")
-        tvNumber.text = data?.getString(EXTRA_CALLKIT_HANDLE, "")
+        tvNameCaller.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
+        tvNumber.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
 
-        val isShowLogo = data?.getBoolean(EXTRA_CALLKIT_IS_SHOW_LOGO, false)
+        val isShowLogo = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO, false)
         ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
 
-        val avatarUrl = data?.getString(EXTRA_CALLKIT_AVATAR, "")
+        val avatarUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {
             ivAvatar.visibility = View.VISIBLE
-            val headers = data.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            val headers = data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
             getPicassoInstance(this@CallkitIncomingActivity, headers)
                     .load(avatarUrl)
                     .placeholder(R.drawable.ic_default_avatar)
@@ -182,31 +169,31 @@ class CallkitIncomingActivity : Activity() {
                     .into(ivAvatar)
         }
 
-        val callType = data?.getInt(EXTRA_CALLKIT_TYPE, 0) ?: 0
+        val callType = data?.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, 0) ?: 0
         if (callType > 0) {
             ivAcceptCall.setImageResource(R.drawable.ic_video)
         }
-        val duration = data?.getLong(EXTRA_CALLKIT_DURATION, 0L) ?: 0L
+        val duration = data?.getLong(CallkitConstants.EXTRA_CALLKIT_DURATION, 0L) ?: 0L
         wakeLockRequest(duration)
 
         finishTimeout(data, duration)
 
-        val textAccept = data?.getString(EXTRA_CALLKIT_TEXT_ACCEPT, "")
+        val textAccept = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
         tvAccept.text = if (TextUtils.isEmpty(textAccept)) getString(R.string.text_accept) else textAccept
-        val textDecline = data?.getString(EXTRA_CALLKIT_TEXT_DECLINE, "")
+        val textDecline = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
         tvDecline.text = if (TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
 
-        val backgroundColor = data?.getString(EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
+        val backgroundColor = data?.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
         try {
             ivBackground.setBackgroundColor(Color.parseColor(backgroundColor))
         } catch (error: Exception) {
         }
-        var backgroundUrl = data?.getString(EXTRA_CALLKIT_BACKGROUND_URL, "")
+        var backgroundUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_URL, "")
         if (backgroundUrl != null && backgroundUrl.isNotEmpty()) {
             if (!backgroundUrl.startsWith("http://", true) && !backgroundUrl.startsWith("https://", true)){
                 backgroundUrl = String.format("file:///android_asset/flutter_assets/%s", backgroundUrl)
             }
-            val headers = data?.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            val headers = data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
             getPicassoInstance(this@CallkitIncomingActivity, headers)
                     .load(backgroundUrl)
                     .placeholder(R.drawable.transparent)
@@ -269,9 +256,9 @@ class CallkitIncomingActivity : Activity() {
 
 
     private fun onAcceptClick() {
-        val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
+        val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
 
-        val acceptIntent = TransparentActivity.getIntent(this, data)
+        val acceptIntent = TransparentActivity.getIntent(this, CallkitConstants.ACTION_CALL_ACCEPT, data)
         startActivity(acceptIntent)
 
         dismissKeyguard()
@@ -286,7 +273,7 @@ class CallkitIncomingActivity : Activity() {
     }
 
     private fun onDeclineClick() {
-        val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
+        val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
         val intent = CallkitIncomingBroadcastReceiver.getIntentDecline(this@CallkitIncomingActivity, data)
         sendBroadcast(intent)
         finishTask()
