@@ -36,6 +36,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private var data: Data?
     private var isFromPushKit: Bool = false
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
+
+    private var answerAction: CXAnswerCallAction?
     
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
         eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
@@ -115,6 +117,10 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         case "getDevicePushTokenVoIP":
             result(self.getDevicePushTokenVoIP())
             break;
+        case "startCallIncoming":
+            self.answerAction?.fulfill()
+            result("OK")
+            break
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -381,8 +387,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self.configurAudioSession()
         }
         self.answerCall = call
+        self.answerAction = action
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
-        action.fulfill()
     }
     
 
