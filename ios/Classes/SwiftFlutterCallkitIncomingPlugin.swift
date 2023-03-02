@@ -14,6 +14,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     static let ACTION_CALL_DECLINE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE"
     static let ACTION_CALL_ENDED = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED"
     static let ACTION_CALL_TIMEOUT = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT"
+    static let ACTION_CALL_CUSTOM = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CUSTOM"
     
     static let ACTION_CALL_TOGGLE_HOLD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD"
     static let ACTION_CALL_TOGGLE_MUTE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE"
@@ -41,8 +42,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
     }
     
-    @objc public func sendEventCustom(_ event: String, body: Any?) {
-        eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
+    @objc public func sendEventCustom(body: Any?) {
+        eventCallbackHandler?.send(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_CUSTOM, body ?? [:] as [String : Any?])
     }
     
     public static func sharePluginWithRegister(with registrar: FlutterPluginRegistrar) -> SwiftFlutterCallkitIncomingPlugin {
