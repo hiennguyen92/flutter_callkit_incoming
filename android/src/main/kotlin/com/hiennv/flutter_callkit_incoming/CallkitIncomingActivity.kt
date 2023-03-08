@@ -285,6 +285,7 @@ class CallkitIncomingActivity : Activity() {
             startActivities(arrayOf(intent, intentTransparent))
         } else {
             val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(this@CallkitIncomingActivity, data)
+            acceptIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
             sendBroadcast(acceptIntent)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
