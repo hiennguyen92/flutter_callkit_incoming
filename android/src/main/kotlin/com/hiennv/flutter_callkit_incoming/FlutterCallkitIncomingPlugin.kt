@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.ACTION_CALL_CUSTOM
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -133,8 +134,8 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         removeAllCalls(context)
     }
 
-    public fun sendEventCustom(event: String, body: Map<String, Any>) {
-        eventHandler.send(event, body)
+    public fun sendEventCustom(body: Map<String, Any>) {
+        eventHandler.send(ACTION_CALL_CUSTOM, body)
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {

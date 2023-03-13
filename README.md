@@ -284,13 +284,13 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 
     ```swift
       //send custom event from native
-      SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendEventCustom("customEvent", body: ["customKey": "customValue"])
+      SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendEventCustom(body: ["customKey": "customValue"])
 
     ```
 
     ```kotlin
         //Kotlin/Java Android
-        FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(event: String, body: Map<String, Any>)
+        FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(body: Map<String, Any>)
     ```
 
 4. Properties
