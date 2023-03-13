@@ -113,7 +113,7 @@ class CallkitIncomingActivity : Activity() {
         incomingData(intent)
         registerReceiver(
                 endedCallkitIncomingBroadcastReceiver,
-                IntentFilter(ACTION_ENDED_CALL_INCOMING)
+                IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}")
         )
     }
 
