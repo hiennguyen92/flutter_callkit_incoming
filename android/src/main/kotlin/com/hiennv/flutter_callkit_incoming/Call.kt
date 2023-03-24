@@ -15,7 +15,7 @@ data class Data(val args: Map<String, Any?>) {
     var handle: String = (args["handle"] as? String) ?: ""
     var avatar: String = (args["avatar"] as? String) ?: ""
     var type: Int = (args["type"] as? Int) ?: 0
-    var duration: Long = (args["duration"] as? Long) ?: ((args["duration"] as? Int)?.toLong() ?: 30000L)
+    var duration: Long = (args["duration"] as? Long) ?: ((args["duration"] as? Double)?.toLong() ?: 30000L)
     var textAccept: String = (args["textAccept"] as? String) ?: ""
     var textDecline: String = (args["textDecline"] as? String) ?: ""
     var textMissedCall: String = (args["textMissedCall"] as? String) ?: ""
