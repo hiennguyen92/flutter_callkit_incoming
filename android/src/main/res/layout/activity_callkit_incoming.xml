@@ -30,10 +30,31 @@
             android:layout_weight="1"
             android:fitsSystemWindows="false">
 
+            <TextView
+                android:id="@+id/tvAppName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="@dimen/size_text_name"
+                android:autoSizeMinTextSize="15sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/size_text_name"
+                app:autoSizeMaxTextSize="@dimen/size_text_name"
+                app:autoSizeMinTextSize="15sp"
+                app:autoSizeStepGranularity="2sp"
+                app:autoSizeTextType="uniform"
+                tools:ignore="MissingPrefix"
+                tools:targetApi="o"
+                tools:text="App Name" 
+                android:visibility="invisible"/>
+
             <ImageView
                 android:id="@+id/ivLogo"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/base_margin_x2_5"
+                android:layout_height="@dimen/base_margin_x6"
                 android:layout_above="@id/ivAvatar"
                 android:layout_centerHorizontal="true"
                 android:adjustViewBounds="true"

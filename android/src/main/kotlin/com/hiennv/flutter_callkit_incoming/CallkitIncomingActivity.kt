@@ -84,6 +84,7 @@ class CallkitIncomingActivity : Activity() {
     private lateinit var llBackgroundAnimation: RippleRelativeLayout
 
     private lateinit var tvNameCaller: TextView
+    private lateinit var tvAppName: TextView
     private lateinit var tvNumber: TextView
     private lateinit var ivLogo: ImageView
     private lateinit var ivAvatar: CircleImageView
@@ -166,6 +167,11 @@ class CallkitIncomingActivity : Activity() {
         if (data == null) finish()
 
         tvNameCaller.text = data?.getString(EXTRA_CALLKIT_NAME_CALLER, "")
+        val appName = data?.getString(EXTRA_CALLKIT_APP_NAME, "")
+        if (appName != null && appName.isNotEmpty()) {
+            tvAppName.text = appName
+            tvAppName.visibility = View.VISIBLE
+        }
         tvNumber.text = data?.getString(EXTRA_CALLKIT_HANDLE, "")
 
         val isShowLogo = data?.getBoolean(EXTRA_CALLKIT_IS_SHOW_LOGO, false)
@@ -241,6 +247,8 @@ class CallkitIncomingActivity : Activity() {
         llBackgroundAnimation.startRippleAnimation()
 
         tvNameCaller = findViewById(R.id.tvNameCaller)
+        tvAppName = findViewById(R.id.tvAppName)
+        tvNumber = findViewById(R.id.tvNumber)
         tvNumber = findViewById(R.id.tvNumber)
         ivLogo = findViewById(R.id.ivLogo)
         ivAvatar = findViewById(R.id.ivAvatar)

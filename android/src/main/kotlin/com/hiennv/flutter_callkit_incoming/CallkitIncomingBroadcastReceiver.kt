@@ -213,6 +213,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val forwardData = mapOf(
                 "id" to data.getString(EXTRA_CALLKIT_ID, ""),
                 "nameCaller" to data.getString(EXTRA_CALLKIT_NAME_CALLER, ""),
+                "appName" to data.getString(EXTRA_CALLKIT_APP_NAME, ""),
                 "avatar" to data.getString(EXTRA_CALLKIT_AVATAR, ""),
                 "number" to data.getString(EXTRA_CALLKIT_HANDLE, ""),
                 "type" to data.getInt(EXTRA_CALLKIT_TYPE, 0),
