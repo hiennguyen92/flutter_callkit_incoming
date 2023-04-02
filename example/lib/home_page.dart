@@ -245,6 +245,8 @@ class HomePageState extends State<HomePage> {
           case Event.actionDidUpdateDevicePushTokenVoip:
             // TODO: only iOS
             break;
+          case Event.actionCallCustom:
+            break;
         }
         if (callback != null) {
           callback(event.toString());
