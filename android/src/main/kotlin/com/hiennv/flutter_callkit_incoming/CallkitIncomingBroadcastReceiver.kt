@@ -105,10 +105,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
         val callkitNotificationManager = CallkitNotificationManager(context)
-        val action = (intent.action ?: return).substringAfter("${context.packageName}.")
+        val action = intent.action ?: return
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA) ?: return
         when (action) {
-            ACTION_CALL_INCOMING -> {
+            "${context.packageName}.${ACTION_CALL_INCOMING}" -> {
                 try {
                     callkitNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(ACTION_CALL_INCOMING, data)
@@ -124,7 +124,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_START -> {
+            "${context.packageName}.${ACTION_CALL_START}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_START, data)
                     addCall(context, Data.fromBundle(data), true)
@@ -132,7 +132,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_ACCEPT -> {
+            "${context.packageName}.${ACTION_CALL_ACCEPT}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -142,7 +142,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_DECLINE -> {
+            "${context.packageName}.${ACTION_CALL_DECLINE}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_DECLINE, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -152,7 +152,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_ENDED -> {
+            "${context.packageName}.${ACTION_CALL_ENDED}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_ENDED, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -162,7 +162,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_TIMEOUT -> {
+            "${context.packageName}.${ACTION_CALL_TIMEOUT}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_TIMEOUT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -174,7 +174,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_CALLBACK -> {
+            "${context.packageName}.${ACTION_CALL_CALLBACK}" -> {
                 try {
                     callkitNotificationManager.clearMissCallNotification(data)
                     sendEventFlutter(ACTION_CALL_CALLBACK, data)

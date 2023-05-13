@@ -49,6 +49,11 @@ class CallManager: NSObject {
         self.requestCall(callTransaction, action: "endCall")
     }
     
+    func connectedCall(call: Call) {
+        let callItem = self.callWithUUID(uuid: call.uuid)
+        callItem?.connectedCall(completion: nil)
+    }
+    
     func endCallAlls() {
         let calls = callController.callObserver.calls
         for call in calls {
@@ -91,9 +96,9 @@ class CallManager: NSObject {
                 print("Error requesting transaction: \(error)")
             }else {
                 if(action == "startCall"){
-                    //push notification for Start Call
+                    //TODO: push notification for Start Call
                 }else if(action == "endCall" || action == "endCallAlls"){
-                    //push notification for End Call
+                    //TODO: push notification for End Call
                 }
                 completion?(error == nil)
                 print("Requested transaction successfully: \(action)")

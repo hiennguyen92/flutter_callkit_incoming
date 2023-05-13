@@ -32,11 +32,12 @@ import flutter_callkit_incoming
         guard let isVideo = userActivity.isVideo else {
             return false
         }
-        let nameCaller = handleObj.getDecryptHandle()["nameCaller"] as? String ?? ""
-        let handle = handleObj.getDecryptHandle()["handle"] as? String ?? ""
+        let objData = handleObj.getDecryptHandle()
+        let nameCaller = objData["nameCaller"] as? String ?? ""
+        let handle = objData["handle"] as? String ?? ""
         let data = flutter_callkit_incoming.Data(id: UUID().uuidString, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
         //set more data...
-        data.nameCaller = "Johnny"
+        //data.nameCaller = nameCaller
         SwiftFlutterCallkitIncomingPlugin.sharedInstance?.startCall(data, fromPushKit: true)
         
         return super.application(application, continue: userActivity, restorationHandler: restorationHandler)

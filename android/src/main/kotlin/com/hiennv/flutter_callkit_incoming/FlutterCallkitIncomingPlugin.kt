@@ -179,6 +179,9 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     )
                     result.success("OK")
                 }
+                "callConnected" -> {
+                    result.success("OK")
+                }
                 "endAllCalls" -> {
                     val calls = getDataActiveCalls(context)
                     calls.forEach {

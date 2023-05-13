@@ -45,6 +45,10 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
           <uses-permission android:name="android.permission.INTERNET"/>
       </manifest>
      ```
+     The following rule needs to be added in the proguard-rules.pro to avoid obfuscated keys.
+     ```
+      -keep class com.hiennv.flutter_callkit_incoming.** { *; }
+     ```
   * iOS
      * Info.plist
       ```
@@ -108,6 +112,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       );
       await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
     ```
+    Note: Firebase Message: https://github.com/firebase/flutterfire/blob/master/docs/cloud-messaging/receive.md#apple-platforms-and-android
   * Show miss call notification
     ```dart
       this._currentUuid = _uuid.v4();

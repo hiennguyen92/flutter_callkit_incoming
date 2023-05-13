@@ -9,6 +9,7 @@ import 'entities/entities.dart';
 /// * startCall(dynamic)
 /// * endCall(dynamic)
 /// * endAllCalls()
+/// * callConnected(dynamic)
 
 class FlutterCallkitIncoming {
   static const MethodChannel _channel =
@@ -60,6 +61,11 @@ class FlutterCallkitIncoming {
   /// On Android, Nothing(only callback event listener).
   static Future endCall(String id) async {
     await _channel.invokeMethod("endCall", {'id': id});
+  }
+
+  /// Set call has been connected successfully.
+  static Future setCallConnected(String id) async {
+    await _channel.invokeMethod("callConnected", {'id': id});
   }
 
   /// End all calls.

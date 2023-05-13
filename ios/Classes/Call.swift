@@ -108,6 +108,13 @@ public class Call: NSObject {
         hasStartedConnecting = true
     }
     
+    var connectedCallCompletion: ((Bool) -> Void)?
+    
+    func connectedCall(completion :((_ success : Bool)->Void)?){
+        connectedCallCompletion = completion
+        hasConnected = true
+    }
+    
     func endCall(){
         hasEnded = true
     }
