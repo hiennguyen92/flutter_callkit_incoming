@@ -201,49 +201,51 @@ class HomePageState extends State<HomePage> {
       FlutterCallkitIncoming.onEvent.listen((event) async {
         print('HOME: $event');
         switch (event!.event) {
-          case Event.ACTION_CALL_INCOMING:
+          case Event.actionCallIncoming:
             // TODO: received an incoming call
             break;
-          case Event.ACTION_CALL_START:
+          case Event.actionCallStart:
             // TODO: started an outgoing call
             // TODO: show screen calling in Flutter
             break;
-          case Event.ACTION_CALL_ACCEPT:
+          case Event.actionCallAccept:
             // TODO: accepted an incoming call
             // TODO: show screen calling in Flutter
             NavigationService.instance
                 .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
             break;
-          case Event.ACTION_CALL_DECLINE:
+          case Event.actionCallDecline:
             // TODO: declined an incoming call
             await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
             break;
-          case Event.ACTION_CALL_ENDED:
+          case Event.actionCallEnded:
             // TODO: ended an incoming/outgoing call
             break;
-          case Event.ACTION_CALL_TIMEOUT:
+          case Event.actionCallTimeout:
             // TODO: missed an incoming call
             break;
-          case Event.ACTION_CALL_CALLBACK:
+          case Event.actionCallCallback:
             // TODO: only Android - click action `Call back` from missed call notification
             break;
-          case Event.ACTION_CALL_TOGGLE_HOLD:
+          case Event.actionCallToggleHold:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_MUTE:
+          case Event.actionCallToggleMute:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_DMTF:
+          case Event.actionCallToggleDmtf:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_GROUP:
+          case Event.actionCallToggleGroup:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+          case Event.actionCallToggleAudioSession:
             // TODO: only iOS
             break;
-          case Event.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+          case Event.actionDidUpdateDevicePushTokenVoip:
             // TODO: only iOS
+            break;
+          case Event.actionCallCustom:
             break;
         }
         if (callback != null) {
