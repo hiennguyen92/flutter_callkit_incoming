@@ -49,7 +49,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             initSharedInstance(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger, handler)
         }
 
-        private fun initSharedInstance(
+        fun initSharedInstance(
             @NonNull context: Context,
             @NonNull binaryMessenger: BinaryMessenger,
             @Nullable handler: MethodCallHandler?
