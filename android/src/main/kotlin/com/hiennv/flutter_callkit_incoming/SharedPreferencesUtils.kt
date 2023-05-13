@@ -2,7 +2,8 @@ package com.hiennv.flutter_callkit_incoming
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.gson.reflect.TypeToken
+import android.util.Log
+import com.fasterxml.jackson.core.type.TypeReference
 
 
 private const val CALLKIT_PREFERENCES_FILE_NAME = "flutter_callkit_incoming"
@@ -18,22 +19,23 @@ private fun initInstance(context: Context) {
 fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
     val json = getString(context, "ACTIVE_CALLS", "[]")
     val arrayData: ArrayList<Data> = Utils.getGsonInstance()
-        .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
+        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
     val currentData = arrayData.find { it == data }
     if(currentData != null) {
         currentData.isAccepted = isAccepted
     }else {
         arrayData.add(data)
     }
-    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().toJson(arrayData))
+    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))
 }
 
 fun removeCall(context: Context?, data: Data) {
     val json = getString(context, "ACTIVE_CALLS", "[]")
+    Log.d("JSON", json!!)
     val arrayData: ArrayList<Data> = Utils.getGsonInstance()
-        .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
+        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
     arrayData.remove(data)
-    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().toJson(arrayData))
+    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))
 }
 
 fun removeAllCalls(context: Context?) {
@@ -41,22 +43,15 @@ fun removeAllCalls(context: Context?) {
     remove(context, "ACTIVE_CALLS")
 }
 
-fun getActiveCalls(context: Context?): String {
-    val json = getString(context, "ACTIVE_CALLS", "[]")
-    val arrayData: ArrayList<Data> = Utils.getGsonInstance()
-        .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
-    return Utils.getGsonInstance().toJson(arrayData)
-}
-
 fun getDataActiveCalls(context: Context?): ArrayList<Data> {
     val json = getString(context, "ACTIVE_CALLS", "[]")
     return Utils.getGsonInstance()
-        .fromJson(json, object : TypeToken<ArrayList<Data>>() {}.type)
+        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
 }
 
 fun getDataActiveCallsForFlutter(context: Context?): ArrayList<Map<String, Any?>> {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    return Utils.getGsonInstance().fromJson(json, object: TypeToken<ArrayList<Map<String, Any?>>>() {}.type)
+    return Utils.getGsonInstance().readValue(json, object : TypeReference<ArrayList<Map<String, Any?>>>() {})
 }
 
 fun putString(context: Context?, key: String, value: String?) {

@@ -3,9 +3,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_callkit_incoming/entities/android_params.dart';
-import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
-import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_callkit_incoming_example/app_router.dart';
 import 'package:flutter_callkit_incoming_example/navigation_service.dart';
@@ -27,15 +25,17 @@ Future<void> showCallkitIncoming(String uuid) async {
     duration: 30000,
     textAccept: 'Accept',
     textDecline: 'Decline',
-    textMissedCall: 'Missed call',
-    textCallback: 'Call back',
+    missedCallNotification: NotificationParams(
+      showNotification: true,
+      isShowCallback: true,
+      subtitle: 'Missed call',
+      callbackText: 'Call back',
+    ),
     extra: <String, dynamic>{'userId': '1a2b3c4d'},
     headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
     android: AndroidParams(
       isCustomNotification: true,
       isShowLogo: false,
-      isShowCallback: true,
-      isShowMissedCallNotification: true,
       ringtonePath: 'system_ringtone_default',
       backgroundColor: '#0955fa',
       backgroundUrl: 'assets/test.png',
