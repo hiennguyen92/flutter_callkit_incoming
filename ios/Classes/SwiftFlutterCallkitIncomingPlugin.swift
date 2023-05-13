@@ -14,6 +14,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     static let ACTION_CALL_DECLINE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE"
     static let ACTION_CALL_ENDED = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED"
     static let ACTION_CALL_TIMEOUT = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT"
+    static let ACTION_CALL_CUSTOM = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CUSTOM"
     
     static let ACTION_CALL_TOGGLE_HOLD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD"
     static let ACTION_CALL_TOGGLE_MUTE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE"
@@ -41,8 +42,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
     }
     
-    @objc public func sendEventCustom(_ event: String, body: Any?) {
-        eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
+    @objc public func sendEventCustom(body: Any?) {
+        eventCallbackHandler?.send(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_CUSTOM, body ?? [:] as [String : Any?])
     }
     
     public static func sharePluginWithRegister(with registrar: FlutterPluginRegistrar) -> SwiftFlutterCallkitIncomingPlugin {
@@ -295,7 +296,14 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     func configurAudioSession(){
         let session = AVAudioSession.sharedInstance()
         do{
-            try session.setCategory(AVAudioSession.Category.playAndRecord, options: AVAudioSession.CategoryOptions.allowBluetooth)
+            try session.setCategory(
+                AVAudioSession.Category.playAndRecord,
+                options: [
+                    .allowBluetoothA2DP,
+                    .duckOthers,
+                    .allowBluetooth,
+                ]
+            )
             try session.setMode(self.getAudioSessionMode(data?.audioSessionMode))
             try session.setActive(data?.audioSessionActive ?? true)
             try session.setPreferredSampleRate(data?.audioSessionPreferredSampleRate ?? 44100.0)

@@ -46,6 +46,7 @@ class TransparentActivity : Activity() {
             "ACCEPT" -> {
                 val data = intent.getBundleExtra("data")
                 val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(this@TransparentActivity, data)
+                acceptIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
                 sendBroadcast(acceptIntent)
                 if(isTaskRoot) {
                     val intent = packageManager.getLaunchIntentForPackage(packageName)?.cloneFilter()

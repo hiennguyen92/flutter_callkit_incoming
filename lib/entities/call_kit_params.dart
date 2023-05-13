@@ -31,8 +31,8 @@ class CallKitParams {
   final String? appName;
   final String? avatar;
   final String? handle;
-  final double? type;
-  final double? duration;
+  final int? type;
+  final int? duration;
   final String? textAccept;
   final String? textDecline;
   final String? textMissedCall;
