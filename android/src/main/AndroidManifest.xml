@@ -11,10 +11,11 @@
 
         <activity
             android:name="com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity"
+            android:taskAffinity="com.hiennv.flutter_callkit_incoming.INCOMING_CALL_AFFINITY"
             android:excludeFromRecents="true"
+            android:noHistory="true"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true"
-            android:launchMode="singleTask"
             android:turnScreenOn="true"
             android:exported="true"
             android:theme="@style/CallkitIncomingTheme">
