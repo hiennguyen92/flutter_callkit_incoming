@@ -1,3 +1,25 @@
+## 2.0.0
+
+* Fixed some bugs.
+* Adapt flutter_lints and use lowerCamelCase to Event enum
+* Rename properties 
+        `textMisssedCall` -> `subtitle`,
+        `textCallback` -> `callbackText`,
+        `isShowMissedCallNotification` -> `showNotification`,
+* Move inside properties `missedCallNotification {showNotification, isShowCallback, subtitle, callbackText}`
+* Add setCallConnected option iOS `await FlutterCallkitIncoming.setCallConnected(this._currentUuid)`
+* Add hold option iOS
+* Add mute call option iOS
+* Many other issues
+    1. Thank @ryojiro
+    https://github.com/hiennguyen92/flutter_callkit_incoming/pull/263
+    https://github.com/hiennguyen92/flutter_callkit_incoming/pull/264
+    https://github.com/hiennguyen92/flutter_callkit_incoming/pull/262
+    2. Many Thank @mouEsam
+    https://github.com/hiennguyen92/flutter_callkit_incoming/pull/227
+    3. ...
+
+
 ## 1.0.3+3
 
 * Update README.md
