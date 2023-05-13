@@ -17,6 +17,7 @@ class IOSParams {
   final bool? audioSessionActive;
   final double? audioSessionPreferredSampleRate;
   final double? audioSessionPreferredIOBufferDuration;
+  final bool? configureAudioSession;
   final bool? supportsDTMF;
   final bool? supportsHolding;
   final bool? supportsGrouping;
@@ -25,7 +26,7 @@ class IOSParams {
   /// Add file to root project xcode /ios/Runner/Ringtone.caf and Copy Bundle Resources(Build Phases) -> value: "Ringtone.caf"
   final String? ringtonePath;
 
-  IOSParams({
+  const IOSParams({
     this.iconName,
     this.handleType,
     this.supportsVideo,
@@ -35,6 +36,7 @@ class IOSParams {
     this.audioSessionActive,
     this.audioSessionPreferredSampleRate,
     this.audioSessionPreferredIOBufferDuration,
+    this.configureAudioSession,
     this.supportsDTMF,
     this.supportsHolding,
     this.supportsGrouping,
