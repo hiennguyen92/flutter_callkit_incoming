@@ -81,30 +81,14 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
-            case "showCallkitIncoming":
-                guard let args = call.arguments else {
-                    result("OK")
-                    return
-                }
-                if let getArgs = args as? [String: Any] {
-                    self.data = Data(args: getArgs)
-                    showCallkitIncoming(self.data!, fromPushKit: false)
-                }
-            }
-            result("OK")
-            break
-        case "callConnected":
+        case "showCallkitIncoming":
             guard let args = call.arguments else {
                 result("OK")
                 return
             }
-            if(self.isFromPushKit){
-                self.connectedCall(self.data!)
-            }else{
-                if let getArgs = args as? [String: Any] {
-                    self.data = Data(args: getArgs)
-                    self.connectedCall(self.data!)
-                }
+            if let getArgs = args as? [String: Any] {
+                self.data = Data(args: getArgs)
+                showCallkitIncoming(self.data!, fromPushKit: false)
             }
             result("OK")
             break
@@ -139,8 +123,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             break
         case "muteCall":
             guard let args = call.arguments as? [String: Any] ,
-                    let callId = args["id"] as? String,
-                    let isMuted = args["isMuted"] as? Bool else {
+                  let callId = args["id"] as? String,
+                  let isMuted = args["isMuted"] as? Bool else {
                 result("OK")
                 return
             }
@@ -150,12 +134,27 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             break
         case "holdCall":
             guard let args = call.arguments as? [String: Any] ,
-                    let callId = args["id"] as? String,
-                    let onHold = args["isOnHold"] as? Bool else {
+                  let callId = args["id"] as? String,
+                  let onHold = args["isOnHold"] as? Bool else {
                 result("OK")
                 return
             }
             self.holdCall(callId, onHold: onHold)
+            result("OK")
+            break
+        case "callConnected":
+            guard let args = call.arguments else {
+                result("OK")
+                return
+            }
+            if(self.isFromPushKit){
+                self.connectedCall(self.data!)
+            }else{
+                if let getArgs = args as? [String: Any] {
+                    self.data = Data(args: getArgs)
+                    self.connectedCall(self.data!)
+                }
+            }
             result("OK")
             break
         case "activeCalls":
@@ -278,7 +277,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }else {
             call = Call(uuid: UUID(uuidString: data.uuid)!, data: data)
         }
-        self.callManager?.connectedCall(call: call!)
+        self.callManager.connectedCall(call: call!)
     }
     
     @objc public func activeCalls() -> [[String: Any]] {
@@ -292,23 +291,23 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func saveEndCall(_ uuid: String, _ reason: Int) {
         switch reason {
-            case 1:
-                self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.failed)
-                break
-            case 2, 6:
-                self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.remoteEnded)
-                break
-            case 3:
-                self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.unanswered)
-                break
-            case 4:
-                self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.answeredElsewhere)
-                break
-            case 5:
-                self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.declinedElsewhere)
-                break
-            default:
-                break
+        case 1:
+            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.failed)
+            break
+        case 2, 6:
+            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.remoteEnded)
+            break
+        case 3:
+            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.unanswered)
+            break
+        case 4:
+            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.answeredElsewhere)
+            break
+        case 5:
+            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.declinedElsewhere)
+            break
+        default:
+            break
         }
     }
     
@@ -332,13 +331,13 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     func getHandleType(_ handleType: String?) -> CXHandle.HandleType {
         var typeDefault = CXHandle.HandleType.generic
         switch handleType {
-            case "number":
-                typeDefault = CXHandle.HandleType.phoneNumber
-                break
-            case "email":
-                typeDefault = CXHandle.HandleType.emailAddress
-            default:
-                typeDefault = CXHandle.HandleType.generic
+        case "number":
+            typeDefault = CXHandle.HandleType.phoneNumber
+            break
+        case "email":
+            typeDefault = CXHandle.HandleType.emailAddress
+        default:
+            typeDefault = CXHandle.HandleType.generic
         }
         return typeDefault
     }
@@ -404,36 +403,36 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     func getAudioSessionMode(_ audioSessionMode: String?) -> AVAudioSession.Mode {
         var mode = AVAudioSession.Mode.default
         switch audioSessionMode {
-            case "gameChat":
-                mode = AVAudioSession.Mode.gameChat
-                break
-            case "measurement":
-                mode = AVAudioSession.Mode.measurement
-                break
-            case "moviePlayback":
-                mode = AVAudioSession.Mode.moviePlayback
-                break
-            case "spokenAudio":
-                mode = AVAudioSession.Mode.spokenAudio
-                break
-            case "videoChat":
-                mode = AVAudioSession.Mode.videoChat
-                break
-            case "videoRecording":
-                mode = AVAudioSession.Mode.videoRecording
-                break
-            case "voiceChat":
-                mode = AVAudioSession.Mode.voiceChat
-                break
-            case "voicePrompt":
-                if #available(iOS 12.0, *) {
-                    mode = AVAudioSession.Mode.voicePrompt
-                } else {
-                    // Fallback on earlier versions
-                }
-                break
-            default:
-                mode = AVAudioSession.Mode.default
+        case "gameChat":
+            mode = AVAudioSession.Mode.gameChat
+            break
+        case "measurement":
+            mode = AVAudioSession.Mode.measurement
+            break
+        case "moviePlayback":
+            mode = AVAudioSession.Mode.moviePlayback
+            break
+        case "spokenAudio":
+            mode = AVAudioSession.Mode.spokenAudio
+            break
+        case "videoChat":
+            mode = AVAudioSession.Mode.videoChat
+            break
+        case "videoRecording":
+            mode = AVAudioSession.Mode.videoRecording
+            break
+        case "voiceChat":
+            mode = AVAudioSession.Mode.voiceChat
+            break
+        case "voicePrompt":
+            if #available(iOS 12.0, *) {
+                mode = AVAudioSession.Mode.voicePrompt
+            } else {
+                // Fallback on earlier versions
+            }
+            break
+        default:
+            mode = AVAudioSession.Mode.default
         }
         return mode
     }
