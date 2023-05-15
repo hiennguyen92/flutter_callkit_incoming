@@ -56,7 +56,7 @@ class CallingPageState extends State<CallingPage> {
     var timeDisplay = intToTimeLeft(_start);
 
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: double.infinity,
         child: Center(
