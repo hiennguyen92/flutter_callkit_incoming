@@ -68,7 +68,7 @@ class CallingPageState extends State<CallingPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text('$timeDisplay'),
-              Text('Calling...'),
+              const Text('Calling...'),
               TextButton(
                 style: ButtonStyle(
                   foregroundColor:
@@ -80,7 +80,7 @@ class CallingPageState extends State<CallingPage> {
                     startTimer();
                   }
                 },
-                child: Text('Fake Connected Call'),
+                child: const Text('Fake Connected Call'),
               ),
               TextButton(
                 style: ButtonStyle(
@@ -95,7 +95,7 @@ class CallingPageState extends State<CallingPage> {
                   NavigationService.instance.goBack();
                   await requestHttp('END_CALL');
                 },
-                child: Text('End Call'),
+                child: const Text('End Call'),
               )
             ],
           ),
