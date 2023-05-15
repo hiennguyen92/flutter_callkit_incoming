@@ -8,6 +8,8 @@ import 'package:flutter_callkit_incoming_example/navigation_service.dart';
 import 'package:http/http.dart';
 
 class CallingPage extends StatefulWidget {
+  const CallingPage({super.key});
+
   @override
   State<StatefulWidget> createState() {
     return CallingPageState();
