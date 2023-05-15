@@ -19,7 +19,7 @@ class CallingPage extends StatefulWidget {
 class CallingPageState extends State<CallingPage> {
   late CallKitParams? calling;
 
-  Timer? _timer = null;
+  Timer? _timer;
   int _start = 0;
 
   void startTimer() {
