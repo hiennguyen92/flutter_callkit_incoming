@@ -15,7 +15,6 @@ dependencies:
 
   firebase_core: ^1.17.0
   firebase_messaging: 11.2.6
-  firebase_messaging_platform_interface: 3.5.0
   http: ^0.13.4
   uuid: 3.0.5
 

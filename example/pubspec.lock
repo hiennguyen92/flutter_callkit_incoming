@@ -98,7 +98,7 @@ packages:
     source: hosted
     version: "11.2.6"
   firebase_messaging_platform_interface:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: firebase_messaging_platform_interface
       sha256: "3facfaee5047908aff9a72946e86633b330b267a08a912a49b14154dd63f4ff5"
