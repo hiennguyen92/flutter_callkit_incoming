@@ -23,7 +23,7 @@ class CallingPageState extends State<CallingPage> {
   int _start = 0;
 
   void startTimer() {
-    const oneSec = const Duration(seconds: 1);
+    const oneSec = Duration(seconds: 1);
     _timer = new Timer.periodic(
       oneSec,
       (Timer timer) {
