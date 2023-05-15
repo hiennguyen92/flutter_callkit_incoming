@@ -255,7 +255,9 @@ class HomePageState extends State<HomePage> {
         }
         callback(event);
       });
-    } on Exception {}
+    } on Exception catch (e) {
+      print(e);
+    }
   }
 
   //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
