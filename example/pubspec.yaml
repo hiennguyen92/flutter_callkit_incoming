@@ -13,10 +13,10 @@ dependencies:
   flutter_callkit_incoming:
     path: ../
 
-  firebase_core: ^1.17.0
-  firebase_messaging: 11.2.6
-  http: ^0.13.4
-  uuid: 3.0.5
+  firebase_core: ^2.12.0
+  firebase_messaging: ^14.6.0
+  http: ^0.13.6
+  uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:
