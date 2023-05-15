@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     checkAndNavigationCallingPage();
   }
 
-  getCurrentCall() async {
+  Future<dynamic> getCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
     if (calls is List) {
@@ -102,7 +102,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
-  checkAndNavigationCallingPage() async {
+  Future<void> checkAndNavigationCallingPage() async {
     var currentCall = await getCurrentCall();
     if (currentCall != null) {
       NavigationService.instance
@@ -125,7 +125,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  initFirebase() async {
+  Future<void> initFirebase() async {
     await Firebase.initializeApp();
     _firebaseMessaging = FirebaseMessaging.instance;
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

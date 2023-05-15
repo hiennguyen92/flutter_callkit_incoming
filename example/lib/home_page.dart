@@ -98,7 +98,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  initCurrentCall() async {
+  Future<dynamic> initCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
     if (calls is List) {
@@ -199,7 +199,7 @@ class HomePageState extends State<HomePage> {
     print(devicePushTokenVoIP);
   }
 
-  Future<void> listenerEvent(Function? callback) async {
+  Future<void> listenerEvent(void Function(CallEvent) callback) async {
     try {
       FlutterCallkitIncoming.onEvent.listen((event) async {
         print('HOME: $event');
@@ -251,9 +251,7 @@ class HomePageState extends State<HomePage> {
           case Event.actionCallCustom:
             break;
         }
-        if (callback != null) {
-          callback(event.toString());
-        }
+        callback(event);
       });
     } on Exception {}
   }
@@ -264,10 +262,10 @@ class HomePageState extends State<HomePage> {
         'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
 
-  onEvent(event) {
+  void onEvent(CallEvent event) {
     if (!mounted) return;
     setState(() {
-      textEvents += "${event.toString()}\n";
+      textEvents += '${event.toString()}\n';
     });
   }
 }
