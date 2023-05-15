@@ -24,7 +24,7 @@ class CallingPageState extends State<CallingPage> {
 
   void startTimer() {
     const oneSec = Duration(seconds: 1);
-    _timer = new Timer.periodic(
+    _timer = Timer.periodic(
       oneSec,
       (Timer timer) {
         setState(() {
