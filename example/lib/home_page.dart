@@ -87,7 +87,7 @@ class HomePageState extends State<HomePage> {
                 constraints: BoxConstraints(
                   minHeight: viewportConstraints.maxHeight,
                 ),
-                child: Text('$textEvents'),
+                child: Text(textEvents),
               ),
             );
           } else {

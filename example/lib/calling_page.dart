@@ -64,7 +64,7 @@ class CallingPageState extends State<CallingPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('$timeDisplay'),
+              Text(timeDisplay),
               const Text('Calling...'),
               TextButton(
                 style: ButtonStyle(
