@@ -11,7 +11,7 @@ import 'package:uuid/uuid.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
-  showCallkitIncoming(Uuid().v4());
+  showCallkitIncoming(const Uuid().v4());
 }
 
 Future<void> showCallkitIncoming(String uuid) async {
@@ -25,7 +25,7 @@ Future<void> showCallkitIncoming(String uuid) async {
     duration: 30000,
     textAccept: 'Accept',
     textDecline: 'Decline',
-    missedCallNotification: NotificationParams(
+    missedCallNotification: const NotificationParams(
       showNotification: true,
       isShowCallback: true,
       subtitle: 'Missed call',
@@ -33,7 +33,7 @@ Future<void> showCallkitIncoming(String uuid) async {
     ),
     extra: <String, dynamic>{'userId': '1a2b3c4d'},
     headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
-    android: AndroidParams(
+    android: const AndroidParams(
       isCustomNotification: true,
       isShowLogo: false,
       ringtonePath: 'system_ringtone_default',
@@ -41,7 +41,7 @@ Future<void> showCallkitIncoming(String uuid) async {
       backgroundUrl: 'assets/test.png',
       actionColor: '#4CAF50',
     ),
-    ios: IOSParams(
+    ios: const IOSParams(
       iconName: 'CallKitLogo',
       handleType: '',
       supportsVideo: true,
@@ -63,15 +63,17 @@ Future<void> showCallkitIncoming(String uuid) async {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late final Uuid _uuid;
   String? _currentUuid;
 
@@ -80,14 +82,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    _uuid = Uuid();
+    _uuid = const Uuid();
     initFirebase();
     WidgetsBinding.instance.addObserver(this);
     //Check call when open app from terminated
     checkAndNavigationCallingPage();
   }
 
-  getCurrentCall() async {
+  Future<dynamic> getCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
     if (calls is List) {
@@ -102,7 +104,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
-  checkAndNavigationCallingPage() async {
+  Future<void> checkAndNavigationCallingPage() async {
     var currentCall = await getCurrentCall();
     if (currentCall != null) {
       NavigationService.instance
@@ -125,7 +127,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  initFirebase() async {
+  Future<void> initFirebase() async {
     await Firebase.initializeApp();
     _firebaseMessaging = FirebaseMessaging.instance;
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
