@@ -14,9 +14,9 @@
             android:taskAffinity="com.hiennv.flutter_callkit_incoming.INCOMING_CALL_AFFINITY"
             android:excludeFromRecents="true"
             android:noHistory="true"
-            android:screenOrientation="portrait"
             android:showOnLockScreen="true"
             android:turnScreenOn="true"
+            android:configChanges="orientation"
             android:exported="true"
             android:theme="@style/CallkitIncomingTheme">
             <intent-filter>

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.res.Resources
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.lang.ref.WeakReference
-import java.text.NumberFormat
 
 
 class Utils {
@@ -74,6 +73,10 @@ class Utils {
                 it.get() == null
             }
             return this
+        }
+
+        fun isTablet(context: Context): Boolean {
+            return context.resources.getBoolean(R.bool.isTablet)
         }
     }
 }
