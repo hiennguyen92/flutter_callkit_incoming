@@ -1,3 +1,9 @@
+## 2.0.0+1
+
+* Fixed some bugs.
+* Add `landscape` for tablet
+* Fix issue head-up for redmi / xiaomi devices
+
 ## 2.0.0
 
 * Fixed some bugs.
