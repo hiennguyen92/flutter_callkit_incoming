@@ -73,6 +73,9 @@ import flutter_callkit_incoming
         //data.iconName = ...
         //data.....
         SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
+        
+        //Make sure call completion()
+        completion()
     }
     
     
