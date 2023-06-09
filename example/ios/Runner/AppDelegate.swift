@@ -75,7 +75,9 @@ import flutter_callkit_incoming
         SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
         
         //Make sure call completion()
-        completion()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            completion()
+        }
     }
     
     

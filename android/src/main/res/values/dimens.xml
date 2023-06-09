@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <bool name="isTablet">false</bool>
     <dimen name="base_margin_half">5dp</dimen>
     <dimen name="base_margin">10dp</dimen>
     <dimen name="base_margin_x1_5">15dp</dimen>
