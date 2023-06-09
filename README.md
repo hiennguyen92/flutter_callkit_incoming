@@ -264,6 +264,10 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       info["type"] = 1
       //... set more data
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
+      
+      //please make sure call `completion()` at the end of the pushRegistry(......, completion: @escaping () -> Void)
+      // or `DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { completion() }`
+      // if you don't call completion() in pushRegistry(......, completion: @escaping () -> Void), there may be app crash by system when receiving voIP
     ```
     
     ```kotlin
