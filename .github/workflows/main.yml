@@ -1,11 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - master
-    tags:
-      - 1.*
+on: pull_request
 
 env:
   FLUTTER_VERSION: "3.10.x"
