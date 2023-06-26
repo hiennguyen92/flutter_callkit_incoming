@@ -7,6 +7,9 @@ on:
     tags:
       - 1.*
 
+env:
+  FLUTTER_VERSION: "3.10.x"
+
 jobs:
   build_android:
     name: Build Flutter (Android)
@@ -21,8 +24,8 @@ jobs:
           distribution: "zulu"
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{env.FLUTTER_VERSION}}
           channel: "stable"
-          flutter-version: "3.3.3"
       - name: Dependencies
         run: flutter pub get
         working-directory: ${{env.working-directory}}
@@ -42,8 +45,8 @@ jobs:
           distribution: "zulu"
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{env.FLUTTER_VERSION}}
           channel: "stable"
-          flutter-version: "3.3.3"
           architecture: x64
       - name: Dependencies
         run: flutter pub get
