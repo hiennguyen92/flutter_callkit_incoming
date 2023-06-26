@@ -28,7 +28,7 @@ jobs:
         run: flutter build apk --debug
   build_ios:
     name: Build Flutter (iOS)
-    runs-on: macOS-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
