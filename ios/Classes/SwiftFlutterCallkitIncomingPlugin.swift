@@ -135,12 +135,12 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         case "isMuted":
             guard let args = call.arguments as? [String: Any] ,
                   let callId = args["id"] as? String else{
-                result("OK")
+                result(false)
                 return
             }
             guard let callUUID = UUID(uuidString: callId),
                   let call = self.callManager.callWithUUID(uuid: callUUID) else {
-                result("OK")
+                result(false)
                 return
             }
             result(call.isMuted)
