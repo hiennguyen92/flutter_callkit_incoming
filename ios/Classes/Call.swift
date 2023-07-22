@@ -108,6 +108,13 @@ public class Call: NSObject {
         hasStartedConnecting = true
     }
     
+    var connectedCallCompletion: ((Bool) -> Void)?
+    
+    func connectedCall(completion :((_ success : Bool)->Void)?){
+        connectedCallCompletion = completion
+        hasConnected = true
+    }
+    
     func endCall(){
         hasEnded = true
     }
@@ -141,6 +148,7 @@ public class Call: NSObject {
     @objc public var supportsUngrouping: Bool
     @objc public var includesCallsInRecents: Bool
     @objc public var ringtonePath: String
+    @objc public var configureAudioSession: Bool
     @objc public var audioSessionMode: String
     @objc public var audioSessionActive: Bool
     @objc public var audioSessionPreferredSampleRate: Double
@@ -166,6 +174,7 @@ public class Call: NSObject {
         self.supportsUngrouping = true
         self.includesCallsInRecents = true
         self.ringtonePath = ""
+        self.configureAudioSession = true
         self.audioSessionMode = ""
         self.audioSessionActive = true
         self.audioSessionPreferredSampleRate = 44100.0
@@ -203,6 +212,7 @@ public class Call: NSObject {
             self.supportsUngrouping = ios["supportsUngrouping"] as? Bool ?? true
             self.includesCallsInRecents = ios["includesCallsInRecents"] as? Bool ?? true
             self.ringtonePath = ios["ringtonePath"] as? String ?? ""
+            self.configureAudioSession = ios["configureAudioSession"] as? Bool ?? true
             self.audioSessionMode = ios["audioSessionMode"] as? String ?? ""
             self.audioSessionActive = ios["audioSessionActive"] as? Bool ?? true
             self.audioSessionPreferredSampleRate = ios["audioSessionPreferredSampleRate"] as? Double ?? 44100.0
@@ -219,6 +229,7 @@ public class Call: NSObject {
             self.supportsUngrouping = args["supportsUngrouping"] as? Bool ?? true
             self.includesCallsInRecents = args["includesCallsInRecents"] as? Bool ?? true
             self.ringtonePath = args["ringtonePath"] as? String ?? ""
+            self.configureAudioSession = args["configureAudioSession"] as? Bool ?? true
             self.audioSessionMode = args["audioSessionMode"] as? String ?? ""
             self.audioSessionActive = args["audioSessionActive"] as? Bool ?? true
             self.audioSessionPreferredSampleRate = args["audioSessionPreferredSampleRate"] as? Double ?? 44100.0
@@ -226,8 +237,8 @@ public class Call: NSObject {
         }
     }
     
-    func toJSON() -> [String: Any?] {
-        let ios = [
+    public func toJSON() -> [String: Any] {
+        let ios: [String : Any] = [
             "iconName": iconName,
             "handleType": handleType,
             "supportsVideo": supportsVideo,
@@ -239,12 +250,13 @@ public class Call: NSObject {
             "supportsUngrouping": supportsUngrouping,
             "includesCallsInRecents": includesCallsInRecents,
             "ringtonePath": ringtonePath,
+            "configureAudioSession": configureAudioSession,
             "audioSessionMode": audioSessionMode,
             "audioSessionActive": audioSessionActive,
             "audioSessionPreferredSampleRate": audioSessionPreferredSampleRate,
             "audioSessionPreferredIOBufferDuration": audioSessionPreferredIOBufferDuration
-        ] as [String : Any?]
-        let map = [
+        ]
+        let map: [String : Any] = [
             "uuid": uuid,
             "id": uuid,
             "nameCaller": nameCaller,
@@ -255,7 +267,7 @@ public class Call: NSObject {
             "duration": duration,
             "extra": extra,
             "ios": ios
-        ] as [String : Any?]
+        ]
         return map
     }
     

@@ -5,6 +5,7 @@ import 'package:flutter_callkit_incoming/entities/android_params.dart';
 import 'package:flutter_callkit_incoming/entities/call_event.dart';
 import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
 import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/entities/notification_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_callkit_incoming_example/app_router.dart';
 import 'package:flutter_callkit_incoming_example/navigation_service.dart';
@@ -12,6 +13,8 @@ import 'package:http/http.dart';
 import 'package:uuid/uuid.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   State<StatefulWidget> createState() {
     return HomePageState();
@@ -26,7 +29,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _uuid = Uuid();
+    _uuid = const Uuid();
     _currentUuid = "";
     textEvents = "";
     initCurrentCall();
@@ -40,35 +43,35 @@ class HomePageState extends State<HomePage> {
         title: const Text('Plugin example app'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.call,
               color: Colors.white,
             ),
             onPressed: makeFakeCallInComing,
           ),
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.call_end,
               color: Colors.white,
             ),
             onPressed: endCurrentCall,
           ),
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.call_made,
               color: Colors.white,
             ),
             onPressed: startOutGoingCall,
           ),
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.call_merge,
               color: Colors.white,
             ),
             onPressed: activeCalls,
           ),
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.clear_all_sharp,
               color: Colors.white,
             ),
@@ -84,11 +87,11 @@ class HomePageState extends State<HomePage> {
                 constraints: BoxConstraints(
                   minHeight: viewportConstraints.maxHeight,
                 ),
-                child: Text('$textEvents'),
+                child: Text(textEvents),
               ),
             );
           } else {
-            return Center(
+            return const Center(
               child: Text('No Event'),
             );
           }
@@ -97,7 +100,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  initCurrentCall() async {
+  Future<dynamic> initCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
     if (calls is List) {
@@ -122,19 +125,21 @@ class HomePageState extends State<HomePage> {
         appName: 'Callkit',
         avatar: 'https://i.pravatar.cc/100',
         handle: '0123456789',
-        type: 0,
+        type: 1,
         duration: 30000,
         textAccept: 'Accept',
         textDecline: 'Decline',
-        textMissedCall: 'Missed call',
-        textCallback: 'Call back',
+        missedCallNotification: const NotificationParams(
+          showNotification: true,
+          isShowCallback: true,
+          subtitle: 'Missed call',
+          callbackText: 'Call back',
+        ),
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
         headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
-        android: AndroidParams(
+        android: const AndroidParams(
           isCustomNotification: true,
           isShowLogo: false,
-          isShowCallback: true,
-          isShowMissedCallNotification: true,
           ringtonePath: 'system_ringtone_default',
           backgroundColor: '#0955fa',
           backgroundUrl: 'assets/test.png',
@@ -142,7 +147,7 @@ class HomePageState extends State<HomePage> {
           incomingCallNotificationChannelName: 'Incoming Call',
           missedCallNotificationChannelName: 'Missed Call',
         ),
-        ios: IOSParams(
+        ios: const IOSParams(
           iconName: 'CallKitLogo',
           handleType: '',
           supportsVideo: true,
@@ -176,7 +181,7 @@ class HomePageState extends State<HomePage> {
       handle: '0123456789',
       type: 1,
       extra: <String, dynamic>{'userId': '1a2b3c4d'},
-      ios: IOSParams(handleType: 'number'),
+      ios: const IOSParams(handleType: 'number'),
     );
     await FlutterCallkitIncoming.startCall(params);
   }
@@ -196,61 +201,63 @@ class HomePageState extends State<HomePage> {
     print(devicePushTokenVoIP);
   }
 
-  Future<void> listenerEvent(Function? callback) async {
+  Future<void> listenerEvent(void Function(CallEvent) callback) async {
     try {
       FlutterCallkitIncoming.onEvent.listen((event) async {
         print('HOME: $event');
         switch (event!.event) {
-          case Event.ACTION_CALL_INCOMING:
+          case Event.actionCallIncoming:
             // TODO: received an incoming call
             break;
-          case Event.ACTION_CALL_START:
+          case Event.actionCallStart:
             // TODO: started an outgoing call
             // TODO: show screen calling in Flutter
             break;
-          case Event.ACTION_CALL_ACCEPT:
+          case Event.actionCallAccept:
             // TODO: accepted an incoming call
             // TODO: show screen calling in Flutter
             NavigationService.instance
                 .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
             break;
-          case Event.ACTION_CALL_DECLINE:
+          case Event.actionCallDecline:
             // TODO: declined an incoming call
             await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
             break;
-          case Event.ACTION_CALL_ENDED:
+          case Event.actionCallEnded:
             // TODO: ended an incoming/outgoing call
             break;
-          case Event.ACTION_CALL_TIMEOUT:
+          case Event.actionCallTimeout:
             // TODO: missed an incoming call
             break;
-          case Event.ACTION_CALL_CALLBACK:
+          case Event.actionCallCallback:
             // TODO: only Android - click action `Call back` from missed call notification
             break;
-          case Event.ACTION_CALL_TOGGLE_HOLD:
+          case Event.actionCallToggleHold:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_MUTE:
+          case Event.actionCallToggleMute:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_DMTF:
+          case Event.actionCallToggleDmtf:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_GROUP:
+          case Event.actionCallToggleGroup:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+          case Event.actionCallToggleAudioSession:
             // TODO: only iOS
             break;
-          case Event.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+          case Event.actionDidUpdateDevicePushTokenVoip:
             // TODO: only iOS
+            break;
+          case Event.actionCallCustom:
             break;
         }
-        if (callback != null) {
-          callback(event.toString());
-        }
+        callback(event);
       });
-    } on Exception {}
+    } on Exception catch (e) {
+      print(e);
+    }
   }
 
   //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
@@ -259,10 +266,10 @@ class HomePageState extends State<HomePage> {
         'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
 
-  onEvent(event) {
+  void onEvent(CallEvent event) {
     if (!mounted) return;
     setState(() {
-      textEvents += "${event.toString()}\n";
+      textEvents += '${event.toString()}\n';
     });
   }
 }

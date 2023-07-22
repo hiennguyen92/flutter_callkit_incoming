@@ -9,8 +9,6 @@ class AndroidParams {
     this.isCustomNotification,
     this.isCustomSmallExNotification,
     this.isShowLogo,
-    this.isShowCallback,
-    this.isShowMissedCallNotification,
     this.ringtonePath,
     this.backgroundColor,
     this.backgroundUrl,
@@ -27,12 +25,6 @@ class AndroidParams {
 
   /// Show logo app inside full screen.
   final bool? isShowLogo;
-
-  /// Show callback action from miss call notification.
-  final bool? isShowCallback;
-
-  /// Show missed call notification when timeout
-  final bool? isShowMissedCallNotification;
 
   /// File name ringtone, put file into /android/app/src/main/res/raw/ringtone_default.pm3 -> value: `ringtone_default.pm3`
   final String? ringtonePath;
