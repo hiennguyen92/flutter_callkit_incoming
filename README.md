@@ -118,6 +118,16 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     ```
     Note: Firebase Message: `@pragma('vm:entry-point')` <br/>
     https://github.com/firebase/flutterfire/blob/master/docs/cloud-messaging/receive.md#apple-platforms-and-android
+
+  * request permission for post Notification Android 13+
+  For Android 13 and above, please `requestNotificationPermission` before `showCallkitIncoming`
+    ```dart
+      await FlutterCallkitIncoming.requestNotificationPermission({
+        "rationaleMessagePermission": "Notification permission is required, to show notification.",
+        "postNotificationMessageRequired": "Notification permission is required, Please allow notification permission from setting."
+      });
+    ```
+
   * Show miss call notification
     ```dart
       this._currentUuid = _uuid.v4();
