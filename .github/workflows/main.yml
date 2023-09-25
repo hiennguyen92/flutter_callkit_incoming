@@ -26,7 +26,7 @@ jobs:
     - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
-        flutter-version: "3.0.5"
+        flutter-version: "3.3.3"
     - name: Dependencies
       run: flutter pub get
       working-directory: ${{env.working-directory}}
@@ -47,7 +47,7 @@ jobs:
     - uses: subosito/flutter-action@v2
       with:
           channel: "stable"
-          flutter-version: "3.0.5"
+          flutter-version: "3.3.3"
           architecture: x64
     - name: Dependencies
       run: flutter pub get

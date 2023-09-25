@@ -1,4 +1,4 @@
-import 'package:flutter_callkit_incoming/entities/call_kit.dart';
+import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
 
 const ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP =
     'com.hiennv.flutter_callkit_incoming.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP';
@@ -26,24 +26,26 @@ const ACTION_CALL_TOGGLE_GROUP =
     'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP';
 const ACTION_CALL_TOGGLE_AUDIO_SESSION =
     'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION';
+const ACTION_CALL_CUSTOM =
+    'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CUSTOM';
 
 /// Object CallEvent.
 class CallEvent {
   CallEvent._();
 
-  factory CallEvent.incoming(CallKit callkit) = CallActionIncoming;
+  factory CallEvent.incoming(CallKitParams callkit) = CallActionIncoming;
 
-  factory CallEvent.start(CallKit callkit) = CallActionStart;
+  factory CallEvent.start(CallKitParams callkit) = CallActionStart;
 
-  factory CallEvent.accept(CallKit callkit) = CallActionAccept;
+  factory CallEvent.accept(CallKitParams callkit) = CallActionAccept;
 
-  factory CallEvent.decline(CallKit callkit) = CallActionDecline;
+  factory CallEvent.decline(CallKitParams callkit) = CallActionDecline;
 
-  factory CallEvent.ended(CallKit callkit) = CallActionEnded;
+  factory CallEvent.ended(CallKitParams callkit) = CallActionEnded;
 
-  factory CallEvent.timeout(CallKit callkit) = CallActionTimeout;
+  factory CallEvent.timeout(CallKitParams callkit) = CallActionTimeout;
 
-  factory CallEvent.callback(CallKit callkit) = CallActionCallback;
+  factory CallEvent.callback(CallKitParams callkit) = CallActionCallback;
 
   factory CallEvent.updateDevicePushToken(String deviceToken) =
       CallActionUpdateDevicePushToken;
@@ -60,69 +62,71 @@ class CallEvent {
 
   factory CallEvent.toggleAudioSession(bool isActivate) =
       CallActionToggleAudioSession;
+
+  factory CallEvent.custom() = CallActionCustom;
 }
 
 class CallActionIncoming extends CallEvent {
-  CallActionIncoming(this.callKit) : super._();
+  CallActionIncoming(this.callKitParams) : super._();
 
-  final CallKit callKit;
+  final CallKitParams callKitParams;
 
   @override
-  String toString() => 'CallEvent.incoming(callkit: $callKit)';
+  String toString() => 'CallEvent.incoming(callkitParams: $callKitParams)';
 }
 
 class CallActionStart extends CallEvent {
-  CallActionStart(this.callKit) : super._();
+  CallActionStart(this.callKitParams) : super._();
 
-  final CallKit callKit;
+  final CallKitParams callKitParams;
 
   @override
-  String toString() => 'CallEvent.start(callkit: $callKit)';
+  String toString() => 'CallEvent.start(callkitParams: $callKitParams)';
 }
 
 class CallActionAccept extends CallEvent {
-  CallActionAccept(this.callKit) : super._();
+  CallActionAccept(this.callKitParams) : super._();
 
-  final CallKit callKit;
+  final CallKitParams callKitParams;
 
   @override
-  String toString() => 'CallEvent.accept(callkit: $callKit)';
+  String toString() => 'CallEvent.accept(callkitParams: $callKitParams)';
 }
 
 class CallActionDecline extends CallEvent {
-  CallActionDecline(this.callKit) : super._();
+  CallActionDecline(this.callKitParams) : super._();
 
-  final CallKit callKit;
+  final CallKitParams callKitParams;
 
   @override
-  String toString() => 'CallEvent.decline(callkit: $callKit)';
+  String toString() => 'CallEvent.decline(callkitParams: $callKitParams)';
 }
 
 class CallActionEnded extends CallEvent {
-  CallActionEnded(this.callKit) : super._();
+  CallActionEnded(this.callKitParams) : super._();
 
-  final CallKit callKit;
+  final CallKitParams callKitParams;
 
   @override
-  String toString() => 'CallEvent.ended(callkit: $callKit)';
+  String toString() => 'CallEvent.ended(callkitParams: $callKitParams)';
 }
 
 class CallActionTimeout extends CallEvent {
-  CallActionTimeout(this.callKit) : super._();
+  CallActionTimeout(this.callKitParams) : super._();
 
-  final CallKit callKit;
+  final CallKitParams callKitParams;
 
   @override
-  String toString() => 'CallEvent.timeout(callkit: $callKit)';
+  String toString() => 'CallEvent.timeout(callkitParams: $callKitParams)';
 }
 
 class CallActionCallback extends CallEvent {
-  CallActionCallback(this.callKit) : super._();
+  CallActionCallback(this.callKitParams) : super._();
 
-  final CallKit callKit;
+  final CallKitParams callKitParams;
 
   @override
-  String toString() => 'CallEvent.callback(callkit: $callKit)';
+  String toString() => 'CallEvent.callback(callkitParams: $callKitParams)';
 }
 
 class CallActionUpdateDevicePushToken extends CallEvent {
@@ -198,6 +202,13 @@ class CallActionToggleAudioSession extends CallEvent {
 
   @override
   String toString() => 'CallEvent.toggleAudioSession(isActivate: $isActivate)';
+}
+
+class CallActionCustom extends CallEvent {
+  CallActionCustom() : super._();
+
+  @override
+  String toString() => 'CallEvent.custom()';
 }
 
 enum DTMFActionType {

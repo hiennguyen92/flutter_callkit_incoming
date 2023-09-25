@@ -13,10 +13,9 @@ AndroidParams _$AndroidParamsFromJson(Map json) => $checkedCreate(
         final val = AndroidParams(
           isCustomNotification:
               $checkedConvert('isCustomNotification', (v) => v as bool?),
+          isCustomSmallExNotification:
+              $checkedConvert('isCustomSmallExNotification', (v) => v as bool?),
           isShowLogo: $checkedConvert('isShowLogo', (v) => v as bool?),
-          isShowCallback: $checkedConvert('isShowCallback', (v) => v as bool?),
-          isShowMissedCallNotification: $checkedConvert(
-              'isShowMissedCallNotification', (v) => v as bool?),
           ringtonePath: $checkedConvert('ringtonePath', (v) => v as String?),
           backgroundColor:
               $checkedConvert('backgroundColor', (v) => v as String?),
@@ -34,9 +33,8 @@ AndroidParams _$AndroidParamsFromJson(Map json) => $checkedCreate(
 Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
     <String, dynamic>{
       'isCustomNotification': instance.isCustomNotification,
+      'isCustomSmallExNotification': instance.isCustomSmallExNotification,
       'isShowLogo': instance.isShowLogo,
-      'isShowCallback': instance.isShowCallback,
-      'isShowMissedCallNotification': instance.isShowMissedCallNotification,
       'ringtonePath': instance.ringtonePath,
       'backgroundColor': instance.backgroundColor,
       'backgroundUrl': instance.backgroundUrl,

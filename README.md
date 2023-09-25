@@ -3,6 +3,7 @@
 A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Callkit for iOS).
 
 [![pub package](https://img.shields.io/pub/v/flutter_callkit_incoming.svg)](https://pub.dev/packages/flutter_callkit_incoming)
+[![pub points](https://img.shields.io/pub/points/flutter_callkit_incoming?label=pub%20points)](https://pub.dev/packages/flutter_callkit_incoming/score)
 [![Build Status](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml/badge.svg)](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml)
 
 <a href="https://www.buymeacoffee.com/hiennguyen92" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
@@ -45,14 +46,18 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
           <uses-permission android:name="android.permission.INTERNET"/>
       </manifest>
      ```
+     The following rule needs to be added in the proguard-rules.pro to avoid obfuscated keys.
+     ```
+      -keep class com.hiennv.flutter_callkit_incoming.** { *; }
+     ```
   * iOS
      * Info.plist
       ```
       <key>UIBackgroundModes</key>
       <array>
-          <string>processing</string>
-          <string>remote-notification</string>
           <string>voip</string>
+          <string>remote-notification</string>
+          <string>processing</string> //you can add this if needed
       </array>
       ```
 
@@ -73,22 +78,25 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         type: 0,
         textAccept: 'Accept',
         textDecline: 'Decline',
-        textMissedCall: 'Missed call',
-        textCallback: 'Call back',
+        missedCallNotification: NotificationParams(
+            showNotification: true,
+            isShowCallback: true,
+            subtitle: 'Missed call',
+            callbackText: 'Call back',
+        ),
         duration: 30000,
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
         headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
         android: const AndroidParams(
             isCustomNotification: true,
             isShowLogo: false,
-            isShowCallback: false,
-            isShowMissedCallNotification: true,
             ringtonePath: 'system_ringtone_default',
             backgroundColor: '#0955fa',
             backgroundUrl: 'https://i.pravatar.cc/500',
             actionColor: '#4CAF50',
             incomingCallNotificationChannelName: "Incoming Call",
-            missedCallNotificationChannelName: "Missed Call"),
+            missedCallNotificationChannelName: "Missed Call"
+        ),
         ios: IOSParams(
           iconName: 'CallKitLogo',
           handleType: 'generic',
@@ -108,6 +116,8 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       );
       await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
     ```
+    Note: Firebase Message: `@pragma('vm:entry-point')` <br/>
+    https://github.com/firebase/flutterfire/blob/master/docs/cloud-messaging/receive.md#apple-platforms-and-android
   * Show miss call notification
     ```dart
       this._currentUuid = _uuid.v4();
@@ -147,7 +157,7 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       await FlutterCallkitIncoming.endAllCalls();
     ```
 
-  * Get active calls. iOS: return active calls from Callkit, Android: only return last call
+  * Get active calls. iOS: return active calls from Callkit(only id), Android: only return last call
     ```dart
       await FlutterCallkitIncoming.activeCalls();
     ```
@@ -155,6 +165,12 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     ```json
     [{"id": "8BAA2B26-47AD-42C1-9197-1D75F662DF78", ...}]
     ```
+  * Set status call connected (only for iOS - used to determine Incoming Call or Outgoing Call status in phone book)
+    ```
+      await FlutterCallkitIncoming.setCallConnected(this._currentUuid);
+    ```
+    After the call is ACCEPT or startCall please call this func.
+    normally it should be called when webrtc/p2p.... is established.
 
   * Get device push token VoIP. iOS: return deviceToken, Android: Empty
 
@@ -190,46 +206,49 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     ```dart
       FlutterCallkitIncoming.onEvent.listen((CallEvent event) {
         switch (event!.event) {
-          case Event.ACTION_CALL_INCOMING:
+          case Event.actionCallIncoming:
             // TODO: received an incoming call
             break;
-          case Event.ACTION_CALL_START:
+          case Event.actionCallStart:
             // TODO: started an outgoing call
             // TODO: show screen calling in Flutter
             break;
-          case Event.ACTION_CALL_ACCEPT:
+          case Event.actionCallAccept:
             // TODO: accepted an incoming call
             // TODO: show screen calling in Flutter
             break;
-          case Event.ACTION_CALL_DECLINE:
+          case Event.actionCallDecline:
             // TODO: declined an incoming call
             break;
-          case Event.ACTION_CALL_ENDED:
+          case Event.actionCallEnded:
             // TODO: ended an incoming/outgoing call
             break;
-          case Event.ACTION_CALL_TIMEOUT:
+          case Event.actionCallTimeout:
             // TODO: missed an incoming call
             break;
-          case Event.ACTION_CALL_CALLBACK:
+          case Event.actionCallCallback:
             // TODO: only Android - click action `Call back` from missed call notification
             break;
-          case Event.ACTION_CALL_TOGGLE_HOLD:
+          case Event.actionCallToggleHold:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_MUTE:
+          case Event.actionCallToggleMute:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_DMTF:
+          case Event.actionCallToggleDmtf:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_GROUP:
+          case Event.actionCallToggleGroup:
             // TODO: only iOS
             break;
-          case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+          case Event.actionCallToggleAudioSession:
             // TODO: only iOS
             break;
-          case Event.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+          case Event.actionDidUpdateDevicePushTokenVoip:
             // TODO: only iOS
+            break;
+          case Event.actionCallCustom:
+            // TODO: for custom action
             break;
         }
       });
@@ -245,6 +264,10 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       info["type"] = 1
       //... set more data
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
+      
+      //please make sure call `completion()` at the end of the pushRegistry(......, completion: @escaping () -> Void)
+      // or `DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { completion() }`
+      // if you don't call completion() in pushRegistry(......, completion: @escaping () -> Void), there may be app crash by system when receiving voIP
     ```
     
     ```kotlin
@@ -284,13 +307,13 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
 
     ```swift
       //send custom event from native
-      SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendEventCustom("customEvent", body: ["customKey": "customValue"])
+      SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendEventCustom(body: ["customKey": "customValue"])
 
     ```
 
     ```kotlin
         //Kotlin/Java Android
-        FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(event: String, body: Map<String, Any>)
+        FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(body: Map<String, Any>)
     ```
 
 4. Properties
@@ -306,15 +329,22 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     | **`duration`**  | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed.                                                                                     |    `30000`  |
    | **`textAccept`**  | Text `Accept` used in Android                                            |    `Accept`  |
    | **`textDecline`**  | Text `Decline` used in Android                                           |    `Decline`  |
-   | **`textMissedCall`**  | Text `Missed Call` used in Android (show in miss call notification)  |    `Missed Call`  |
-   | **`textCallback`**  | Text `Call back` used in Android (show in miss call notification)     |    `Call back`  |
     |   **`extra`**   | Any data added to the event when received.                              |     `{}`    |
     |   **`headers`** | Any data for custom header avatar/background image.                     |     `{}`    |
+    |  **`missedCallNotification`**  | Android data needed to customize Miss Call Notification.                                    |    Below    |
     |  **`android`**  | Android data needed to customize UI.                                    |    Below    |
     |    **`ios`**    | iOS data needed.                                                        |    Below    |
 
     <br>
-    
+
+* Missed Call Notification
+
+    | Prop            | Description                                                             | Default     |
+    | --------------- | ----------------------------------------------------------------------- | ----------- |
+    | **`subtitle`**  | Text `Missed Call` used in Android (show in miss call notification)  |    `Missed Call`  |
+   | **`callbackText`**  | Text `Call back` used in Android (show in miss call notification)     |    `Call back`  |
+   |       **`showNotification`**      | Show missed call notification when timeout | `true`          |
+    |       **`isShowCallback`**      | Show callback action from miss call notification. | `true`          |
 * Android
 
     | Prop                        | Description                                                             | Default          |
@@ -322,8 +352,6 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     | **`isCustomNotification`**  | Using custom notifications.                                             | `false`          |
     | **`isCustomSmallExNotification`**  | Using custom notification small on some devices clipped out in android.                                             | `false`          |
     |       **`isShowLogo`**      | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png` | `false`          |
-    |       **`isShowMissedCallNotification`**      | Show missed call notification when timeout | `true`          |
-    |       **`isShowCallback`**      | Show callback action from miss call notification. | `true`          |
     |      **`ringtonePath`**     | File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`                                                                                                    |`system_ringtone_default` <br>using ringtone default of the phone|
     |     **`backgroundColor`**   | Incoming call screen background color.                                  |     `#0955fa`    |
     |      **`backgroundUrl`**    | Using image background for Incoming call screen. example: http://... https://... or "assets/abc.png"                       |       _None_     |
