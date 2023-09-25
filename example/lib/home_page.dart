@@ -100,7 +100,15 @@ class HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> requestNotificationPermission() async {
+    await FlutterCallkitIncoming.requestNotificationPermission({
+      "rationaleMessagePermission": "Notification permission is required, to show notification.",
+      "postNotificationMessageRequired": "Notification permission is required, Please allow notification permission from setting."
+    });
+  }
+
   Future<dynamic> initCurrentCall() async {
+    await requestNotificationPermission();
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
     if (calls is List) {
