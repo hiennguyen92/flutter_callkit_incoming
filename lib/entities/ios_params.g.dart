@@ -28,6 +28,8 @@ IOSParams _$IOSParamsFromJson(Map json) => $checkedCreate(
           audioSessionPreferredIOBufferDuration: $checkedConvert(
               'audioSessionPreferredIOBufferDuration',
               (v) => (v as num?)?.toDouble()),
+          configureAudioSession:
+              $checkedConvert('configureAudioSession', (v) => v as bool?),
           supportsDTMF: $checkedConvert('supportsDTMF', (v) => v as bool?),
           supportsHolding:
               $checkedConvert('supportsHolding', (v) => v as bool?),
@@ -53,6 +55,7 @@ Map<String, dynamic> _$IOSParamsToJson(IOSParams instance) => <String, dynamic>{
           instance.audioSessionPreferredSampleRate,
       'audioSessionPreferredIOBufferDuration':
           instance.audioSessionPreferredIOBufferDuration,
+      'configureAudioSession': instance.configureAudioSession,
       'supportsDTMF': instance.supportsDTMF,
       'supportsHolding': instance.supportsHolding,
       'supportsGrouping': instance.supportsGrouping,

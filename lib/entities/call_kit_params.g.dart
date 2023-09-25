@@ -1,28 +1,31 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'call_kit.dart';
+part of 'call_kit_params.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-CallKit _$CallKitFromJson(Map json) => $checkedCreate(
-      'CallKit',
+CallKitParams _$CallKitParamsFromJson(Map json) => $checkedCreate(
+      'CallKitParams',
       json,
       ($checkedConvert) {
-        final val = CallKit(
-          id: $checkedConvert('id', (v) => v as String),
+        final val = CallKitParams(
+          id: $checkedConvert('id', (v) => v as String?),
           nameCaller: $checkedConvert('nameCaller', (v) => v as String?),
           appName: $checkedConvert('appName', (v) => v as String?),
           avatar: $checkedConvert('avatar', (v) => v as String?),
           handle: $checkedConvert('handle', (v) => v as String?),
-          type: $checkedConvert('type', (v) => (v as num?)?.toDouble()),
-          duration: $checkedConvert('duration', (v) => (v as num?)?.toDouble()),
+          type: $checkedConvert('type', (v) => v as int?),
+          duration: $checkedConvert('duration', (v) => v as int?),
           textAccept: $checkedConvert('textAccept', (v) => v as String?),
           textDecline: $checkedConvert('textDecline', (v) => v as String?),
-          textMissedCall:
-              $checkedConvert('textMissedCall', (v) => v as String?),
-          textCallback: $checkedConvert('textCallback', (v) => v as String?),
+          missedCallNotification: $checkedConvert(
+              'missedCallNotification',
+              (v) => v == null
+                  ? null
+                  : NotificationParams.fromJson(
+                      Map<String, dynamic>.from(v as Map))),
           extra: $checkedConvert(
               'extra',
               (v) => (v as Map?)?.map(
@@ -49,7 +52,8 @@ CallKit _$CallKitFromJson(Map json) => $checkedCreate(
       },
     );
 
-Map<String, dynamic> _$CallKitToJson(CallKit instance) => <String, dynamic>{
+Map<String, dynamic> _$CallKitParamsToJson(CallKitParams instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'nameCaller': instance.nameCaller,
       'appName': instance.appName,
@@ -59,8 +63,7 @@ Map<String, dynamic> _$CallKitToJson(CallKit instance) => <String, dynamic>{
       'duration': instance.duration,
       'textAccept': instance.textAccept,
       'textDecline': instance.textDecline,
-      'textMissedCall': instance.textMissedCall,
-      'textCallback': instance.textCallback,
+      'missedCallNotification': instance.missedCallNotification?.toJson(),
       'extra': instance.extra,
       'headers': instance.headers,
       'android': instance.android?.toJson(),

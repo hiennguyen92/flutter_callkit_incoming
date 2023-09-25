@@ -9,6 +9,7 @@ import 'entities/entities.dart';
 /// * startCall(dynamic)
 /// * endCall(dynamic)
 /// * endAllCalls()
+/// * callConnected(dynamic)
 
 class FlutterCallkitIncoming {
   FlutterCallkitIncoming._();
@@ -19,9 +20,9 @@ class FlutterCallkitIncoming {
       _instance ??= FlutterCallkitIncoming._();
 
   static const MethodChannel _channel =
-      const MethodChannel('flutter_callkit_incoming');
+      MethodChannel('flutter_callkit_incoming');
   static const EventChannel _eventChannel =
-      const EventChannel('flutter_callkit_incoming_events');
+      EventChannel('flutter_callkit_incoming_events');
 
   /// Listen to event callback from [FlutterCallkitIncoming].
   ///
@@ -45,13 +46,13 @@ class FlutterCallkitIncoming {
 
   /// Show Callkit Incoming.
   /// On iOS, using Callkit. On Android, using a custom UI.
-  Future<void> showCallkitIncoming(CallKit params) async {
+  Future<void> showCallkitIncoming(CallKitParams params) async {
     await _channel.invokeMethod<void>("showCallkitIncoming", params.toJson());
   }
 
   /// Show Miss Call Notification.
   /// Only Android
-  Future<void> showMissCallNotification(CallKit params) async {
+  Future<void> showMissCallNotification(CallKitParams params) async {
     await _channel.invokeMethod<void>(
         "showMissCallNotification", params.toJson());
   }
@@ -59,8 +60,22 @@ class FlutterCallkitIncoming {
   /// Start an Outgoing call.
   /// On iOS, using Callkit(create a history into the Phone app).
   /// On Android, Nothing(only callback event listener).
-  Future<void> startCall(CallKit params) async {
+  Future<void> startCall(CallKitParams params) async {
     await _channel.invokeMethod<void>("startCall", params.toJson());
+  }
+
+  /// Muting an Ongoing call.
+  /// On iOS, using Callkit(update the ongoing call ui).
+  /// On Android, Nothing(only callback event listener).
+  static Future muteCall(String id, {bool isMuted = true}) async {
+    await _channel.invokeMethod("muteCall", {'id': id, 'isMuted': isMuted});
+  }
+
+  /// Hold an Ongoing call.
+  /// On iOS, using Callkit(update the ongoing call ui).
+  /// On Android, Nothing(only callback event listener).
+  static Future holdCall(String id, {bool isOnHold = true}) async {
+    await _channel.invokeMethod("holdCall", {'id': id, 'isOnHold': isOnHold});
   }
 
   /// End an Incoming/Outgoing call.
@@ -68,6 +83,13 @@ class FlutterCallkitIncoming {
   /// On Android, Nothing(only callback event listener).
   Future<void> endCall(String id) async {
     await _channel.invokeMethod<void>("endCall", {'id': id});
+  }
+
+  /// Set call has been connected successfully.
+  /// On iOS, using Callkit(update a history into the Phone app).
+  /// On Android, Nothing(only callback event listener).
+  static Future setCallConnected(String id) async {
+    await _channel.invokeMethod("callConnected", {'id': id});
   }
 
   /// End all calls.
@@ -78,14 +100,14 @@ class FlutterCallkitIncoming {
   /// Get active calls.
   /// On iOS: return active calls from Callkit.
   /// On Android: only return last call
-  Future<List<CallKit>?> activeCalls() async {
+  Future<List<CallKitParams>?> activeCalls() async {
     final jsonList = await _channel.invokeMethod<List<Object?>?>("activeCalls");
 
     if (jsonList == null) {
       return null;
     }
     return jsonList
-        .map((e) => CallKit.fromJson(
+        .map((e) => CallKitParams.fromJson(
             Map<String, dynamic>.from(e as Map<Object?, Object?>)))
         .toList();
   }
@@ -113,13 +135,149 @@ class FlutterCallkitIncoming {
       return null;
     }
 
-    final event = Event.values.firstWhere((e) => e.name == data['event']);
-    final callkit = CallKit.fromJson(
-        Map<String, dynamic>.from(data['body'] as Map<Object?, Object?>));
+    switch (data['event']) {
+      case ACTION_CALL_INCOMING:
+        final callkit = toCallkit(data);
+        if (callkit != null) {
+          return CallEvent.incoming(callkit);
+        }
+        throw const FormatException('[ACTION_CALL_INCOMING] body is null.');
+      case ACTION_CALL_START:
+        final callkit = toCallkit(data);
+        if (callkit == null) {
+          throw const FormatException('[ACTION_CALL_START] body is null.');
+        }
+        return CallEvent.start(callkit);
+      case ACTION_CALL_ACCEPT:
+        final callkit = toCallkit(data);
+        if (callkit == null) {
+          throw const FormatException('[ACTION_CALL_ACCEPT] body is null.');
+        }
+        return CallEvent.accept(callkit);
+      case ACTION_CALL_DECLINE:
+        final callkit = toCallkit(data);
+        if (callkit == null) {
+          throw const FormatException('[ACTION_CALL_DECLINE] body is null.');
+        }
+        return CallEvent.decline(callkit);
+      case ACTION_CALL_ENDED:
+        final callkit = toCallkit(data);
+        if (callkit == null) {
+          throw const FormatException('[ACTION_CALL_ENDED] body is null.');
+        }
+        return CallEvent.ended(callkit);
+      case ACTION_CALL_TIMEOUT:
+        final callkit = toCallkit(data);
+        if (callkit == null) {
+          throw const FormatException('[ACTION_CALL_TIMEOUT] body is null.');
+        }
+        return CallEvent.timeout(callkit);
+      case ACTION_CALL_CALLBACK:
+        final callkit = toCallkit(data);
+        if (callkit == null) {
+          throw const FormatException('[ACTION_CALL_CALLBACK] body is null.');
+        }
+        return CallEvent.callback(callkit);
+      case ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final deviceToken = body?['deviceTokenVoIP'] as String?;
+        if (deviceToken != null) {
+          return CallEvent.updateDevicePushToken(deviceToken);
+        }
+        throw const FormatException(
+          '[ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP] deviceTokenVoIP is null.',
+        );
+      case ACTION_CALL_TOGGLE_HOLD:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final id = body?['id'] as String?;
+        if (id == null) {
+          throw const FormatException('[ACTION_CALL_TOGGLE_HOLD] id is null.');
+        }
+        final isOnHold = body?['isOnHold'] as bool?;
+        if (isOnHold == null) {
+          throw const FormatException(
+              '[ACTION_CALL_TOGGLE_HOLD] isOnHold is null.');
+        }
+        return CallEvent.toggleHold(id, isOnHold);
+      case ACTION_CALL_TOGGLE_MUTE:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final id = body?['id'] as String?;
+        if (id == null) {
+          throw const FormatException('[ACTION_CALL_TOGGLE_MUTE] id is null.');
+        }
+        final isMuted = body?['isMuted'] as bool?;
+        if (isMuted == null) {
+          throw const FormatException(
+              '[ACTION_CALL_TOGGLE_MUTE] isMuted is null.');
+        }
+        return CallEvent.toggleMute(id, isMuted);
+      case ACTION_CALL_TOGGLE_DMTF:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final id = body?['id'] as String?;
+        if (id == null) {
+          throw const FormatException('[ACTION_CALL_TOGGLE_DMTF] id is null.');
+        }
+        final digits = body?['digits'] as String?;
+        if (digits == null) {
+          throw const FormatException(
+              '[ACTION_CALL_TOGGLE_DMTF] digits is null.');
+        }
+        final type = body != null ? toDTMFActionType(body) : null;
+        if (type == null) {
+          throw const FormatException(
+              '[ACTION_CALL_TOGGLE_DMTF] typs is null.');
+        }
+        return CallEvent.toggleDMTF(id, digits, type);
+      case ACTION_CALL_TOGGLE_GROUP:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final id = body?['id'] as String?;
+        if (id == null) {
+          throw const FormatException('[ACTION_CALL_TOGGLE_GROUP] id is null.');
+        }
+        final callUUIDToGroupWith = body?['callUUIDToGroupWith'] as String?;
+        if (callUUIDToGroupWith == null) {
+          throw const FormatException(
+            '[ACTION_CALL_TOGGLE_GROUP] callUUIDToGroupWith is null.',
+          );
+        }
+        return CallEvent.toggleGroup(id, callUUIDToGroupWith);
+      case ACTION_CALL_TOGGLE_AUDIO_SESSION:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final isActivate = body?['isActivate'] as bool?;
+        if (isActivate == null) {
+          throw const FormatException(
+            '[ACTION_CALL_TOGGLE_AUDIO_SESSION] isActivate is null.',
+          );
+        }
+        return CallEvent.toggleAudioSession(isActivate);
+      default:
+        return null;
+    }
+  }
 
-    return CallEvent(
-      event: event,
-      callKit: callkit,
-    );
+  CallKitParams? toCallkit(Map data) {
+    final body = data['body'] as Map<Object?, Object?>?;
+    if (body == null) {
+      return null;
+    }
+    return CallKitParams.fromJson(Map<String, dynamic>.from(body));
+  }
+
+  DTMFActionType? toDTMFActionType(Map data) {
+    final type = data['type'] as String?;
+    if (type == null) {
+      return null;
+    }
+
+    switch (type) {
+      case 'singleTone':
+        return DTMFActionType.singleTone;
+      case 'softPause':
+        return DTMFActionType.softPause;
+      case 'hardPause':
+        return DTMFActionType.hardPause;
+      default:
+        return null;
+    }
   }
 }

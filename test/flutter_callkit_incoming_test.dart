@@ -2,17 +2,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('flutter_callkit_incoming');
-
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  const MethodChannel channel = MethodChannel('flutter_callkit_incoming');
+  final messenger =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
   setUp(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return '42';
-    });
+    messenger.setMockMethodCallHandler(channel, (methodCall) async => '42');
   });
 
   tearDown(() {
-    channel.setMockMethodCallHandler(null);
+    messenger.setMockMethodCallHandler(channel, null);
   });
 }
