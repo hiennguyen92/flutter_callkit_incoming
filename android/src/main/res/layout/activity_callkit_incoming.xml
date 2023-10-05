@@ -51,7 +51,9 @@
                 android:layout_centerInParent="true"
                 android:src="@drawable/ic_default_avatar"
                 app:civ_border_color="#80ffffff"
-                app:civ_border_width="1dp" />
+                app:civ_border_width="1dp"
+                android:visibility="gone"
+                />
 
 
             <LinearLayout

@@ -21,12 +21,14 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.hiennv.flutter_callkit_incoming.AppUtils.loguer
 import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
@@ -67,9 +69,9 @@ class CallkitNotificationManager(private val context: Context) {
     private var targetLoadAvatarCustomize = object : Target {
         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
             notificationViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
-            notificationViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
+            //notificationViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
             notificationSmallViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
-            notificationSmallViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
+            //notificationSmallViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
             getNotificationManager().notify(notificationId, notificationBuilder.build())
         }
 
@@ -82,6 +84,7 @@ class CallkitNotificationManager(private val context: Context) {
 
 
     fun showIncomingNotification(data: Bundle) {
+        Log.d("HP","showIncomingNotification")
         data.putLong(EXTRA_TIME_START_CALL, System.currentTimeMillis())
 
         notificationId = data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
@@ -128,7 +131,7 @@ class CallkitNotificationManager(private val context: Context) {
         val actionColor = data.getString(CallkitConstants.EXTRA_CALLKIT_ACTION_COLOR, "#4CAF50")
         try {
             notificationBuilder.color = Color.parseColor(actionColor)
-        } catch (error: Exception) {
+        } catch (_: Exception) {
         }
         notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
@@ -136,6 +139,7 @@ class CallkitNotificationManager(private val context: Context) {
                 data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
         val isCustomSmallExNotification =
                 data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION, false)
+        Log.d("HP","isCustomNotification: $isCustomNotification")
         if (isCustomNotification) {
             notificationViews =
                     RemoteViews(context.packageName, R.layout.layout_custom_notification)
@@ -367,12 +371,14 @@ class CallkitNotificationManager(private val context: Context) {
 
 
     fun clearIncomingNotification(data: Bundle, isAccepted: Boolean) {
+        loguer("clearIncomingNotification")
         context.sendBroadcast(CallkitIncomingActivity.getIntentEnded(context, isAccepted))
         notificationId = data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
     }
 
     fun clearMissCallNotification(data: Bundle) {
+        loguer("clearMissCallNotification")
         notificationId = data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
         Handler(Looper.getMainLooper()).postDelayed({
@@ -385,7 +391,7 @@ class CallkitNotificationManager(private val context: Context) {
 
     fun incomingChannelEnabled(): Boolean = getNotificationManager().run {
         val channel = getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
-
+        loguer("incomingChannelEnabled")
         return areNotificationsEnabled() &&
                 (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
                         channel != null &&
@@ -397,6 +403,7 @@ class CallkitNotificationManager(private val context: Context) {
             incomingCallChannelName: String,
             missedCallChannelName: String,
     ) {
+        loguer("createNotificationChanel")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getNotificationManager().apply {
                 var channelCall = getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
@@ -441,6 +448,7 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private fun getAcceptPendingIntent(id: Int, data: Bundle): PendingIntent {
+        loguer("getAcceptPendingIntent")
         val intentTransparent = TransparentActivity.getIntent(
                 context,
                 CallkitConstants.ACTION_CALL_ACCEPT,
@@ -450,16 +458,19 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private fun getDeclinePendingIntent(id: Int, data: Bundle): PendingIntent {
+        loguer("getDeclinePendingIntent")
         val declineIntent = CallkitIncomingBroadcastReceiver.getIntentDecline(context, data)
         return PendingIntent.getBroadcast(context, id, declineIntent, getFlagPendingIntent())
     }
 
     private fun getTimeOutPendingIntent(id: Int, data: Bundle): PendingIntent {
+        loguer("getTimeOutPendingIntent")
         val timeOutIntent = CallkitIncomingBroadcastReceiver.getIntentTimeout(context, data)
         return PendingIntent.getBroadcast(context, id, timeOutIntent, getFlagPendingIntent())
     }
 
     private fun getCallbackPendingIntent(id: Int, data: Bundle): PendingIntent {
+        loguer("getCallbackPendingIntent")
         val intentTransparent = TransparentActivity.getIntent(
                 context,
                 CallkitConstants.ACTION_CALL_CALLBACK,
@@ -469,16 +480,19 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private fun getActivityPendingIntent(id: Int, data: Bundle): PendingIntent {
+        loguer("getActivityPendingIntent")
         val intent = CallkitIncomingActivity.getIntent(context, data)
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
     }
 
     private fun getAppPendingIntent(id: Int, data: Bundle): PendingIntent {
+        loguer("getAppPendingIntent")
         val intent: Intent? = AppUtils.getAppIntent(context, data = data)
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
     }
 
     private fun getFlagPendingIntent(): Int {
+        loguer("getFlagPendingIntent")
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         } else {

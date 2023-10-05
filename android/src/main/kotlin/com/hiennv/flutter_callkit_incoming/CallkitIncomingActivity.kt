@@ -1,7 +1,6 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -13,23 +12,23 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
+import android.text.TextUtils
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.Window
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.hiennv.flutter_callkit_incoming.AppUtils.loguer
 import com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
+import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlin.math.abs
 import okhttp3.OkHttpClient
-import com.squareup.picasso.OkHttp3Downloader
-import android.view.ViewGroup.MarginLayoutParams
-import android.os.PowerManager
-import android.text.TextUtils
-import android.util.Log
+import kotlin.math.abs
 
 
 class CallkitIncomingActivity : Activity() {
@@ -43,6 +42,7 @@ class CallkitIncomingActivity : Activity() {
             action = "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}"
             putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            //flags = Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT
         }
 
         fun getIntentEnded(context: Context, isAccepted: Boolean): Intent {
@@ -84,6 +84,7 @@ class CallkitIncomingActivity : Activity() {
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
+        loguer("onCreate CallkitIncomigActivity")
         super.onCreate(savedInstanceState)
         requestedOrientation = if (!Utils.isTablet(this@CallkitIncomingActivity)) {
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -166,7 +167,7 @@ class CallkitIncomingActivity : Activity() {
 
         val avatarUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {
-            ivAvatar.visibility = View.VISIBLE
+            //ivAvatar.visibility = View.VISIBLE
             val headers = data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
             getPicassoInstance(this@CallkitIncomingActivity, headers)
                     .load(avatarUrl)

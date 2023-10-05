@@ -3,6 +3,7 @@ package com.hiennv.flutter_callkit_incoming
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 
 object AppUtils {
     fun getAppIntent(context: Context, action: String? = null, data: Bundle? = null): Intent? {
@@ -11,5 +12,9 @@ object AppUtils {
         intent?.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
         intent?.action = action
         return intent
+    }
+
+    fun loguer(msg:String){
+        Log.d("DEV",msg)
     }
 }

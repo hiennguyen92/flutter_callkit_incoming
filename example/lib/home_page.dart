@@ -124,7 +124,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> makeFakeCallInComing() async {
-    await Future.delayed(const Duration(seconds: 10), () async {
+    await Future.delayed(const Duration(milliseconds: 10), () async {
       _currentUuid = _uuid.v4();
 
       final params = CallKitParams(
@@ -133,10 +133,10 @@ class HomePageState extends State<HomePage> {
         appName: 'Callkit',
         avatar: 'https://i.pravatar.cc/100',
         handle: '0123456789',
-        type: 1,
+        type: 0,
         duration: 30000,
-        textAccept: 'Accept',
-        textDecline: 'Decline',
+        textAccept: 'Contestar',
+        textDecline: 'Colgar',
         missedCallNotification: const NotificationParams(
           showNotification: true,
           isShowCallback: true,
