@@ -69,7 +69,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA) ?: return
 
-        Cache.updateLatestEvent(action, data.toData())
+        Cache.updateLatestEvent(
+            action.removePrefix("${context.packageName}."), data.toData(),
+        )
 
         when (action) {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
