@@ -48,6 +48,7 @@
                 android:id="@+id/ivAvatar"
                 android:layout_width="@dimen/size_avatar"
                 android:layout_height="@dimen/size_avatar"
+                android:visibility="invisible"
                 android:layout_centerInParent="true"
                 android:src="@drawable/ic_default_avatar"
                 app:civ_border_color="#80ffffff"
