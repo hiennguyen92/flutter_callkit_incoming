@@ -159,7 +159,6 @@ class CallkitIncomingActivity : Activity() {
         if (data == null) finish()
 
 		val textColor = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_COLOR, "#ffffff")
-		println("TEXT COLOR = ${textColor}");
         tvNameCaller.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
         tvNumber.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
 
@@ -201,7 +200,6 @@ class CallkitIncomingActivity : Activity() {
 			tvAccept.setTextColor(Color.parseColor(textColor))
 			tvDecline.setTextColor(Color.parseColor(textColor))
 		} catch (error: Exception) {
-			println(error.message);
 		}
 
         val backgroundColor = data?.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
