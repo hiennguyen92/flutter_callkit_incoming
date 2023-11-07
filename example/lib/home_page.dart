@@ -152,6 +152,7 @@ class HomePageState extends State<HomePage> {
           backgroundColor: '#0955fa',
           backgroundUrl: 'assets/test.png',
           actionColor: '#4CAF50',
+          textColor: '#ffffff',
           incomingCallNotificationChannelName: 'Incoming Call',
           missedCallNotificationChannelName: 'Missed Call',
         ),
@@ -204,8 +205,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> getDevicePushTokenVoIP() async {
-    var devicePushTokenVoIP =
-        await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    var devicePushTokenVoIP = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
     print(devicePushTokenVoIP);
   }
 
@@ -224,8 +224,7 @@ class HomePageState extends State<HomePage> {
           case Event.actionCallAccept:
             // TODO: accepted an incoming call
             // TODO: show screen calling in Flutter
-            NavigationService.instance
-                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
+            NavigationService.instance.pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
             break;
           case Event.actionCallDecline:
             // TODO: declined an incoming call
@@ -270,8 +269,7 @@ class HomePageState extends State<HomePage> {
 
   //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
   Future<void> requestHttp(content) async {
-    get(Uri.parse(
-        'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
+    get(Uri.parse('https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
 
   void onEvent(CallEvent event) {
