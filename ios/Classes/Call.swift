@@ -272,7 +272,36 @@ public class Call: NSObject {
     }
     
     func getEncryptHandle() -> String {
-        return String(format: "{\"nameCaller\":\"%@\", \"handle\":\"%@\"}", nameCaller, handle).encryptHandle()
+        do {
+            var map: [String: Any] = [:]
+
+            map["nameCaller"] = nameCaller
+            map["handle"] = handle
+            
+            var mapExtras = extra as? [String: Any]
+            
+            if (mapExtras == nil) {
+                print("error casting dictionary to [String: Any]")
+                return String(format: "{\"nameCaller\":\"%@\", \"handle\":\"%@\"}", nameCaller, handle).encryptHandle()
+            }
+            
+            for (key, value) in mapExtras! {
+                map[key] = value
+            }
+            
+            let mapData = try JSONSerialization.data(withJSONObject: map, options: .prettyPrinted)
+
+            // Convert the JSON data to a string
+            let mapString: String = String(data: mapData, encoding: .utf8) ?? ""
+            
+            print("encrypting call data -> " + mapString)
+            
+            return mapString.encryptHandle()
+        } catch {
+            print("error encrypting call data")
+            return String(format: "{\"nameCaller\":\"%@\", \"handle\":\"%@\"}", nameCaller, handle).encryptHandle()
+        }
+       
     }
     
     
