@@ -291,11 +291,8 @@ public class Call: NSObject {
             
             let mapData = try JSONSerialization.data(withJSONObject: map, options: .prettyPrinted)
 
-            // Convert the JSON data to a string
             let mapString: String = String(data: mapData, encoding: .utf8) ?? ""
-            
-            print("encrypting call data -> " + mapString)
-            
+
             return mapString.encryptHandle()
         } catch {
             print("error encrypting call data")
