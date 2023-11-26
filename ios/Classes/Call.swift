@@ -133,6 +133,7 @@ public class Call: NSObject {
     @objc public var handle: String
     @objc public var avatar: String
     @objc public var type: Int
+    @objc public var normalHandle: Int
     @objc public var duration: Int
     @objc public var extra: NSDictionary
     
@@ -161,6 +162,7 @@ public class Call: NSObject {
         self.handle = handle
         self.avatar = ""
         self.type = type
+        self.normalHandle = 0
         self.duration = 30000
         self.extra = [:]
         self.iconName = "CallKitLogo"
@@ -196,6 +198,7 @@ public class Call: NSObject {
         self.handle = args["handle"] as? String ?? ""
         self.avatar = args["avatar"] as? String ?? ""
         self.type = args["type"] as? Int ?? 0
+        self.normalHandle = args["normalHandle"] as? Int ?? 0
         self.duration = args["duration"] as? Int ?? 30000
         self.extra = args["extra"] as? NSDictionary ?? [:]
         
@@ -264,6 +267,7 @@ public class Call: NSObject {
             "handle": handle,
             "avatar": avatar,
             "type": type,
+            "normalHandle": normalHandle,
             "duration": duration,
             "extra": extra,
             "ios": ios
@@ -272,6 +276,9 @@ public class Call: NSObject {
     }
     
     func getEncryptHandle() -> String {
+        if (normalHandle > 0) {
+            return handle
+        }
         do {
             var map: [String: Any] = [:]
 

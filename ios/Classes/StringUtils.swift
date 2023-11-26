@@ -48,6 +48,13 @@ extension String {
     }
     
     public func getDecryptHandle() -> [String: Any] {
+        if (!self.isBase64Encoded()) {
+            print("normal value")
+            var map: [String: Any] = [:]
+            map["handle"] = self
+            return map
+        }
+        print("base64 value")
         if let data = self.decryptHandle().data(using: .utf8) {
             do {
                 return try (JSONSerialization.jsonObject(with: data, options: []) as? [String: Any])!
@@ -56,6 +63,33 @@ extension String {
             }
         }
         return [:]
+    }
+    
+    public func getHandleType() -> String {
+        if (!self.isBase64Encoded()) {
+            if (!self.isPhoneNumber()) {
+                return "email"
+            } else {
+                return "number"
+            }
+        }
+        return "generic"
+    }
+    
+    public func isBase64Encoded() -> Bool {
+        let value = self.fromBase64()
+        return !value.isEmpty
+    }
+    
+    func isPhoneNumber() -> Bool {
+        let cleanedValue = self
+            .replacingOccurrences(of: "[+-]", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "[ ]", with: "", options: .regularExpression)
+            
+    
+        let decimalCharacters = CharacterSet.decimalDigits
+        let characterSet = CharacterSet(charactersIn: cleanedValue)
+        return decimalCharacters.isSuperset(of: characterSet)
     }
     
 }
