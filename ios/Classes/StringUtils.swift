@@ -30,8 +30,7 @@ extension String {
         guard let data = Foundation.Data(base64Encoded: self) else {
             return ""
         }
-        
-        return String(data: data, encoding: .utf8)!
+        return String(data: data, encoding: .utf8) ?? ""
     }
     
     func toBase64() -> String {
@@ -49,12 +48,10 @@ extension String {
     
     public func getDecryptHandle() -> [String: Any] {
         if (!self.isBase64Encoded()) {
-            print("normal value")
             var map: [String: Any] = [:]
             map["handle"] = self
             return map
         }
-        print("base64 value")
         if let data = self.decryptHandle().data(using: .utf8) {
             do {
                 return try (JSONSerialization.jsonObject(with: data, options: []) as? [String: Any])!
