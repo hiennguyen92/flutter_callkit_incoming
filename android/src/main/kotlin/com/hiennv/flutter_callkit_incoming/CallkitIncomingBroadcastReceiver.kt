@@ -12,6 +12,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
     companion object {
         private const val TAG = "CallkitIncomingReceiver"
+        var silenceEvents = false
 
         fun getIntent(context: Context, action: String, data: Bundle?) =
             Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
@@ -150,6 +151,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun sendEventFlutter(event: String, data: Bundle) {
+        if(silenceEvents) return
+
         val android = mapOf(
             "isCustomNotification" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false),
             "isCustomSmallExNotification" to data.getBoolean(

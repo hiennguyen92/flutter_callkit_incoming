@@ -35,11 +35,17 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     private var data: Data?
     private var isFromPushKit: Bool = false
+    private var silenceEvents: Bool = false
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
     
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
-        streamHandlers.reap().forEach { handler in
-            handler?.send(event, body ?? [:])
+        if silenceEvents {
+            print(event, " silenced")
+            return
+        } else {
+            streamHandlers.reap().forEach { handler in
+                handler?.send(event, body ?? [:])
+            }
         }
     }
     
@@ -179,6 +185,17 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             break
         case "getDevicePushTokenVoIP":
             result(self.getDevicePushTokenVoIP())
+            break;
+        case "silenceEvents":
+            guard let silence = call.arguments as? Bool else {
+                result("OK")
+                return
+            }
+            
+            print("silence events")
+            print(silence)
+            self.silenceEvents = silence
+            result("OK")
             break;
         default:
             result(FlutterMethodNotImplemented)

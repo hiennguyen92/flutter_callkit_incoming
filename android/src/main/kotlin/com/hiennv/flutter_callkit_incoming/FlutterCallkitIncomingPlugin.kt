@@ -243,6 +243,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "getDevicePushTokenVoIP" -> {
                     result.success("")
                 }
+                "silenceEvents" -> {
+                    val silence = call.arguments as? Boolean ?: false
+                    CallkitIncomingBroadcastReceiver.silenceEvents = silence
+                    result.success("")
+                }
                 "requestNotificationPermission" -> {
                     val map = buildMap {
                         val args = call.arguments
