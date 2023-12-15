@@ -22,7 +22,7 @@
         android:orientation="vertical">
 
 
-        <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
+        <RelativeLayout
             android:id="@+id/llBackgroundAnimation"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -36,11 +36,11 @@
                 android:layout_height="@dimen/base_margin_x2_5"
                 android:layout_above="@id/ivAvatar"
                 android:layout_centerHorizontal="true"
-                android:adjustViewBounds="true"
-                android:visibility="invisible"
-                android:scaleType="fitCenter"
                 android:layout_marginBottom="@dimen/base_margin_x5"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
                 android:src="@drawable/ic_logo"
+                android:visibility="invisible"
                 tools:ignore="ContentDescription" />
 
 
@@ -96,7 +96,7 @@
 
             </LinearLayout>
 
-        </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
+        </RelativeLayout>
 
 
         <Space
@@ -119,12 +119,10 @@
                 android:orientation="vertical"
                 tools:ignore="UseCompoundDrawables">
 
-                <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
+                <RelativeLayout
                     android:layout_width="@dimen/size_button_x2_5"
                     android:layout_height="@dimen/size_button_x2_5"
-                    app:ripple_amount="4"
-                    app:ripple_radius="@dimen/base_margin_x1_5"
-                    app:ripple_scale="4.5">
+                    tools:ignore="UselessParent">
 
                     <ImageView
                         android:id="@+id/ivDeclineCall"
@@ -147,7 +145,7 @@
                         android:textColor="@color/action_text"
                         android:textSize="@dimen/size_text_action" />
 
-                </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
+                </RelativeLayout>
 
             </LinearLayout>
 
