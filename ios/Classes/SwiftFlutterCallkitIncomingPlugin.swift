@@ -47,6 +47,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 handler?.send(event, body ?? [:])
             }
         }
+        
     }
     
     @objc public func sendEventCustom(_ event: String, body: NSDictionary?) {
@@ -192,8 +193,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 return
             }
             
-            print("silence events")
-            print(silence)
             self.silenceEvents = silence
             result("OK")
             break;
