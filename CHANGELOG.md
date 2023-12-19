@@ -1,3 +1,8 @@
+## 2.0.0+2
+
+* Fixed some bugs.
+* Support request permission for Android 13+ `requestNotificationPermission`
+
 ## 2.0.0+1
 
 * Fixed some bugs.
