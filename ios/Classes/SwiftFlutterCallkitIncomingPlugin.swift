@@ -402,7 +402,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         if data?.configureAudioSession != false {
             let session = AVAudioSession.sharedInstance()
             do{
-                try session.setCategory(AVAudioSession.Category.playAndRecord, options: [.duckOthers,.allowBluetooth])
+                try session.setCategory(AVAudioSession.Category.playAndRecord, options: [
+                    .allowBluetoothA2DP,
+                    .duckOthers,
+                    .allowBluetooth,
+                ])
                 try session.setMode(self.getAudioSessionMode(data?.audioSessionMode))
                 try session.setActive(data?.audioSessionActive ?? true)
                 try session.setPreferredSampleRate(data?.audioSessionPreferredSampleRate ?? 44100.0)
