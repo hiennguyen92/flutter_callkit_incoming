@@ -169,7 +169,7 @@ class CallkitIncomingActivity : Activity() {
 
         tvNameCaller.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
         tvNumber.text = additionalDataModel.accident_description
-        tvAddress.text = additionalDataModel.caller.city.plus(", ").plus(additionalDataModel.caller.region).plus(", ").plus(additionalDataModel.caller.street)
+        tvAddress.text = additionalDataModel.address
 
         val isShowLogo = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO, false)
 //        ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE

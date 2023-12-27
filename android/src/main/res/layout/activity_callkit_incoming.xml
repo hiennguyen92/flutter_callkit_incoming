@@ -85,6 +85,26 @@
                     tools:text="Caller Name" />
 
                 <TextView
+                    android:id="@+id/tvCustomId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="20sp"
+                    android:autoSizeMinTextSize="12sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@android:color/holo_green_dark"
+                    android:textSize="20sp"
+                    app:autoSizeMaxTextSize="20sp"
+                    app:autoSizeMinTextSize="12sp"
+                    app:autoSizeStepGranularity="2sp"
+                    app:autoSizeTextType="uniform"
+                    tools:ignore="MissingPrefix"
+                    tools:targetApi="o"
+                    tools:text="AZ-GC-46672" />
+
+                <TextView
                     android:id="@+id/tvNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -110,12 +130,6 @@
             </LinearLayout>
 
         </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
-
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
 
         <LinearLayout
             android:id="@+id/llAction"

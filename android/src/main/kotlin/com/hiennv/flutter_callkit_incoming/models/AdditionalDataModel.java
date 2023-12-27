@@ -1,20 +1,23 @@
 package com.hiennv.flutter_callkit_incoming.models;
 
-public class AdditionalDataModel {
-  private float id;
+public class AdditionalDataModel {private String address;
+  private String sub_category;
   private String custom_id;
   private String accident_description;
-  private String status;
   private String created_at;
-  Category CategoryObject;
-  Sub_category Sub_categoryObject;
-  Caller CallerObject;
+  private String subscriber_full_name;
+  private float id;
+  private String category;
+  private String status;
 
+  // Getter Methods
 
- // Getter Methods 
+  public String getAddress() {
+    return address;
+  }
 
-  public float getId() {
-    return id;
+  public String getSub_category() {
+    return sub_category;
   }
 
   public String getCustom_id() {
@@ -25,30 +28,34 @@ public class AdditionalDataModel {
     return accident_description;
   }
 
-  public String getStatus() {
-    return status;
-  }
-
   public String getCreated_at() {
     return created_at;
   }
 
-  public Category getCategory() {
-    return CategoryObject;
+  public String getSubscriber_full_name() {
+    return subscriber_full_name;
   }
 
-  public Sub_category getSub_category() {
-    return Sub_categoryObject;
+  public float getId() {
+    return id;
   }
 
-  public Caller getCaller() {
-    return CallerObject;
+  public String getCategory() {
+    return category;
   }
 
- // Setter Methods 
+  public String getStatus() {
+    return status;
+  }
 
-  public void setId( float id ) {
-    this.id = id;
+  // Setter Methods
+
+  public void setAddress( String address ) {
+    this.address = address;
+  }
+
+  public void setSub_category( String sub_category ) {
+    this.sub_category = sub_category;
   }
 
   public void setCustom_id( String custom_id ) {
@@ -59,23 +66,23 @@ public class AdditionalDataModel {
     this.accident_description = accident_description;
   }
 
-  public void setStatus( String status ) {
-    this.status = status;
-  }
-
   public void setCreated_at( String created_at ) {
     this.created_at = created_at;
   }
 
-  public void setCategory( Category categoryObject ) {
-    this.CategoryObject = categoryObject;
+  public void setSubscriber_full_name( String subscriber_full_name ) {
+    this.subscriber_full_name = subscriber_full_name;
   }
 
-  public void setSub_category( Sub_category sub_categoryObject ) {
-    this.Sub_categoryObject = sub_categoryObject;
+  public void setId( float id ) {
+    this.id = id;
   }
 
-  public void setCaller( Caller callerObject ) {
-    this.CallerObject = callerObject;
+  public void setCategory( String category ) {
+    this.category = category;
+  }
+
+  public void setStatus( String status ) {
+    this.status = status;
   }
 }
