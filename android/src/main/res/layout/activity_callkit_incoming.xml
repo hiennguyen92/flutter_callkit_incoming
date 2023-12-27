@@ -112,6 +112,7 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="@color/action_text"
+                    android:textStyle="bold"
                     android:textSize="@dimen/size_text_action"
                     tools:text="Some info" />
 
@@ -124,7 +125,7 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="@color/action_text"
-                    android:textSize="@dimen/size_text_action"
+                    android:textSize="14sp"
                     tools:text="Address" />
 
             </LinearLayout>

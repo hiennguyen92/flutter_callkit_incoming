@@ -39,7 +39,7 @@ class CallkitIncomingActivity : Activity() {
     companion object {
 
         private const val ACTION_ENDED_CALL_INCOMING =
-                "com.hiennv.flutter_callkit_incoming.ACTION_ENDED_CALL_INCOMING"
+            "com.hiennv.flutter_callkit_incoming.ACTION_ENDED_CALL_INCOMING"
 
         fun getIntent(context: Context, data: Bundle) = Intent(CallkitConstants.ACTION_CALL_INCOMING).apply {
             action = "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}"
@@ -73,9 +73,10 @@ class CallkitIncomingActivity : Activity() {
     private lateinit var llBackgroundAnimation: RippleRelativeLayout
 
     private lateinit var tvNameCaller: TextView
+    private lateinit var tvCustomId: TextView
     private lateinit var tvNumber: TextView
     private lateinit var tvAddress: TextView
-//    private lateinit var ivLogo: ImageView
+    //    private lateinit var ivLogo: ImageView
     private lateinit var ivAvatar: CircleImageView
 
     private lateinit var llAction: LinearLayout
@@ -108,8 +109,8 @@ class CallkitIncomingActivity : Activity() {
         initView()
         incomingData(intent)
         registerReceiver(
-                endedCallkitIncomingBroadcastReceiver,
-                IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}")
+            endedCallkitIncomingBroadcastReceiver,
+            IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}")
         )
     }
 
@@ -117,8 +118,8 @@ class CallkitIncomingActivity : Activity() {
 
         val pm = applicationContext.getSystemService(POWER_SERVICE) as PowerManager
         val wakeLock = pm.newWakeLock(
-                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                "Callkit:PowerManager"
+            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "Callkit:PowerManager"
         )
         wakeLock.acquire(duration)
     }
@@ -126,8 +127,8 @@ class CallkitIncomingActivity : Activity() {
     private fun transparentStatusAndNavigation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             setWindowFlag(
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                            or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, true
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+                        or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, true
             )
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -137,8 +138,8 @@ class CallkitIncomingActivity : Activity() {
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setWindowFlag(
-                    (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                            or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION), false
+                (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+                        or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION), false
             )
             window.statusBarColor = Color.TRANSPARENT
             window.navigationBarColor = Color.TRANSPARENT
@@ -161,13 +162,16 @@ class CallkitIncomingActivity : Activity() {
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
         if (data == null) finish()
 
-        val extraData = data?.getString(CallkitConstants.EXTRA_CALLKIT_EXTRA);
+        val extraData = data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA);
+
+        print(extraData);
 
         var gson = Gson();
 
-        var additionalDataModel = gson.fromJson(extraData, AdditionalDataModel::class.java)
+        var additionalDataModel = gson.fromJson(gson.toJson(extraData), AdditionalDataModel::class.java)
 
         tvNameCaller.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
+        tvCustomId.text = additionalDataModel.custom_id
         tvNumber.text = additionalDataModel.accident_description
         tvAddress.text = additionalDataModel.address
 
@@ -211,18 +215,18 @@ class CallkitIncomingActivity : Activity() {
             }
             val headers = data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
             getPicassoInstance(this@CallkitIncomingActivity, headers)
-                    .load(backgroundUrl)
-                    .placeholder(R.drawable.transparent)
-                    .error(R.drawable.transparent)
-                    .into(ivBackground)
+                .load(backgroundUrl)
+                .placeholder(R.drawable.transparent)
+                .error(R.drawable.transparent)
+                .into(ivBackground)
         }
     }
 
     private fun finishTimeout(data: Bundle?, duration: Long) {
         val currentSystemTime = System.currentTimeMillis()
         val timeStartCall =
-                data?.getLong(CallkitNotificationManager.EXTRA_TIME_START_CALL, currentSystemTime)
-                        ?: currentSystemTime
+            data?.getLong(CallkitNotificationManager.EXTRA_TIME_START_CALL, currentSystemTime)
+                ?: currentSystemTime
 
         val timeOut = duration - abs(currentSystemTime - timeStartCall)
         Handler(Looper.getMainLooper()).postDelayed({
@@ -236,10 +240,11 @@ class CallkitIncomingActivity : Activity() {
         ivBackground = findViewById(R.id.ivBackground)
         llBackgroundAnimation = findViewById(R.id.llBackgroundAnimation)
         llBackgroundAnimation.layoutParams.height =
-                Utils.getScreenWidth() + Utils.getStatusBarHeight(this@CallkitIncomingActivity)
+            Utils.getScreenWidth() + Utils.getStatusBarHeight(this@CallkitIncomingActivity)
         llBackgroundAnimation.startRippleAnimation()
 
         tvNameCaller = findViewById(R.id.tvNameCaller)
+        tvCustomId = findViewById(R.id.tvCustomId)
         tvNumber = findViewById(R.id.tvNumber)
         tvAddress = findViewById(R.id.tvAddress)
 //        ivLogo = findViewById(R.id.ivLogo)
@@ -267,7 +272,7 @@ class CallkitIncomingActivity : Activity() {
 
     private fun animateAcceptCall() {
         val shakeAnimation =
-                AnimationUtils.loadAnimation(this@CallkitIncomingActivity, R.anim.shake_anim)
+            AnimationUtils.loadAnimation(this@CallkitIncomingActivity, R.anim.shake_anim)
         ivAcceptCall.animation = shakeAnimation
     }
 
@@ -311,17 +316,17 @@ class CallkitIncomingActivity : Activity() {
 
     private fun getPicassoInstance(context: Context, headers: HashMap<String, Any?>): Picasso {
         val client = OkHttpClient.Builder()
-                .addNetworkInterceptor { chain ->
-                    val newRequestBuilder: okhttp3.Request.Builder = chain.request().newBuilder()
-                    for ((key, value) in headers) {
-                        newRequestBuilder.addHeader(key, value.toString())
-                    }
-                    chain.proceed(newRequestBuilder.build())
+            .addNetworkInterceptor { chain ->
+                val newRequestBuilder: okhttp3.Request.Builder = chain.request().newBuilder()
+                for ((key, value) in headers) {
+                    newRequestBuilder.addHeader(key, value.toString())
                 }
-                .build()
+                chain.proceed(newRequestBuilder.build())
+            }
+            .build()
         return Picasso.Builder(context)
-                .downloader(OkHttp3Downloader(client))
-                .build()
+            .downloader(OkHttp3Downloader(client))
+            .build()
     }
 
     override fun onDestroy() {
