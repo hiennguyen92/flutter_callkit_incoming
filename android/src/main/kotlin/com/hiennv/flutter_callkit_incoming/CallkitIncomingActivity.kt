@@ -30,6 +30,8 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.text.TextUtils
 import android.util.Log
+import com.google.gson.Gson
+import com.hiennv.flutter_callkit_incoming.models.AdditionalDataModel
 
 
 class CallkitIncomingActivity : Activity() {
@@ -72,15 +74,16 @@ class CallkitIncomingActivity : Activity() {
 
     private lateinit var tvNameCaller: TextView
     private lateinit var tvNumber: TextView
-    private lateinit var ivLogo: ImageView
+    private lateinit var tvAddress: TextView
+//    private lateinit var ivLogo: ImageView
     private lateinit var ivAvatar: CircleImageView
 
     private lateinit var llAction: LinearLayout
     private lateinit var ivAcceptCall: ImageView
     private lateinit var tvAccept: TextView
 
-    private lateinit var ivDeclineCall: ImageView
-    private lateinit var tvDecline: TextView
+//    private lateinit var ivDeclineCall: ImageView
+//    private lateinit var tvDecline: TextView
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,22 +161,29 @@ class CallkitIncomingActivity : Activity() {
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
         if (data == null) finish()
 
+        val extraData = data?.getString(CallkitConstants.EXTRA_CALLKIT_EXTRA);
+
+        var gson = Gson();
+
+        var additionalDataModel = gson.fromJson(extraData, AdditionalDataModel::class.java)
+
         tvNameCaller.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
-        tvNumber.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
+        tvNumber.text = additionalDataModel.accident_description
+        tvAddress.text = additionalDataModel.caller.city.plus(", ").plus(additionalDataModel.caller.region).plus(", ").plus(additionalDataModel.caller.street)
 
         val isShowLogo = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO, false)
-        ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
+//        ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
 
-        val avatarUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-        if (avatarUrl != null && avatarUrl.isNotEmpty()) {
-            ivAvatar.visibility = View.VISIBLE
-            val headers = data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
-            getPicassoInstance(this@CallkitIncomingActivity, headers)
-                    .load(avatarUrl)
-                    .placeholder(R.drawable.ic_default_avatar)
-                    .error(R.drawable.ic_default_avatar)
-                    .into(ivAvatar)
-        }
+//        val avatarUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+//        if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+//            ivAvatar.visibility = View.VISIBLE
+//            val headers = data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+//            getPicassoInstance(this@CallkitIncomingActivity, headers)
+//                    .load(avatarUrl)
+//                    .placeholder(R.drawable.ic_default_avatar)
+//                    .error(R.drawable.ic_default_avatar)
+//                    .into(ivAvatar)
+//        }
 
         val callType = data?.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, 0) ?: 0
         if (callType > 0) {
@@ -187,7 +197,7 @@ class CallkitIncomingActivity : Activity() {
         val textAccept = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
         tvAccept.text = if (TextUtils.isEmpty(textAccept)) getString(R.string.text_accept) else textAccept
         val textDecline = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
-        tvDecline.text = if (TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
+//        tvDecline.text = if (TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
 
         val backgroundColor = data?.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
         try {
@@ -231,7 +241,8 @@ class CallkitIncomingActivity : Activity() {
 
         tvNameCaller = findViewById(R.id.tvNameCaller)
         tvNumber = findViewById(R.id.tvNumber)
-        ivLogo = findViewById(R.id.ivLogo)
+        tvAddress = findViewById(R.id.tvAddress)
+//        ivLogo = findViewById(R.id.ivLogo)
         ivAvatar = findViewById(R.id.ivAvatar)
 
         llAction = findViewById(R.id.llAction)
@@ -242,16 +253,16 @@ class CallkitIncomingActivity : Activity() {
 
         ivAcceptCall = findViewById(R.id.ivAcceptCall)
         tvAccept = findViewById(R.id.tvAccept)
-        ivDeclineCall = findViewById(R.id.ivDeclineCall)
-        tvDecline = findViewById(R.id.tvDecline)
+//        ivDeclineCall = findViewById(R.id.ivDeclineCall)
+//        tvDecline = findViewById(R.id.tvDecline)
         animateAcceptCall()
 
         ivAcceptCall.setOnClickListener {
             onAcceptClick()
         }
-        ivDeclineCall.setOnClickListener {
-            onDeclineClick()
-        }
+//        ivDeclineCall.setOnClickListener {
+//            onDeclineClick()
+//        }
     }
 
     private fun animateAcceptCall() {

@@ -10,7 +10,7 @@
         android:id="@+id/ivBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#0955fa"
+        android:background="#001726"
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/base_margin_revert_x5"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:fitsSystemWindows="false">
 
             <ImageView
@@ -49,8 +49,8 @@
                 android:layout_width="@dimen/size_avatar"
                 android:layout_height="@dimen/size_avatar"
                 android:layout_centerInParent="true"
-                android:visibility="gone"
-                android:src="@drawable/ic_default_avatar"
+                android:src="@drawable/azerigas_logo"
+                android:scaleType="centerCrop"
                 app:civ_border_color="#80ffffff"
                 app:civ_border_width="1dp" />
 
@@ -95,6 +95,18 @@
                     android:textSize="@dimen/size_text_action"
                     tools:text="Some info" />
 
+
+                <TextView
+                    android:id="@+id/tvAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/action_text"
+                    android:textSize="@dimen/size_text_action"
+                    tools:text="Address" />
+
             </LinearLayout>
 
         </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
@@ -112,50 +124,9 @@
             android:layout_gravity="bottom"
             android:layout_marginBottom="0dp"
             android:fitsSystemWindows="true"
+            android:gravity="center_horizontal"
             android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
-
-                <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
-                    android:layout_width="@dimen/size_button_x2_5"
-                    android:layout_height="@dimen/size_button_x2_5"
-                    app:ripple_amount="4"
-                    app:ripple_radius="@dimen/base_margin_x1_5"
-                    app:ripple_scale="4.5">
-
-                    <ImageView
-                        android:id="@+id/ivDeclineCall"
-                        android:layout_width="@dimen/size_button"
-                        android:layout_height="@dimen/size_button"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/bg_button_decline"
-                        android:padding="@dimen/base_margin_x1_5"
-                        android:src="@drawable/ic_decline"
-                        tools:ignore="ContentDescription" />
-
-                    <TextView
-                        android:id="@+id/tvDecline"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/ivDeclineCall"
-                        android:layout_marginBottom="@dimen/base_margin"
-                        android:gravity="center"
-                        android:text="@string/text_decline"
-                        android:textColor="@color/action_text"
-                        android:textSize="@dimen/size_text_action" />
-
-                </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
-
-            </LinearLayout>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
