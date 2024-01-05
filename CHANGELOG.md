@@ -1,3 +1,6 @@
+## 2.0.1-dev
+* Add AVAudioSession Appdelegate(iOS)
+
 ## 2.0.1
 
 * Fixed some bugs.

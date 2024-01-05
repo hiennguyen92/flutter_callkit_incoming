@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AVFAudio
 
 
 public protocol CallkitIncomingAppDelegate : NSObjectProtocol {
@@ -17,5 +18,9 @@ public protocol CallkitIncomingAppDelegate : NSObjectProtocol {
     func onEnd(_ call: Call);
     
     func onTimeOut(_ call: Call);
+
+    func didActivateAudioSession(_ audioSession: AVAudioSession)
+    
+    func didDeactivateAudioSession(_ audioSession: AVAudioSession)
     
 }
