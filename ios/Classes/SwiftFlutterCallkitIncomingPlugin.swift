@@ -196,6 +196,18 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self.silenceEvents = silence
             result("OK")
             break;
+        case "requestNotificationPermission": 
+            result("OK")
+            break
+        case "hideCallkitIncoming":
+            result("OK")
+            break
+        case "endNativeSubsystemOnly":
+            result("OK")
+            break
+        case "setAudioRoute":
+            result("OK")
+            break
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -494,7 +506,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             action.fail()
             return
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1000)) {
             self.configurAudioSession()
         }
         call.hasConnectDidChange = { [weak self] in

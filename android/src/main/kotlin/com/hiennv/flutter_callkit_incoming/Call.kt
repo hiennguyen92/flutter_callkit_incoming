@@ -73,6 +73,13 @@ data class Data(val args: Map<String, Any?>) {
     @JsonProperty("isAccepted")
     var isAccepted: Boolean = false
 
+    @JsonProperty("isOnHold")
+    var isOnHold: Boolean = (args["isOnHold"] as? Boolean) ?: false
+    @JsonProperty("audioRoute")
+    var audioRoute: Int = (args["audioRoute"] as? Int) ?: 1
+    @JsonProperty("isMuted")
+    var isMuted: Boolean = (args["isMuted"] as? Boolean) ?: false
+
     init {
         var android: Map<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         android = android ?: args
