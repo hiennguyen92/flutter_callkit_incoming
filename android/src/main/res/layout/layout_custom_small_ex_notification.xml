@@ -17,7 +17,7 @@
             android:layout_height="@dimen/base_margin_x4"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_default_avatar"
-            android:visibility="visible" />
+            android:visibility="invisible" />
 
         <LinearLayout
             android:layout_width="@dimen/base_margin_half"
