@@ -40,6 +40,7 @@ Future<void> showCallkitIncoming(String uuid) async {
       backgroundColor: '#0955fa',
       backgroundUrl: 'assets/test.png',
       actionColor: '#4CAF50',
+      textColor: '#ffffff',
     ),
     ios: const IOSParams(
       iconName: 'CallKitLogo',
@@ -107,8 +108,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Future<void> checkAndNavigationCallingPage() async {
     var currentCall = await getCurrentCall();
     if (currentCall != null) {
-      NavigationService.instance
-          .pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
+      NavigationService.instance.pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
     }
   }
 
@@ -132,8 +132,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     _firebaseMessaging = FirebaseMessaging.instance;
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      print(
-          'Message title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data}');
+      print('Message title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data}');
       _currentUuid = _uuid.v4();
       showCallkitIncoming(_currentUuid!);
     });
@@ -149,15 +148,12 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
       onGenerateRoute: AppRoute.generateRoute,
       initialRoute: AppRoute.homePage,
       navigatorKey: NavigationService.instance.navigationKey,
-      navigatorObservers: <NavigatorObserver>[
-        NavigationService.instance.routeObserver
-      ],
+      navigatorObservers: <NavigatorObserver>[NavigationService.instance.routeObserver],
     );
   }
 
   Future<void> getDevicePushTokenVoIP() async {
-    var devicePushTokenVoIP =
-        await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    var devicePushTokenVoIP = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
     print(devicePushTokenVoIP);
   }
 }
