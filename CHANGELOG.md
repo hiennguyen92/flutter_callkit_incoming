@@ -1,3 +1,6 @@
+## 2.0.1-dev.1
+* Add AVAudioSession Appdelegate(iOS)
+
 ## 2.0.1-dev
 * Add AVAudioSession Appdelegate(iOS)
 

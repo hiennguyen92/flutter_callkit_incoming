@@ -442,6 +442,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                     .duckOthers,
                     .allowBluetooth,
                 ])
+                
                 try session.setMode(self.getAudioSessionMode(data?.audioSessionMode))
                 try session.setActive(data?.audioSessionActive ?? true)
                 try session.setPreferredSampleRate(data?.audioSessionPreferredSampleRate ?? 44100.0)
@@ -529,7 +530,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.onAccept(call)
         }
-        action.fulfill()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
+            action.fulfill()
+        }
     }
     
     
