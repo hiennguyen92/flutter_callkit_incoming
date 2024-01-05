@@ -517,7 +517,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             action.fail()
             return
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1000)) {
+        self.configurAudioSession()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
             self.configurAudioSession()
         }
         call.hasConnectDidChange = { [weak self] in

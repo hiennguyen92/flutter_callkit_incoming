@@ -83,8 +83,8 @@ import flutter_callkit_incoming
     
     // Func Call api for Accept
     func onAccept(_ call: Call) {
-        let json = ["action": "ACCEPT", "uuid": "XXX-XXX-XXX-XXX-ACCEPT"]
-        print("CCCC: onAccept")
+        let json = ["action": "ACCEPT", "data": call.data.toJSON()] as [String: Any]
+        print("LOG: onAccept")
         self.performRequest(parameters: json) { result in
             switch result {
             case .success(let data):
@@ -98,8 +98,8 @@ import flutter_callkit_incoming
     
     // Func Call API for Decline
     func onDecline(_ call: Call) {
-        let json = ["action": "DECLINE", "uuid": "XXX-XXX-XXX-XXX-DECLINE"]
-        print("CCCC: onDecline")
+        let json = ["action": "DECLINE", "data": call.data.toJSON()] as [String: Any]
+        print("LOG: onDecline")
         self.performRequest(parameters: json) { result in
             switch result {
             case .success(let data):
@@ -112,8 +112,8 @@ import flutter_callkit_incoming
     }
     
     func onEnd(_ call: Call) {
-        let json = ["action": "END", "uuid": "XXX-XXX-XXX-XXX-END"]
-        print("CCCC: onEnd")
+        let json = ["action": "END", "data": call.data.toJSON()] as [String: Any]
+        print("LOG: onEnd")
         self.performRequest(parameters: json) { result in
             switch result {
             case .success(let data):
@@ -126,8 +126,8 @@ import flutter_callkit_incoming
     }
     
     func onTimeOut(_ call: Call) {
-        let json = ["action": "TIMEOUT", "uuid": "XXX-XXX-XXX-XXX-TIMEOUT"]
-        print("CCCC: onTimeOut")
+        let json = ["action": "TIMEOUT", "data": call.data.toJSON()] as [String: Any]
+        print("LOG: onTimeOut")
         self.performRequest(parameters: json) { result in
             switch result {
             case .success(let data):

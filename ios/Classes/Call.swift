@@ -10,11 +10,11 @@ import AVFoundation
 
 public class Call: NSObject {
     
-    let uuid: UUID
-    let data: Data
-    let isOutGoing: Bool
+    public var uuid: UUID
+    public var data: Data
+    public var isOutGoing: Bool
     
-    var handle: String?
+    public var handle: String?
     
     var stateDidChange: (() -> Void)?
     var hasStartedConnectDidChange: (() -> Void)?
@@ -240,7 +240,7 @@ public class Call: NSObject {
         }
     }
     
-    public func toJSON() -> [String: Any] {
+    open func toJSON() -> [String: Any] {
         let ios: [String : Any] = [
             "iconName": iconName,
             "handleType": handleType,

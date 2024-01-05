@@ -326,6 +326,75 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
         //Kotlin/Java Android
         FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(body: Map<String, Any>)
     ```
+    * 3.1 Call API when accept/decline/end/timeout
+    ```swift
+    //Appdelegate
+    ...
+    @UIApplicationMain
+    @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate, CallkitIncomingAppDelegate {
+    ...
+
+    // Func Call api for Accept
+    func onAccept(_ call: Call) {
+        let json = ["action": "ACCEPT", "data": call.data.toJSON()] as [String: Any]
+        print("LOG: onAccept")
+        self.performRequest(parameters: json) { result in
+            switch result {
+            case .success(let data):
+                print("Received data: \(data)")
+
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    // Func Call API for Decline
+    func onDecline(_ call: Call) {
+        let json = ["action": "DECLINE", "data": call.data.toJSON()] as [String: Any]
+        print("LOG: onDecline")
+        self.performRequest(parameters: json) { result in
+            switch result {
+            case .success(let data):
+                print("Received data: \(data)")
+
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func onEnd(_ call: Call) {
+        let json = ["action": "END", "data": call.data.toJSON()] as [String: Any]
+        print("LOG: onEnd")
+        self.performRequest(parameters: json) { result in
+            switch result {
+            case .success(let data):
+                print("Received data: \(data)")
+
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func onTimeOut(_ call: Call) {
+        let json = ["action": "TIMEOUT", "data": call.data.toJSON()] as [String: Any]
+        print("LOG: onTimeOut")
+        self.performRequest(parameters: json) { result in
+            switch result {
+            case .success(let data):
+                print("Received data: \(data)")
+
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    ...
+
+    ``` 
+    <a href='https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/ios/Runner/AppDelegate.swift'>Please check full: Example</a>
 
 4. Properties
 
