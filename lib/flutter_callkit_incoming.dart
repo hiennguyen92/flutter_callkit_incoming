@@ -9,12 +9,13 @@ import 'entities/entities.dart';
 /// * startCall(dynamic)
 /// * endCall(dynamic)
 /// * endAllCalls()
+/// * callConnected(dynamic)
 
 class FlutterCallkitIncoming {
   static const MethodChannel _channel =
-      const MethodChannel('flutter_callkit_incoming');
+      MethodChannel('flutter_callkit_incoming');
   static const EventChannel _eventChannel =
-      const EventChannel('flutter_callkit_incoming_events');
+      EventChannel('flutter_callkit_incoming_events');
 
   /// Listen to event callback from [FlutterCallkitIncoming].
   ///
@@ -55,11 +56,40 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("startCall", params.toJson());
   }
 
+  /// Muting an Ongoing call.
+  /// On iOS, using Callkit(update the ongoing call ui).
+  /// On Android, Nothing(only callback event listener).
+  static Future muteCall(String id, {bool isMuted = true}) async {
+    await _channel.invokeMethod("muteCall", {'id': id, 'isMuted': isMuted});
+  }
+
+  /// Get Callkit Mic Status (muted/unmuted).
+  /// On iOS, using Callkit(update call ui).
+  /// On Android, Nothing(only callback event listener).
+  static Future<bool> isMuted(String id) async {
+    return (await _channel.invokeMethod("isMuted", {'id': id})) as bool? ??
+        false;
+  }
+
+  /// Hold an Ongoing call.
+  /// On iOS, using Callkit(update the ongoing call ui).
+  /// On Android, Nothing(only callback event listener).
+  static Future holdCall(String id, {bool isOnHold = true}) async {
+    await _channel.invokeMethod("holdCall", {'id': id, 'isOnHold': isOnHold});
+  }
+
   /// End an Incoming/Outgoing call.
   /// On iOS, using Callkit(update a history into the Phone app).
   /// On Android, Nothing(only callback event listener).
   static Future endCall(String id) async {
     await _channel.invokeMethod("endCall", {'id': id});
+  }
+
+  /// Set call has been connected successfully.
+  /// On iOS, using Callkit(update a history into the Phone app).
+  /// On Android, Nothing(only callback event listener).
+  static Future setCallConnected(String id) async {
+    await _channel.invokeMethod("callConnected", {'id': id});
   }
 
   /// End all calls.
@@ -81,11 +111,18 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("getDevicePushTokenVoIP");
   }
 
+
   /// Start incoming call
   /// On iOS: start connection timer
   /// On Android: not implemented
   static Future startIncomingCall() async {
     await _channel.invokeMethod("startCallIncoming");
+  }
+
+  /// Request permisstion show notification for Android(13)
+  /// Only Android: show request permission post notification for Android 13+
+  static Future requestNotificationPermission(dynamic data) async {
+    return await _channel.invokeMethod("requestNotificationPermission", data);
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {

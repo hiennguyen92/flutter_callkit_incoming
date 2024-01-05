@@ -9,6 +9,11 @@
 
     </style>
 
+    <style name="DialogTheme" parent="@style/Theme.AppCompat.Light.Dialog.Alert">
+
+    </style>
+
+
     <style name="TranslucentTheme" parent="@android:style/Theme.Translucent.NoTitleBar">
         <item name="android:background">@android:color/transparent</item>
         <item name="background">@android:color/transparent</item>

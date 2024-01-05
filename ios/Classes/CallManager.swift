@@ -41,12 +41,31 @@ class CallManager: NSObject {
         })
     }
     
+    func muteCall(call: Call, isMuted: Bool) {
+        let muteAction = CXSetMutedCallAction(call: call.uuid, muted: isMuted)
+        let callTransaction = CXTransaction()
+        callTransaction.addAction(muteAction)
+        self.requestCall(callTransaction, action: "muteCall")
+    }
+    
+    func holdCall(call: Call, onHold: Bool) {
+        let muteAction = CXSetHeldCallAction(call: call.uuid, onHold: onHold)
+        let callTransaction = CXTransaction()
+        callTransaction.addAction(muteAction)
+        self.requestCall(callTransaction, action: "holdCall")
+    }
+    
     func endCall(call: Call) {
         let endCallAction = CXEndCallAction(call: call.uuid)
         let callTransaction = CXTransaction()
         callTransaction.addAction(endCallAction)
         //requestCall
         self.requestCall(callTransaction, action: "endCall")
+    }
+    
+    func connectedCall(call: Call) {
+        let callItem = self.callWithUUID(uuid: call.uuid)
+        callItem?.connectedCall(completion: nil)
     }
     
     func endCallAlls() {
@@ -59,13 +78,13 @@ class CallManager: NSObject {
         }
     }
     
-    func activeCalls() -> [[String: Any?]] {
+    func activeCalls() -> [[String: Any]] {
         let calls = callController.callObserver.calls
-        var json = [[String: Any?]]()
+        var json = [[String: Any]]()
         for call in calls {
             let callItem = self.callWithUUID(uuid: call.uuid)
             if(callItem != nil){
-                let item: [String: Any?] = callItem!.data.toJSON()
+                let item: [String: Any] = callItem!.data.toJSON()
                 json.append(item)
             }else {
                 let item: [String: String] = ["id": call.uuid.uuidString]
@@ -91,9 +110,9 @@ class CallManager: NSObject {
                 print("Error requesting transaction: \(error)")
             }else {
                 if(action == "startCall"){
-                    //push notification for Start Call
+                    //TODO: push notification for Start Call
                 }else if(action == "endCall" || action == "endCallAlls"){
-                    //push notification for End Call
+                    //TODO: push notification for End Call
                 }
                 completion?(error == nil)
                 print("Requested transaction successfully: \(action)")
