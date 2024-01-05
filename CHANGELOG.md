@@ -1,3 +1,13 @@
+## 2.0.1
+
+* Fixed some bugs.
+* `Android` using Telecom Framework
+* Add `silenceEvents`
+* Add `normalHandle` props https://github.com/hiennguyen92/flutter_callkit_incoming/pull/403
+* Android add `textColor` props https://github.com/hiennguyen92/flutter_callkit_incoming/pull/398
+* Android invisible avatar for default https://github.com/hiennguyen92/flutter_callkit_incoming/pull/393
+* Add Method for call API when accept/decline/end/timeout
+
 ## 2.0.0+2
 
 * Fixed some bugs.
