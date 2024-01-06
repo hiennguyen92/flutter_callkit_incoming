@@ -1,4 +1,5 @@
 import UIKit
+import CallKit
 import AVFAudio
 import PushKit
 import Flutter
@@ -88,13 +89,14 @@ import flutter_callkit_incoming
     
     
     // Func Call api for Accept
-    func onAccept(_ call: Call) {
+    func onAccept(_ call: Call, _ action: CXAnswerCallAction) {
         let json = ["action": "ACCEPT", "data": call.data.toJSON()] as [String: Any]
         print("LOG: onAccept")
         self.performRequest(parameters: json) { result in
             switch result {
             case .success(let data):
                 print("Received data: \(data)")
+                //action.fulfill()
 
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")

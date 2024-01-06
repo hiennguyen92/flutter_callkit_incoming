@@ -528,10 +528,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.answerCall = call
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
-            appDelegate.onAccept(call)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
-            action.fulfill()
+            appDelegate.onAccept(call, action)
+        }else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
+                action.fulfill()
+            }
         }
     }
     
