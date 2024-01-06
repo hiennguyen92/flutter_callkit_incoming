@@ -174,7 +174,7 @@ class CallkitNotificationManager(private val context: Context) {
                 )
             )
             notificationBuilder.setContentText(data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, ""))
-            val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
+//            val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
 //            val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
 //                    R.drawable.ic_decline,
 //                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline,
@@ -184,7 +184,7 @@ class CallkitNotificationManager(private val context: Context) {
             val textAccept = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
             val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                 R.drawable.ic_accept,
-                if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
+                if (TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept,
                 getAcceptPendingIntent(notificationId, data)
             ).build()
             notificationBuilder.addAction(acceptAction)
@@ -203,15 +203,15 @@ class CallkitNotificationManager(private val context: Context) {
             R.id.tvNumber,
             data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
         )
-        remoteViews.setOnClickPendingIntent(
-            R.id.llDecline,
-            getDeclinePendingIntent(notificationId, data)
-        )
-        val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
-        remoteViews.setTextViewText(
-            R.id.tvDecline,
-            if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline
-        )
+//        remoteViews.setOnClickPendingIntent(
+//            R.id.llDecline,
+//            getDeclinePendingIntent(notificationId, data)
+//        )
+//        val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
+//        remoteViews.setTextViewText(
+//            R.id.tvDecline,
+//            if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline
+//        )
         remoteViews.setOnClickPendingIntent(
             R.id.llAccept,
             getAcceptPendingIntent(notificationId, data)
