@@ -1,10 +1,14 @@
 import UIKit
+import CallKit
+import AVFAudio
 import PushKit
 import Flutter
 import flutter_callkit_incoming
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate, CallkitIncomingAppDelegate {
+
+    
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -16,6 +20,10 @@ import flutter_callkit_incoming
         let voipRegistry: PKPushRegistry = PKPushRegistry(queue: mainQueue)
         voipRegistry.delegate = self
         voipRegistry.desiredPushTypes = [PKPushType.voIP]
+
+        //Use if using WebRTC
+        //RTCAudioSession.sharedInstance().useManualAudio = true
+        //RTCAudioSession.sharedInstance().isAudioEnabled = false
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
@@ -82,13 +90,15 @@ import flutter_callkit_incoming
     
     
     // Func Call api for Accept
-    func onAccept(_ call: Call) {
+    func onAccept(_ call: Call, _ action: CXAnswerCallAction) {
         let json = ["action": "ACCEPT", "data": call.data.toJSON()] as [String: Any]
         print("LOG: onAccept")
         self.performRequest(parameters: json) { result in
             switch result {
             case .success(let data):
                 print("Received data: \(data)")
+                //Make sure call action.fulfill() when you are done(connected WebRTC - Start counting seconds)
+                //action.fulfill()
 
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
@@ -111,6 +121,7 @@ import flutter_callkit_incoming
         }
     }
     
+    // Func Call API for End
     func onEnd(_ call: Call) {
         let json = ["action": "END", "data": call.data.toJSON()] as [String: Any]
         print("LOG: onEnd")
@@ -125,6 +136,7 @@ import flutter_callkit_incoming
         }
     }
     
+    // Func Call API for TimeOut
     func onTimeOut(_ call: Call) {
         let json = ["action": "TIMEOUT", "data": call.data.toJSON()] as [String: Any]
         print("LOG: onTimeOut")
@@ -137,6 +149,20 @@ import flutter_callkit_incoming
                 print("Error: \(error.localizedDescription)")
             }
         }
+    }
+    
+    // Func Callback Toggle Audio Session
+    func didActivateAudioSession(_ audioSession: AVAudioSession) {
+        //Use if using WebRTC
+        //RTCAudioSession.sharedInstance().audioSessionDidActivate(audioSession)
+        //RTCAudioSession.sharedInstance().isAudioEnabled = true
+    }
+    
+    // Func Callback Toggle Audio Session
+    func didDeactivateAudioSession(_ audioSession: AVAudioSession) {
+        //Use if using WebRTC
+        //RTCAudioSession.sharedInstance().audioSessionDidDeactivate(audioSession)
+        //RTCAudioSession.sharedInstance().isAudioEnabled = false
     }
     
     func performRequest(parameters: [String: Any], completion: @escaping (Result<Any, Error>) -> Void) {

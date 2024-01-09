@@ -334,14 +334,36 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
     @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate, CallkitIncomingAppDelegate {
     ...
 
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        GeneratedPluginRegistrant.register(with: self)
+        
+        //Setup VOIP
+        let mainQueue = DispatchQueue.main
+        let voipRegistry: PKPushRegistry = PKPushRegistry(queue: mainQueue)
+        voipRegistry.delegate = self
+        voipRegistry.desiredPushTypes = [PKPushType.voIP]
+
+        //Use if using WebRTC
+        //RTCAudioSession.sharedInstance().useManualAudio = true
+        //RTCAudioSession.sharedInstance().isAudioEnabled = false
+        
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+
+
     // Func Call api for Accept
-    func onAccept(_ call: Call) {
+    func onAccept(_ call: Call, _ action: CXAnswerCallAction) {
         let json = ["action": "ACCEPT", "data": call.data.toJSON()] as [String: Any]
         print("LOG: onAccept")
         self.performRequest(parameters: json) { result in
             switch result {
             case .success(let data):
                 print("Received data: \(data)")
+                //Make sure call action.fulfill() when you are done(connected WebRTC - Start counting seconds)
+                //action.fulfill()
 
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
@@ -390,6 +412,18 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
                 print("Error: \(error.localizedDescription)")
             }
         }
+    }
+
+    func didActivateAudioSession(_ audioSession: AVAudioSession) {
+        //Use if using WebRTC
+        //RTCAudioSession.sharedInstance().audioSessionDidActivate(audioSession)
+        //RTCAudioSession.sharedInstance().isAudioEnabled = true
+    }
+    
+    func didDeactivateAudioSession(_ audioSession: AVAudioSession) {
+        //Use if using WebRTC
+        //RTCAudioSession.sharedInstance().audioSessionDidDeactivate(audioSession)
+        //RTCAudioSession.sharedInstance().isAudioEnabled = false
     }
     ...
 

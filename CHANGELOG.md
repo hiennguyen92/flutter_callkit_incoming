@@ -1,3 +1,16 @@
+## 2.0.1+1
+* Add Callback AVAudioSession for WebRTC setup
+* Fix issue no audio for using WebRTC
+
+## 2.0.1-dev.2
+* Add Action for onAccept
+
+## 2.0.1-dev.1
+* Add AVAudioSession Appdelegate(iOS)
+
+## 2.0.1-dev
+* Add AVAudioSession Appdelegate(iOS)
+
 ## 2.0.1
 
 * Fixed some bugs.
