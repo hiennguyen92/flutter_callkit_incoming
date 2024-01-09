@@ -111,6 +111,16 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("getDevicePushTokenVoIP");
   }
 
+  /// Silence CallKit events
+  static Future silenceEvents() async {
+    return await _channel.invokeMethod("silenceEvents", true);
+  }
+
+  /// Unsilence CallKit events
+  static Future unsilenceEvents() async {
+    return await _channel.invokeMethod("silenceEvents", false);
+  }
+
   /// Request permisstion show notification for Android(13)
   /// Only Android: show request permission post notification for Android 13+
   static Future requestNotificationPermission(dynamic data) async {

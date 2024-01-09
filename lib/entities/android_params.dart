@@ -13,6 +13,7 @@ class AndroidParams {
     this.backgroundColor,
     this.backgroundUrl,
     this.actionColor,
+    this.textColor,
     this.incomingCallNotificationChannelName,
     this.missedCallNotificationChannelName,
   });
@@ -38,14 +39,16 @@ class AndroidParams {
   /// Color used in button/text on notification.
   final String? actionColor;
 
+  /// Color used for the text in the full screen notification
+  final String? textColor;
+
   /// Notification channel name of incoming call.
   final String? incomingCallNotificationChannelName;
 
   /// Notification channel name of missed call.
   final String? missedCallNotificationChannelName;
 
-  factory AndroidParams.fromJson(Map<String, dynamic> json) =>
-      _$AndroidParamsFromJson(json);
+  factory AndroidParams.fromJson(Map<String, dynamic> json) => _$AndroidParamsFromJson(json);
 
   Map<String, dynamic> toJson() => _$AndroidParamsToJson(this);
 }
