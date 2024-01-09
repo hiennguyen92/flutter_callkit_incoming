@@ -21,6 +21,7 @@ import flutter_callkit_incoming
         voipRegistry.delegate = self
         voipRegistry.desiredPushTypes = [PKPushType.voIP]
 
+        //Use if using WebRTC
         //RTCAudioSession.sharedInstance().useManualAudio = true
         //RTCAudioSession.sharedInstance().isAudioEnabled = false
         
@@ -96,6 +97,7 @@ import flutter_callkit_incoming
             switch result {
             case .success(let data):
                 print("Received data: \(data)")
+                //Make sure call action.fulfill() when you are done(connected WebRTC - Start counting seconds)
                 //action.fulfill()
 
             case .failure(let error):
@@ -119,6 +121,7 @@ import flutter_callkit_incoming
         }
     }
     
+    // Func Call API for End
     func onEnd(_ call: Call) {
         let json = ["action": "END", "data": call.data.toJSON()] as [String: Any]
         print("LOG: onEnd")
@@ -133,6 +136,7 @@ import flutter_callkit_incoming
         }
     }
     
+    // Func Call API for TimeOut
     func onTimeOut(_ call: Call) {
         let json = ["action": "TIMEOUT", "data": call.data.toJSON()] as [String: Any]
         print("LOG: onTimeOut")
@@ -147,12 +151,16 @@ import flutter_callkit_incoming
         }
     }
     
+    // Func Callback Toggle Audio Session
     func didActivateAudioSession(_ audioSession: AVAudioSession) {
+        //Use if using WebRTC
         //RTCAudioSession.sharedInstance().audioSessionDidActivate(audioSession)
         //RTCAudioSession.sharedInstance().isAudioEnabled = true
     }
     
+    // Func Callback Toggle Audio Session
     func didDeactivateAudioSession(_ audioSession: AVAudioSession) {
+        //Use if using WebRTC
         //RTCAudioSession.sharedInstance().audioSessionDidDeactivate(audioSession)
         //RTCAudioSession.sharedInstance().isAudioEnabled = false
     }

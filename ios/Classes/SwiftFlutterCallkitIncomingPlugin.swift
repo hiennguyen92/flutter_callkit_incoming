@@ -619,6 +619,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) {
+
+        if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
+            appDelegate.didActivateAudioSession(audioSession)
+        }
+
         if(self.answerCall?.hasConnected ?? false){
             sendDefaultAudioInterruptionNofificationToStartAudioResource()
             return
@@ -641,14 +646,15 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         sendDefaultAudioInterruptionNofificationToStartAudioResource()
         configurAudioSession()
 
-        if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
-            appDelegate.didActivateAudioSession(audioSession)
-        }
-
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": true ])
     }
     
     public func provider(_ provider: CXProvider, didDeactivate audioSession: AVAudioSession) {
+        
+        if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
+            appDelegate.didDeactivateAudioSession(audioSession)
+        }
+
         if self.outgoingCall?.isOnHold ?? false || self.answerCall?.isOnHold ?? false{
             print("Call is on hold")
             return
@@ -662,10 +668,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self.answerCall = nil
         }
         self.callManager.removeAllCalls()
-        
-        if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
-            appDelegate.didDeactivateAudioSession(audioSession)
-        }
         
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": false ])
     }
