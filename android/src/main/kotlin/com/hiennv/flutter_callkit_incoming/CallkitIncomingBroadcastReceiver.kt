@@ -75,17 +75,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
                 try {
 
-                    val wakeLock: PowerManager.WakeLock =
-                        (context.getSystemService(POWER_SERVICE) as PowerManager).run {
-                            newWakeLock(
-                                PowerManager.PARTIAL_WAKE_LOCK,
-                                CallkitIncomingBroadcastReceiver::class.java.canonicalName
-                            ).apply {
-                                setReferenceCounted(false);
-                                acquire(3 * 60 * 1000L /*10 minutes*/)
-                            }
-                        }
-
                     callkitNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
