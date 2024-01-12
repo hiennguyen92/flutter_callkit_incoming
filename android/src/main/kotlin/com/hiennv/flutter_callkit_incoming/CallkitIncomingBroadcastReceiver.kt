@@ -3,11 +3,13 @@ package com.hiennv.flutter_callkit_incoming
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.POWER_SERVICE
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.util.Log
+
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
@@ -71,20 +73,19 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA) ?: return
         when (action) {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
-
-                // Acquire a WakeLock to turn on the screen
-                val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager?
-                val wakeLock = powerManager?.newWakeLock(
-                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                    "MyApp::NotificationWakeLockTag"
-                )
-
-                wakeLock?.apply {
-                    acquire(5000) // Adjust the duration as needed
-                    release() // Release the WakeLock when done
-                }
-
                 try {
+
+                    val wakeLock: PowerManager.WakeLock =
+                        (context.getSystemService(POWER_SERVICE) as PowerManager).run {
+                            newWakeLock(
+                                PowerManager.PARTIAL_WAKE_LOCK,
+                                CallkitIncomingBroadcastReceiver::class.java.canonicalName
+                            ).apply {
+                                setReferenceCounted(false);
+                                acquire(3 * 60 * 1000L /*10 minutes*/)
+                            }
+                        }
+
                     callkitNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
@@ -98,6 +99,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     Log.e(TAG, null, error)
                 }
             }
+
             "${context.packageName}.${CallkitConstants.ACTION_CALL_START}" -> {
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_START, data)
@@ -106,6 +108,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     Log.e(TAG, null, error)
                 }
             }
+
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT}" -> {
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ACCEPT, data)
@@ -116,6 +119,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     Log.e(TAG, null, error)
                 }
             }
+
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
@@ -126,6 +130,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     Log.e(TAG, null, error)
                 }
             }
+
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
@@ -136,6 +141,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     Log.e(TAG, null, error)
                 }
             }
+
             "${context.packageName}.${CallkitConstants.ACTION_CALL_TIMEOUT}" -> {
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_TIMEOUT, data)
@@ -148,6 +154,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     Log.e(TAG, null, error)
                 }
             }
+
             "${context.packageName}.${CallkitConstants.ACTION_CALL_CALLBACK}" -> {
                 try {
                     callkitNotificationManager.clearMissCallNotification(data)
@@ -165,13 +172,19 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
     private fun sendEventFlutter(event: String, data: Bundle) {
         val android = mapOf(
-            "isCustomNotification" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false),
+            "isCustomNotification" to data.getBoolean(
+                CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
+                false
+            ),
             "isCustomSmallExNotification" to data.getBoolean(
                 CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION,
                 false
             ),
             "ringtonePath" to data.getString(CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH, ""),
-            "backgroundColor" to data.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, ""),
+            "backgroundColor" to data.getString(
+                CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR,
+                ""
+            ),
             "backgroundUrl" to data.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_URL, ""),
             "actionColor" to data.getString(CallkitConstants.EXTRA_CALLKIT_ACTION_COLOR, ""),
             "incomingCallNotificationChannelName" to data.getString(
