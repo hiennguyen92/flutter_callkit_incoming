@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.util.Log
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
@@ -70,6 +71,19 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA) ?: return
         when (action) {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
+
+                // Acquire a WakeLock to turn on the screen
+                val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager?
+                val wakeLock = powerManager?.newWakeLock(
+                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                    "MyApp::NotificationWakeLockTag"
+                )
+
+                wakeLock?.apply {
+                    acquire(5000) // Adjust the duration as needed
+                    release() // Release the WakeLock when done
+                }
+
                 try {
                     callkitNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
