@@ -6,7 +6,16 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="@dimen/base_margin_x4"
+            android:layout_height="@dimen/base_margin_x4"
+            android:scaleType="centerCrop"
+            android:visibility="visible"
+            android:src="@drawable/azerigas_logo"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -31,24 +40,6 @@
 
         </LinearLayout>
 
-
-        <ImageView
-            android:id="@+id/ivAvatar"
-            android:layout_width="@dimen/base_margin_x4"
-            android:layout_height="@dimen/base_margin_x4"
-            android:scaleType="centerCrop"
-            android:visibility="visible"
-            android:src="@drawable/azerigas_logo"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/base_margin"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal">
-
-
         <LinearLayout
             android:id="@+id/llCallback"
             android:layout_width="wrap_content"
@@ -72,7 +63,6 @@
                 android:textColor="@android:color/white" />
 
         </LinearLayout>
-
     </LinearLayout>
 
 
