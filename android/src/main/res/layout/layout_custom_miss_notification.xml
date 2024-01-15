@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/ivAvatar"
             android:layout_width="@dimen/base_margin_x4"
             android:layout_height="@dimen/base_margin_x4"
             android:scaleType="centerCrop"
-            android:visibility="visible"
+            android:visibility="gone"
             android:src="@drawable/azerigas_logo"/>
 
         <LinearLayout
@@ -41,26 +42,37 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llCallback"
-            android:layout_width="wrap_content"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:layout_height="wrap_content"
+            android:id="@+id/llAccept"
+            android:layout_width="@dimen/base_margin_x4"
+            android:layout_height="@dimen/base_margin_x4"
             android:background="@drawable/rounded_button_accept"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
             android:orientation="horizontal">
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/base_margin_half"
+                android:layout_marginRight="@dimen/base_margin_half"
+                android:src="@drawable/ic_accept"
+                android:tint="@android:color/white"
+                app:tint="@android:color/white"
+                tools:ignore="UseAppTint" />
+
             <TextView
-                android:id="@+id/tvCallback"
+                android:id="@+id/tvAccept"
                 style="@style/Widget.Compat.NotificationActionText"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/base_margin_x4"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/base_margin_half"
+                android:layout_marginRight="@dimen/base_margin_half"
                 android:gravity="center"
-                android:text="@string/text_call_back"
+                android:text="@string/text_accept"
+                android:visibility="gone"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white" />
+                android:textColor="@color/action_text" />
 
         </LinearLayout>
     </LinearLayout>

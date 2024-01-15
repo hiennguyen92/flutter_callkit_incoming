@@ -118,10 +118,10 @@ class CallkitNotificationManager(private val context: Context) {
         val typeCall = data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
         var smallIcon = context.applicationInfo.icon
         if (typeCall > 0) {
-            smallIcon = R.drawable.ic_video
+            smallIcon = R.drawable.azerigas_logo
         } else {
             if (smallIcon >= 0) {
-                smallIcon = R.drawable.ic_accept
+                smallIcon = R.drawable.azerigas_logo
             }
         }
         notificationBuilder.setSmallIcon(smallIcon)
@@ -250,10 +250,10 @@ class CallkitNotificationManager(private val context: Context) {
         val typeCall = data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
         var smallIcon = context.applicationInfo.icon
         if (typeCall > 0) {
-            smallIcon = R.drawable.ic_video_missed
+            smallIcon = R.drawable.azerigas_logo
         } else {
             if (smallIcon >= 0) {
-                smallIcon = R.drawable.ic_call_missed
+                smallIcon = R.drawable.azerigas_logo
             }
         }
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_MISSED)

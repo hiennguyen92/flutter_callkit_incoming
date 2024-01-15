@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
     android:orientation="vertical">
 
     <LinearLayout
@@ -18,7 +17,7 @@
             android:layout_height="@dimen/base_margin_x4"
             android:scaleType="centerCrop"
             android:src="@drawable/azerigas_logo"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="@dimen/base_margin_half"
@@ -48,9 +47,6 @@
                 android:maxLines="1"
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
                 android:textSize="@dimen/size_text_action" />
-
-
-
 
         </LinearLayout>
 
