@@ -42,7 +42,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llAccept"
+            android:id="@+id/llCallback"
             android:layout_width="@dimen/base_margin_x4"
             android:layout_height="@dimen/base_margin_x4"
             android:background="@drawable/rounded_button_accept"
@@ -62,7 +62,7 @@
                 tools:ignore="UseAppTint" />
 
             <TextView
-                android:id="@+id/tvAccept"
+                android:id="@+id/tvCallback"
                 style="@style/Widget.Compat.NotificationActionText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
