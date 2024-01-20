@@ -167,8 +167,10 @@ class CallkitIncomingActivity : Activity() {
         if (data == null) finish()
 
 		val textColor = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_COLOR, "#ffffff")
+        val isShowCallID = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID, false)
         tvNameCaller.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
         tvNumber.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
+        tvNumber.visibility = if (isShowCallID == true) View.VISIBLE else View.INVISIBLE
 
 		try {
 			tvNameCaller.setTextColor(Color.parseColor(textColor))

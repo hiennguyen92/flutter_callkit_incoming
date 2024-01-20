@@ -44,6 +44,8 @@ data class Data(val args: Map<String, Any?>) {
     var isCustomSmallExNotification: Boolean = false
     @JsonProperty("isShowLogo")
     var isShowLogo: Boolean = false
+    @JsonProperty("isShowCallID")
+    var isShowCallID: Boolean = false
     @JsonProperty("ringtonePath")
     var ringtonePath: String
     @JsonProperty("backgroundColor")
@@ -86,6 +88,7 @@ data class Data(val args: Map<String, Any?>) {
         isCustomNotification = android["isCustomNotification"] as? Boolean ?: false
         isCustomSmallExNotification = android["isCustomSmallExNotification"] as? Boolean ?: false
         isShowLogo = android["isShowLogo"] as? Boolean ?: false
+        isShowCallID = android["isShowCallID"] as? Boolean ?: false
         ringtonePath = android["ringtonePath"] as? String ?: ""
         backgroundColor = android["backgroundColor"] as? String ?: "#0955fa"
         backgroundUrl = android["backgroundUrl"] as? String ?: ""
@@ -179,6 +182,10 @@ data class Data(val args: Map<String, Any?>) {
             CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO,
             isShowLogo
         )
+        bundle.putBoolean(
+            CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID,
+            isShowCallID
+        )
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH, ringtonePath)
         bundle.putString(
             CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR,
@@ -251,6 +258,10 @@ data class Data(val args: Map<String, Any?>) {
             )
             data.isShowLogo = bundle.getBoolean(
                 CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO,
+                false
+            )
+            data.isShowCallID = bundle.getBoolean(
+                CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID,
                 false
             )
             data.ringtonePath = bundle.getString(

@@ -134,7 +134,7 @@ class HomePageState extends State<HomePage> {
         avatar: 'https://i.pravatar.cc/100',
         handle: '0123456789',
         type: 1,
-        duration: 30000,
+        duration: 10000,
         textAccept: 'Accept',
         textDecline: 'Decline',
         missedCallNotification: const NotificationParams(
