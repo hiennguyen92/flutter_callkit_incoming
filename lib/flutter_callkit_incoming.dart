@@ -49,6 +49,12 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("showMissCallNotification", params.toJson());
   }
 
+  /// Hide notification call for Android.
+  /// Only Android
+  static Future hideCallkitIncoming(CallKitParams params) async {
+    await _channel.invokeMethod("hideCallkitIncoming", params.toJson());
+  }
+
   /// Start an Outgoing call.
   /// On iOS, using Callkit(create a history into the Phone app).
   /// On Android, Nothing(only callback event listener).
