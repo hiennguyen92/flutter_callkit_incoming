@@ -1,3 +1,8 @@
+## 2.0.1+2
+* Add Action for onDecline
+* Add Action for onEnd
+* add android props `isShowCallID`
+
 ## 2.0.1+1
 * Add Callback AVAudioSession for WebRTC setup
 * Fix issue no audio for using WebRTC

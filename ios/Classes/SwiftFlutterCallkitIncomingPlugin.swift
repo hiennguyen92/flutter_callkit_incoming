@@ -530,9 +530,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.onAccept(call, action)
         }else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
-                action.fulfill()
-            }
+            action.fulfill()
         }
     }
     
@@ -552,15 +550,17 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         if (self.answerCall == nil && self.outgoingCall == nil) {
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
-                appDelegate.onDecline(call)
+                appDelegate.onDecline(call, action)
+            } else {
+                action.fulfill()
             }
-            action.fulfill()
         }else {
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
-                appDelegate.onEnd(call)
+                appDelegate.onEnd(call, action)
+            } else {
+                action.fulfill()
             }
-            action.fulfill()
         }
     }
     

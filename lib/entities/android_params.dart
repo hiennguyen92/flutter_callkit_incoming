@@ -9,6 +9,7 @@ class AndroidParams {
     this.isCustomNotification,
     this.isCustomSmallExNotification,
     this.isShowLogo,
+    this.isShowCallID,
     this.ringtonePath,
     this.backgroundColor,
     this.backgroundUrl,
@@ -26,6 +27,9 @@ class AndroidParams {
 
   /// Show logo app inside full screen.
   final bool? isShowLogo;
+
+  /// Show call id app inside full screen.
+  final bool? isShowCallID;
 
   /// File name ringtone, put file into /android/app/src/main/res/raw/ringtone_default.pm3 -> value: `ringtone_default.pm3`
   final String? ringtonePath;
@@ -48,7 +52,8 @@ class AndroidParams {
   /// Notification channel name of missed call.
   final String? missedCallNotificationChannelName;
 
-  factory AndroidParams.fromJson(Map<String, dynamic> json) => _$AndroidParamsFromJson(json);
+  factory AndroidParams.fromJson(Map<String, dynamic> json) =>
+      _$AndroidParamsFromJson(json);
 
   Map<String, dynamic> toJson() => _$AndroidParamsToJson(this);
 }
