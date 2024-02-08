@@ -426,15 +426,17 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     func sendDefaultAudioInterruptionNofificationToStartAudioResource(){
-        var userInfo : [AnyHashable : Any] = [:]
+        // THIS IS COMMENTED BECAUSE IT OVERTAKES WEBRTC AUDIO SESSION MANAGEMENT
+        /*var userInfo : [AnyHashable : Any] = [:]
         let intrepEndeRaw = AVAudioSession.InterruptionType.ended.rawValue
         userInfo[AVAudioSessionInterruptionTypeKey] = intrepEndeRaw
         userInfo[AVAudioSessionInterruptionOptionKey] = AVAudioSession.InterruptionOptions.shouldResume.rawValue
-        NotificationCenter.default.post(name: AVAudioSession.interruptionNotification, object: self, userInfo: userInfo)
+        NotificationCenter.default.post(name: AVAudioSession.interruptionNotification, object: self, userInfo: userInfo)*/
     }
     
     func configurAudioSession(){
-        if data?.configureAudioSession != false {
+        // THIS IS COMMENTED BECAUSE IT OVERTAKES WEBRTC AUDIO SESSION MANAGEMENT
+        /*if data?.configureAudioSession != false {
             let session = AVAudioSession.sharedInstance()
             do{
                 try session.setCategory(AVAudioSession.Category.playAndRecord, options: [
@@ -453,7 +455,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             }catch{
                 print(error)
             }
-        }
+        }*/
     }
     
     func getAudioSessionMode(_ audioSessionMode: String?) -> AVAudioSession.Mode {
