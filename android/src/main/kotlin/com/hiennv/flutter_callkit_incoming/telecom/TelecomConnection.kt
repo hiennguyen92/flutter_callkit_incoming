@@ -91,7 +91,6 @@ class TelecomConnection internal constructor(private val context: Context, priva
 				put(EXTRA_CALLKIT_ID, uuid)
 			}
 		}
-		context.sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentEnded(context, bundleOf(*data.toList().toTypedArray())))
 		try {
 			TelecomConnectionService.deinitConnection(handle[EXTRA_CALLKIT_ID] ?: "")
 
