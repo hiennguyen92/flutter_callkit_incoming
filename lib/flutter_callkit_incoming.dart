@@ -134,7 +134,7 @@ class FlutterCallkitIncoming {
   }
 
   /// Hide notification call for Android
-  static Future endCall(String id) async {
+  static Future hideCallkitIncoming(String id) async {
     await _channel.invokeMethod("hideCallkitIncoming", {'id': id});
   }
 
