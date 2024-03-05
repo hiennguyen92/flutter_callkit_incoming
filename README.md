@@ -160,7 +160,7 @@ Our top sponsors are shown below!
     ```
   * Hide notification call for Android
     ```
-    hideCallkitIncoming({ id: 'uuid call' })
+     await FlutterCallkitIncoming.hideCallkitIncoming(this._currentUuid);
     ```
 
   * Started an outgoing call
