@@ -1,3 +1,8 @@
+## 2.0.2
+* Add func `hideCallkitIncoming` clear the incoming notification/ring (after accept/decline/timeout)
+* Add props `isShowFullLockedScreen` on Android
+* Fixed example/Fixed update android 14
+
 ## 2.0.1+2
 * Add Action for onDecline
 * Add Action for onEnd
