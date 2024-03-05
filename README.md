@@ -150,6 +150,10 @@ Our top sponsors are shown below!
       );
       await FlutterCallkitIncoming.showMissCallNotification(params);
     ```
+  * Hide notification call for Android
+    ```
+    hideCallkitIncoming
+    ```
 
   * Started an outgoing call
     ```dart
