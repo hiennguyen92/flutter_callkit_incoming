@@ -1,3 +1,6 @@
+## 2.0.2+1
+* Fixed linked func `hideCallkitIncoming`
+
 ## 2.0.2
 * Add func `hideCallkitIncoming` clear the incoming notification/ring (after accept/decline/timeout)
 * Add props `isShowFullLockedScreen` on Android
