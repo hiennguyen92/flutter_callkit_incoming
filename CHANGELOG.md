@@ -1,3 +1,6 @@
+## 2.0.2+2
+* Fixed linked func `hideCallkitIncoming`
+
 ## 2.0.2+1
 * Fixed linked func `hideCallkitIncoming`
 
