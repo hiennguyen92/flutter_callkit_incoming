@@ -17,6 +17,7 @@ class AndroidParams {
     this.textColor,
     this.incomingCallNotificationChannelName,
     this.missedCallNotificationChannelName,
+    this.isShowFullLockedScreen,
   });
 
   /// Using custom notifications.
@@ -51,6 +52,9 @@ class AndroidParams {
 
   /// Notification channel name of missed call.
   final String? missedCallNotificationChannelName;
+
+  /// Show full locked screen.
+  final bool? isShowFullLockedScreen;
 
   factory AndroidParams.fromJson(Map<String, dynamic> json) =>
       _$AndroidParamsFromJson(json);

@@ -35,27 +35,35 @@ Our top sponsors are shown below!
     ```console
     flutter pub add flutter_callkit_incoming
     ```
-  * Add pubspec.yaml:
-    ```console
-        dependencies:
-          flutter_callkit_incoming: any
-    ```
-2. Configure Project
-  * Android
-     * AndroidManifest.xml
-     ```
-      <manifest...>
-          ...
-          <!--
-              Using for load image from internet
-          -->
-          <uses-permission android:name="android.permission.INTERNET"/>
-      </manifest>
-     ```
-     The following rule needs to be added in the proguard-rules.pro to avoid obfuscated keys.
-     ```
-      -keep class com.hiennv.flutter_callkit_incoming.** { *; }
-     ```
+    * Add pubspec.yaml:
+      ```console
+          dependencies:
+            flutter_callkit_incoming: any
+      ```
+      2. Configure Project
+         * Android
+            * AndroidManifest.xml
+            ```
+             <manifest...>
+                 ...
+                 <!--
+                     Using for load image from internet
+                 -->
+                 <uses-permission android:name="android.permission.INTERNET"/>
+
+               <application ...>
+                   <activity ...
+                      android:name=".MainActivity"
+                      android:launchMode="singleInstance">
+                    ...
+               ...
+    
+             </manifest>
+            ```
+            The following rule needs to be added in the proguard-rules.pro to avoid obfuscated keys.
+            ```
+             -keep class com.hiennv.flutter_callkit_incoming.** { *; }
+            ```
   * iOS
      * Info.plist
       ```
@@ -149,6 +157,10 @@ Our top sponsors are shown below!
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
       );
       await FlutterCallkitIncoming.showMissCallNotification(params);
+    ```
+  * Hide notification call for Android
+    ```
+    hideCallkitIncoming({ id: 'uuid call' })
     ```
 
   * Started an outgoing call
@@ -486,6 +498,7 @@ Our top sponsors are shown below!
     |  **`incomingCallNotificationChannelName`** | Notification channel name of incoming call.                                                          | `Incoming call`                                                   |
     |  **`missedCallNotificationChannelName`** | Notification channel name of missed call.                                                            | `Missed call`                                                     |
     |  **`isShowCallID`** | Show call id app inside full screen/notification.                                                    | false                                                             |
+    |  **`isShowFullLockedScreen`** | Show full screen on Locked Screen.                                                                   | true                                                              |
 
     <br>
 

@@ -138,8 +138,8 @@ class HomePageState extends State<HomePage> {
         appName: 'Callkit',
         avatar: 'https://i.pravatar.cc/100',
         handle: '0123456789',
-        type: 1,
-        duration: 10000,
+        type: 0,
+        duration: 30000,
         textAccept: 'Accept',
         textDecline: 'Decline',
         missedCallNotification: const NotificationParams(
