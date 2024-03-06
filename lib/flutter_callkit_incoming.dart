@@ -133,11 +133,6 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("requestNotificationPermission", data);
   }
 
-  /// Hide notification call for Android
-  static Future hideCallkitIncoming(String id) async {
-    await _channel.invokeMethod("hideCallkitIncoming", {'id': id});
-  }
-
   static CallEvent? _receiveCallEvent(dynamic data) {
     Event? event;
     Map<String, dynamic> body = {};
