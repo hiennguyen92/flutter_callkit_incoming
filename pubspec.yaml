@@ -39,8 +39,8 @@ flutter:
       android:
         package: com.hiennv.flutter_callkit_incoming
         pluginClass: FlutterCallkitIncomingPlugin
-      ios:
-        pluginClass: FlutterCallkitIncomingPlugin
+      # ios:
+      #   pluginClass: FlutterCallkitIncomingPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
