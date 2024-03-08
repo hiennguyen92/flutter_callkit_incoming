@@ -44,12 +44,16 @@ data class Data(val args: Map<String, Any?>) {
     var isCustomSmallExNotification: Boolean = false
     @JsonProperty("isShowLogo")
     var isShowLogo: Boolean = false
+    @JsonProperty("isShowCallID")
+    var isShowCallID: Boolean = false
     @JsonProperty("ringtonePath")
     var ringtonePath: String
     @JsonProperty("backgroundColor")
     var backgroundColor: String
     @JsonProperty("backgroundUrl")
     var backgroundUrl: String
+    @JsonProperty("textColor")
+    var textColor: String
     @JsonProperty("actionColor")
     var actionColor: String
     @JsonProperty("incomingCallNotificationChannelName")
@@ -71,19 +75,32 @@ data class Data(val args: Map<String, Any?>) {
     @JsonProperty("isAccepted")
     var isAccepted: Boolean = false
 
+    @JsonProperty("isOnHold")
+    var isOnHold: Boolean = (args["isOnHold"] as? Boolean) ?: false
+    @JsonProperty("audioRoute")
+    var audioRoute: Int = (args["audioRoute"] as? Int) ?: 1
+    @JsonProperty("isMuted")
+    var isMuted: Boolean = (args["isMuted"] as? Boolean) ?: false
+
+    @JsonProperty("isShowFullLockedScreen")
+    var isShowFullLockedScreen: Boolean = true
+
     init {
         var android: Map<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         android = android ?: args
         isCustomNotification = android["isCustomNotification"] as? Boolean ?: false
         isCustomSmallExNotification = android["isCustomSmallExNotification"] as? Boolean ?: false
         isShowLogo = android["isShowLogo"] as? Boolean ?: false
+        isShowCallID = android["isShowCallID"] as? Boolean ?: false
         ringtonePath = android["ringtonePath"] as? String ?: ""
         backgroundColor = android["backgroundColor"] as? String ?: "#0955fa"
         backgroundUrl = android["backgroundUrl"] as? String ?: ""
         actionColor = android["actionColor"] as? String ?: "#4CAF50"
+        textColor = android["textColor"] as? String ?: "#ffffff"
         incomingCallNotificationChannelName =
             android["incomingCallNotificationChannelName"] as? String
         missedCallNotificationChannelName = android["missedCallNotificationChannelName"] as? String
+        isShowFullLockedScreen = android["isShowFullLockedScreen"] as? Boolean ?: true
 
         val missedNotification: Map<String, Any?>? =
             args["missedCallNotification"] as? Map<String, Any?>?
@@ -169,6 +186,10 @@ data class Data(val args: Map<String, Any?>) {
             CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO,
             isShowLogo
         )
+        bundle.putBoolean(
+            CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID,
+            isShowCallID
+        )
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH, ringtonePath)
         bundle.putString(
             CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR,
@@ -178,6 +199,7 @@ data class Data(val args: Map<String, Any?>) {
             CallkitConstants.EXTRA_CALLKIT_BACKGROUND_URL,
             backgroundUrl
         )
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_TEXT_COLOR, textColor)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_ACTION_COLOR, actionColor)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_ACTION_FROM, from)
         bundle.putString(
@@ -187,6 +209,10 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putString(
             CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME,
             missedCallNotificationChannelName
+        )
+        bundle.putBoolean(
+            CallkitConstants.EXTRA_CALLKIT_IS_SHOW_FULL_LOCKED_SCREEN,
+            isShowFullLockedScreen
         )
         return bundle
     }
@@ -242,6 +268,10 @@ data class Data(val args: Map<String, Any?>) {
                 CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO,
                 false
             )
+            data.isShowCallID = bundle.getBoolean(
+                CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID,
+                false
+            )
             data.ringtonePath = bundle.getString(
                 CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH,
                 ""
@@ -256,6 +286,10 @@ data class Data(val args: Map<String, Any?>) {
                 CallkitConstants.EXTRA_CALLKIT_ACTION_COLOR,
                 "#4CAF50"
             )
+            data.textColor = bundle.getString(
+                CallkitConstants.EXTRA_CALLKIT_TEXT_COLOR,
+                "#FFFFFF"
+            )
             data.from =
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_ACTION_FROM, "")
 
@@ -264,6 +298,10 @@ data class Data(val args: Map<String, Any?>) {
             )
             data.missedCallNotificationChannelName = bundle.getString(
                 CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME
+            )
+            data.isShowFullLockedScreen = bundle.getBoolean(
+                CallkitConstants.EXTRA_CALLKIT_IS_SHOW_FULL_LOCKED_SCREEN,
+                true
             )
             return data
         }

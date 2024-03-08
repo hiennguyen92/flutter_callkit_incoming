@@ -41,69 +41,74 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Plugin example app'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(
-              Icons.call,
-              color: Colors.white,
-            ),
-            onPressed: makeFakeCallInComing,
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.call_end,
-              color: Colors.white,
-            ),
-            onPressed: endCurrentCall,
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.call_made,
-              color: Colors.white,
-            ),
-            onPressed: startOutGoingCall,
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.call_merge,
-              color: Colors.white,
-            ),
-            onPressed: activeCalls,
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.clear_all_sharp,
-              color: Colors.white,
-            ),
-            onPressed: endAllCalls,
-          )
-        ],
       ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          if (textEvents.isNotEmpty) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: viewportConstraints.maxHeight,
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          children: [
+            Column(
+              children: [
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.call),
+                  label: Text('Make fake call incoming'),
+                  onPressed: makeFakeCallInComing,
                 ),
-                child: Text(textEvents),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.call_end),
+                  label: Text('End current call'),
+                  onPressed: endCurrentCall,
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.call_made),
+                  label: Text('Start outgoing call'),
+                  onPressed: startOutGoingCall,
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.call_merge),
+                  label: Text('Active calls'),
+                  onPressed: activeCalls,
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.clear_all_sharp),
+                  label: Text('End all calls'),
+                  onPressed: endAllCalls,
+                ),
+                const Divider(),
+              ],
+            ),
+            Expanded(
+              child: LayoutBuilder(
+                builder:
+                    (BuildContext context, BoxConstraints viewportConstraints) {
+                  if (textEvents.isNotEmpty) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: viewportConstraints.maxHeight,
+                        ),
+                        child: Text(textEvents),
+                      ),
+                    );
+                  } else {
+                    return const Center(
+                      child: Text('No Event'),
+                    );
+                  }
+                },
               ),
-            );
-          } else {
-            return const Center(
-              child: Text('No Event'),
-            );
-          }
-        },
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Future<void> requestNotificationPermission() async {
     await FlutterCallkitIncoming.requestNotificationPermission({
-      "rationaleMessagePermission": "Notification permission is required, to show notification.",
-      "postNotificationMessageRequired": "Notification permission is required, Please allow notification permission from setting."
+      "rationaleMessagePermission":
+          "Notification permission is required, to show notification.",
+      "postNotificationMessageRequired":
+          "Notification permission is required, Please allow notification permission from setting."
     });
   }
 
@@ -133,7 +138,7 @@ class HomePageState extends State<HomePage> {
         appName: 'Callkit',
         avatar: 'https://i.pravatar.cc/100',
         handle: '0123456789',
-        type: 1,
+        type: 0,
         duration: 30000,
         textAccept: 'Accept',
         textDecline: 'Decline',
@@ -152,6 +157,7 @@ class HomePageState extends State<HomePage> {
           backgroundColor: '#0955fa',
           backgroundUrl: 'assets/test.png',
           actionColor: '#4CAF50',
+          textColor: '#ffffff',
           incomingCallNotificationChannelName: 'Incoming Call',
           missedCallNotificationChannelName: 'Missed Call',
         ),
@@ -277,7 +283,7 @@ class HomePageState extends State<HomePage> {
   void onEvent(CallEvent event) {
     if (!mounted) return;
     setState(() {
-      textEvents += '${event.toString()}\n';
+      textEvents += '---\n${event.toString()}\n';
     });
   }
 }

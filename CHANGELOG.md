@@ -1,3 +1,45 @@
+## 2.0.3
+* Fixed linked func `hideCallkitIncoming`
+
+## 2.0.2+2
+* Fixed linked func `hideCallkitIncoming`
+
+## 2.0.2+1
+* Fixed linked func `hideCallkitIncoming`
+
+## 2.0.2
+* Add func `hideCallkitIncoming` clear the incoming notification/ring (after accept/decline/timeout)
+* Add props `isShowFullLockedScreen` on Android
+* Fixed example/Fixed update android 14
+
+## 2.0.1+2
+* Add Action for onDecline
+* Add Action for onEnd
+* add android props `isShowCallID`
+
+## 2.0.1+1
+* Add Callback AVAudioSession for WebRTC setup
+* Fix issue no audio for using WebRTC
+
+## 2.0.1-dev.2
+* Add Action for onAccept
+
+## 2.0.1-dev.1
+* Add AVAudioSession Appdelegate(iOS)
+
+## 2.0.1-dev
+* Add AVAudioSession Appdelegate(iOS)
+
+## 2.0.1
+
+* Fixed some bugs.
+* `Android` using Telecom Framework
+* Add `silenceEvents`
+* Add `normalHandle` props https://github.com/hiennguyen92/flutter_callkit_incoming/pull/403
+* Android add `textColor` props https://github.com/hiennguyen92/flutter_callkit_incoming/pull/398
+* Android invisible avatar for default https://github.com/hiennguyen92/flutter_callkit_incoming/pull/393
+* Add Method for call API when accept/decline/end/timeout
+
 ## 2.0.0+2
 
 * Fixed some bugs.

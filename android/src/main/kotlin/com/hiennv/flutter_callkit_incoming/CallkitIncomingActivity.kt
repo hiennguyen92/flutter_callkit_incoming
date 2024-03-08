@@ -93,21 +93,27 @@ class CallkitIncomingActivity : Activity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             setTurnScreenOn(true)
-            setShowWhenLocked(true)
         } else {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
-            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
             window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
         transparentStatusAndNavigation()
         setContentView(R.layout.activity_callkit_incoming)
         initView()
         incomingData(intent)
-        registerReceiver(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                endedCallkitIncomingBroadcastReceiver,
+                IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}"),
+                Context.RECEIVER_EXPORTED,
+            )
+        } else {
+            registerReceiver(
                 endedCallkitIncomingBroadcastReceiver,
                 IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}")
-        )
+            )
+        }
     }
 
     private fun wakeLockRequest(duration: Long) {
@@ -158,8 +164,26 @@ class CallkitIncomingActivity : Activity() {
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
         if (data == null) finish()
 
+        val isShowFullLockedScreen = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_FULL_LOCKED_SCREEN, true)
+        if(isShowFullLockedScreen == true) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                setShowWhenLocked(true)
+            } else {
+                window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+            }
+        }
+
+		val textColor = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_COLOR, "#ffffff")
+        val isShowCallID = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID, false)
         tvNameCaller.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
         tvNumber.text = data?.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
+        tvNumber.visibility = if (isShowCallID == true) View.VISIBLE else View.INVISIBLE
+
+		try {
+			tvNameCaller.setTextColor(Color.parseColor(textColor))
+			tvNumber.setTextColor(Color.parseColor(textColor))
+		} catch (error: Exception) {
+		}
 
         val isShowLogo = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO, false)
         ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
@@ -188,6 +212,12 @@ class CallkitIncomingActivity : Activity() {
         tvAccept.text = if (TextUtils.isEmpty(textAccept)) getString(R.string.text_accept) else textAccept
         val textDecline = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
         tvDecline.text = if (TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
+
+		try {
+			tvAccept.setTextColor(Color.parseColor(textColor))
+			tvDecline.setTextColor(Color.parseColor(textColor))
+		} catch (error: Exception) {
+		}
 
         val backgroundColor = data?.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
         try {

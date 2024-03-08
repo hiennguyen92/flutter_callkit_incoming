@@ -1,10 +1,8 @@
 package com.hiennv.flutter_callkit_incoming
 
-import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.res.AssetFileDescriptor
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -37,6 +35,9 @@ class CallkitSoundPlayerService : Service() {
         mediaPlayer?.stop()
         mediaPlayer?.release()
         vibrator?.cancel()
+
+        mediaPlayer = null
+        vibrator = null
     }
 
     private fun prepare() {
