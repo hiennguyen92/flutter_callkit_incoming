@@ -64,8 +64,16 @@ class CallManager: NSObject {
     }
     
     func connectedCall(call: Call) {
-        let callItem = self.callWithUUID(uuid: call.uuid)
-        callItem?.connectedCall(completion: nil)
+        let answerAction = CXAnswerCallAction(call: call.uuid)        
+        let transaction = CXTransaction(action: answerAction)
+
+        callController.request(transaction) { error in
+            if let error = error {
+                print("Error answering call: \(error.localizedDescription)")
+            } else {
+                // Call successfully answered
+            }
+        }
     }
     
     func endCallAlls() {
