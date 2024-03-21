@@ -1,57 +1,44 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
-on:
-  push:
-    branches:
-      - master
-    tags:        
-      - 1.*
+on: pull_request
 
+env:
+  FLUTTER_VERSION: "3.10.x"
+  WORKING_DIRECTORY: ./example
 
 jobs:
   build_android:
     name: Build Flutter (Android)
     runs-on: ubuntu-latest
-    env: 
-      working-directory: ./example
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v2
-      with:
-        java-version: '12.x'
-        distribution: 'zulu'
-    - uses: subosito/flutter-action@v2
-      with:
-        channel: 'stable'
-        flutter-version: "3.3.3"
-    - name: Dependencies
-      run: flutter pub get
-      working-directory: ${{env.working-directory}}
-    - name: Build APK
-      working-directory: ${{env.working-directory}}
-      run: flutter build apk --debug
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v2
+        with:
+          java-version: "12.x"
+          distribution: "zulu"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{env.FLUTTER_VERSION}}
+          channel: "stable"
+      - name: Dependencies
+        run: flutter pub get
+        working-directory: ${{env.WORKING_DIRECTORY}}
+      - name: Build APK
+        working-directory: ${{env.WORKING_DIRECTORY}}
+        run: flutter build apk --debug
   build_ios:
     name: Build Flutter (iOS)
-    runs-on: macOS-latest
-    env: 
-      working-directory: ./example
+    runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v2
-      with:
-        java-version: '12.x'
-        distribution: 'zulu'
-    - uses: subosito/flutter-action@v2
-      with:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{env.FLUTTER_VERSION}}
           channel: "stable"
-          flutter-version: "3.3.3"
           architecture: x64
-    - name: Dependencies
-      run: flutter pub get
-      working-directory: ${{env.working-directory}}
-    - name: Build IPA
-      working-directory: ${{env.working-directory}}
-      run: flutter build ios --release --no-codesign
+      - name: Dependencies
+        run: flutter pub get
+        working-directory: ${{env.WORKING_DIRECTORY}}
+      - name: Build IPA
+        working-directory: ${{env.WORKING_DIRECTORY}}
+        run: flutter build ios --release --no-codesign
