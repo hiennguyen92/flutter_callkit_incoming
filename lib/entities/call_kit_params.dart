@@ -16,6 +16,7 @@ class CallKitParams {
     this.avatar,
     this.handle,
     this.type,
+    this.normalHandle,
     this.duration,
     this.textAccept,
     this.textDecline,
@@ -32,6 +33,7 @@ class CallKitParams {
   final String? avatar;
   final String? handle;
   final int? type;
+  final int? normalHandle;
   final int? duration;
   final String? textAccept;
   final String? textDecline;

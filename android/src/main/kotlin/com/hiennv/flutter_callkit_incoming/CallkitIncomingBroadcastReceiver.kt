@@ -12,6 +12,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
     companion object {
         private const val TAG = "CallkitIncomingReceiver"
+        var silenceEvents = false
 
         fun getIntent(context: Context, action: String, data: Bundle?) =
             Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
@@ -58,6 +59,18 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         fun getIntentCallback(context: Context, data: Bundle?) =
             Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_CALLBACK}"
+                putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+            }
+
+        fun getIntentHeldByCell(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = "${context.packageName}.${CallkitConstants.ACTION_CALL_HELD}"
+                putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+            }
+
+        fun getIntentUnHeldByCell(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = "${context.packageName}.${CallkitConstants.ACTION_CALL_UNHELD}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
             }
     }
@@ -161,6 +174,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun sendEventFlutter(event: String, data: Bundle) {
+        if (silenceEvents) return
+
         FlutterCallkitIncomingPlugin.sendEvent(event, data.toData())
     }
 }
@@ -180,6 +195,7 @@ private fun Bundle.toData(): Map<String, Any> {
         "backgroundColor" to getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, ""),
         "backgroundUrl" to getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_URL, ""),
         "actionColor" to getString(CallkitConstants.EXTRA_CALLKIT_ACTION_COLOR, ""),
+        "textColor" to getString(CallkitConstants.EXTRA_CALLKIT_TEXT_COLOR, ""),
         "incomingCallNotificationChannelName" to getString(
             CallkitConstants.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME,
             ""
