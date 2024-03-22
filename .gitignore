@@ -10,3 +10,6 @@ build/
 *.iml
 
 pubspec.lock
+
+example/ios/Podfile.lock
+example/pubspec.lock

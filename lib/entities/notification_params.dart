@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'notification_params.g.dart';
 
-/// Object config for Android.
+/// Object config for Notification Android.
 @JsonSerializable(explicitToJson: true)
 class NotificationParams {
   const NotificationParams({
