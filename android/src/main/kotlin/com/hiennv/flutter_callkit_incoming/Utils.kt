@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.Resources
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.lang.ref.WeakReference
+import android.content.ComponentName
 
 
 class Utils {
@@ -61,8 +62,8 @@ class Utils {
         }
 
         fun backToForeground(context: Context) {
-            val packageName = context.packageName
-            val intent = context.packageManager.getLaunchIntentForPackage(packageName)?.cloneFilter()
+             val intent = Intent()
+            intent.setComponent(ComponentName(context.packageName, "com.noknox.morador.flutter.FlutterCallActivity"))
             intent?.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
