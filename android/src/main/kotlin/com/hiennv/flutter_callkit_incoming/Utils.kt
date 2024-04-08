@@ -5,6 +5,10 @@ import android.content.Intent
 import android.content.res.Resources
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.lang.ref.WeakReference
+import android.content.ComponentName
+import android.content.pm.ResolveInfo
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 
 
 class Utils {
@@ -61,11 +65,39 @@ class Utils {
         }
 
         fun backToForeground(context: Context) {
-            val packageName = context.packageName
-            val intent = context.packageManager.getLaunchIntentForPackage(packageName)?.cloneFilter()
-            intent?.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-            intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val resolvedActivityClass = getCustomActivityClassWithIntentFilter(context)
+            var intent = Intent()
+            if (resolvedActivityClass == "") {
+                 intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()!!
+            }else{
+
+                intent.setComponent(ComponentName(context.packageName, resolvedActivityClass))
+            }
+
+            intent.setComponent(ComponentName(context.packageName, resolvedActivityClass))
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
+        }
+
+        private fun getCustomActivityClassWithIntentFilter(context: Context): String{
+            val searchedIntent: Intent =
+                Intent().setAction("com.hiennv.flutter_callkit_incoming.CALL_ACTIVITY").setPackage(context.getPackageName())
+            val resolveInfos: List<ResolveInfo> = context.getPackageManager().queryIntentActivities(
+                searchedIntent,
+                PackageManager.GET_RESOLVED_FILTER
+            )
+            if (resolveInfos.size > 0) {
+                val resolveInfo: ResolveInfo = resolveInfos[0]
+                try {
+
+                    return resolveInfo.activityInfo.name
+                } catch (e: java.lang.ClassNotFoundException) {
+                    //Should not happen, print it to the log!
+
+                }
+            }
+            return ""
         }
 
         fun <T, C : MutableCollection<WeakReference<T>>> C.reapCollection(): C {
