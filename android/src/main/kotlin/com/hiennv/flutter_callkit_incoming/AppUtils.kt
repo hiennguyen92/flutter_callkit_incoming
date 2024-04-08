@@ -9,6 +9,7 @@ import android.app.Activity
 import android.content.pm.ResolveInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import org.json.JSONObject
 
 object AppUtils {
     fun getAppIntent(context: Context, action: String? = null, data: Bundle? = null): Intent? {
@@ -16,7 +17,7 @@ object AppUtils {
         val resolvedActivityClass = getCustomActivityClassWithIntentFilter(context)
 
         var intent = Intent()
-        
+
         if (resolvedActivityClass == "") {
             intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()!!
         }else{
@@ -26,6 +27,8 @@ object AppUtils {
         intent.setComponent(ComponentName(context.packageName, resolvedActivityClass))
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
+        val callToken = JSONObject(data?.getSerializable("EXTRA_CALLKIT_EXTRA").toString()).getString("call_token")
+        intent.putExtra("route","/doorman-call/$callToken")
         intent.action = action
         return intent
     }
