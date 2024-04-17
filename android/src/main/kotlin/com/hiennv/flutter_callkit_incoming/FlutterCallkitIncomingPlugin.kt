@@ -10,7 +10,6 @@ import android.os.Looper
 import android.util.Log
 import androidx.annotation.NonNull
 import com.hiennv.flutter_callkit_incoming.Utils.Companion.reapCollection
-import com.hiennv.flutter_callkit_incoming.telecom.TelecomUtilities
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -28,9 +27,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
         @SuppressLint("StaticFieldLeak")
         private lateinit var instance: FlutterCallkitIncomingPlugin
-
-        @SuppressLint("StaticFieldLeak")
-        private lateinit var telecomUtilities: TelecomUtilities
 
         public fun getInstance(): FlutterCallkitIncomingPlugin {
             return instance
@@ -78,8 +74,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             eventHandlers.add(WeakReference(handler))
             events.setStreamHandler(handler)
 
-            telecomUtilities = TelecomUtilities(context)
-            TelecomUtilities.telecomUtilitiesSingleton = telecomUtilities
         }
 
     }
@@ -163,22 +157,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             )
                     )
 
-                    // only report to telecom if it's a voice call
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        telecomUtilities.reportIncomingCall(data)
-                    }
-
                     result.success("OK")
                 }
 
                 "showCallkitIncomingSilently" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
-
-                    // we don't need to send a broadcast, we only need to report the data to telecom
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        telecomUtilities.reportIncomingCall(data)
-                    }
 
                     result.success("OK")
                 }
@@ -199,10 +183,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             )
                     )
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        telecomUtilities.startCall(data)
-                    }
-
                     result.success("OK")
                 }
 
@@ -215,11 +195,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     }
                     sendEvent(CallkitConstants.ACTION_CALL_TOGGLE_MUTE, map)
 
-                    val data = Data(call.arguments() ?: HashMap())
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        telecomUtilities.muteCall(data)
-                    }
-
                     result.success("OK")
                 }
 
@@ -231,15 +206,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                         }
                     }
                     sendEvent(CallkitConstants.ACTION_CALL_TOGGLE_HOLD, map)
-
-                    val data = Data(call.arguments() ?: HashMap())
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (data.isOnHold) {
-                            telecomUtilities.holdCall(data)
-                        } else {
-                            telecomUtilities.unHoldCall(data)
-                        }
-                    }
 
                     result.success("OK")
                 }
@@ -257,18 +223,10 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             )
                     )
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        telecomUtilities.endCall(data)
-                    }
-
                     result.success("OK")
                 }
 
                 "callConnected" -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        telecomUtilities.acceptCall(Data(call.arguments() ?: HashMap()))
-                    }
-
                     result.success("OK")
                 }
 
@@ -292,12 +250,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                         }
                     }
                     removeAllCalls(context)
-
-                    //Additional safety net
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        telecomUtilities.endAllActiveCalls()
-                    }
-
                     result.success("OK")
                 }
 
@@ -332,17 +284,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 }
 
                 "endNativeSubsystemOnly" -> {
-                    val data = Data(call.arguments() ?: HashMap())
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        telecomUtilities.endCall(data)
-                    }
+
                 }
 
                 "setAudioRoute" -> {
-                    val data = Data(call.arguments() ?: HashMap())
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        telecomUtilities.setAudioRoute(data)
-                    }
+
                 }
             }
         } catch (error: Exception) {
@@ -371,10 +317,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     override fun onDetachedFromActivity() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Log.d("FlutterCallkitPlugin", "onDetachedFromActivity: called -- activity destroyed? ${activity?.isDestroyed}")
-            if (activity?.isDestroyed == true) telecomUtilities.endAllActiveCalls()
-        }
+
     }
 
     class EventCallbackHandler : EventChannel.StreamHandler {
