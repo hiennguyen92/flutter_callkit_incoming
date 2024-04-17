@@ -1,3 +1,7 @@
+## 2.0.4
+* Removed `Telecom Framework` (Android)
+* Fixed hide notification for action `CallBack` (Android)
+
 ## 2.0.3
 * Fixed linked func `hideCallkitIncoming`
 
