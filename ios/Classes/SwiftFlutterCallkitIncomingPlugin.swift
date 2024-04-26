@@ -43,12 +43,13 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         Cache.shared.updateLatestEvent(action: event, data: data)
         streamHandlers.reap().forEach { handler in
             handler?.send(event, body ?? [:])
-        if silenceEvents {
-            print(event, " silenced")
-            return
-        } else {
-            streamHandlers.reap().forEach { handler in
-                handler?.send(event, body ?? [:])
+            if silenceEvents {
+                print(event, " silenced")
+                return
+            } else {
+                streamHandlers.reap().forEach { handler in
+                    handler?.send(event, body ?? [:])
+                }
             }
         }
         
