@@ -48,15 +48,5 @@
             android:exported="true"
             android:name="com.hiennv.flutter_callkit_incoming.CallkitSoundPlayerService"/>
 
-        <service
-            android:enabled="true"
-            android:exported="true"
-            android:name="com.hiennv.flutter_callkit_incoming.telecom.TelecomConnectionService"
-            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE">
-            <intent-filter>
-                <action android:name="android.telecom.ConnectionService" />
-            </intent-filter>
-        </service>
-
     </application>
 </manifest>
