@@ -11,6 +11,8 @@ import CallKit
 
 
 public protocol CallkitIncomingAppDelegate : NSObjectProtocol {
+
+    var callToFullFillAction : CXAnswerCallAction? { get set };
     
     func onAccept(_ call: Call, _ action: CXAnswerCallAction);
     

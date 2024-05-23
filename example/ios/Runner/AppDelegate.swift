@@ -8,6 +8,7 @@ import flutter_callkit_incoming
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate, CallkitIncomingAppDelegate {
 
+    var callToFullFillAction : CXAnswerCallAction? = nil
     
     override func application(
         _ application: UIApplication,
