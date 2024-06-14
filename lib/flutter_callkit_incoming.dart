@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'entities/entities.dart';
 
@@ -36,6 +37,20 @@ class FlutterCallkitIncoming {
   /// }
   static Stream<CallEvent?> get onEvent =>
       _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
+
+  static final _controllerEvent = BehaviorSubject<CallEvent?>();
+
+  static ValueStream<CallEvent?> get subscriptionEvent {
+    onEvent.asBroadcastStream().listen(
+      (event) {
+        _controllerEvent
+          ..sink
+          ..add(event);
+      },
+    );
+
+    return _controllerEvent.stream;
+  }
 
   /// Show Callkit Incoming.
   /// On iOS, using Callkit. On Android, using a custom UI.
