@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -44,6 +45,16 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             eventHandlers.reapCollection().forEach {
                 it.get()?.send(event, body)
             }
+        }
+
+         fun acceptCallHandleCallback(bundle:Bundle){
+            Handler(Looper.getMainLooper()).postDelayed( {
+                val mData = bundle.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA)!!
+                methodChannels.values.forEach {
+                    Log.e("acceptCallHandle","send data")
+                    it.invokeMethod("acceptCallHandle",mData)
+                }
+            },1000)
         }
 
         public fun sendEventCustom(event: String, body: Map<String, Any>) {
@@ -289,6 +300,14 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
                 "setAudioRoute" -> {
 
+                }
+                "setAcceptCallHandle" -> {
+                    val data = call.arguments() ?: listOf<Any>()
+                    if(data.size < 2) return
+                    val key = data.last() as? String
+                    val handle = data.first() as? Int
+
+                    saveHandle(context,key.orEmpty(),handle ?: 0)
                 }
             }
         } catch (error: Exception) {

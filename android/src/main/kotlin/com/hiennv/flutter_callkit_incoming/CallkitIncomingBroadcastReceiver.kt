@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.loader.FlutterLoader
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
@@ -113,6 +115,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data, true)
                     addCall(context, Data.fromBundle(data), true)
+
+                    FlutterCallkitIncomingPlugin.acceptCallHandleCallback(data)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }

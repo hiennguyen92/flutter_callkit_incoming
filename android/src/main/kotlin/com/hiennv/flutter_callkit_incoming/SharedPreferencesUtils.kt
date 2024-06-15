@@ -73,3 +73,16 @@ fun remove(context: Context?, key: String) {
     editor?.remove(key)
     editor?.commit()
 }
+
+fun saveHandle(context: Context?,key: String,handle:Int){
+    if (context == null) return
+    initInstance(context)
+    editor?.putInt(key,handle)
+    editor?.commit()
+}
+
+fun getRawHandle(context: Context?,key: String): Int? {
+    if (context == null) return null
+    initInstance(context)
+    return prefs?.getInt(key,0)
+}

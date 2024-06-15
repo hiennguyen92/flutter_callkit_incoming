@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'entities/entities.dart';
+
+typedef void ActionEvent(Map<dynamic, dynamic> data);
 
 /// Instance to use library functions.
 /// * showCallkitIncoming(dynamic)
@@ -50,6 +53,31 @@ class FlutterCallkitIncoming {
     );
 
     return _controllerEvent.stream;
+  }
+
+
+  static void acceptCallHandle(ActionEvent handler) {
+    final rawHandle = PluginUtilities.getCallbackHandle(handler)?.toRawHandle();
+    _channel.invokeMethod("setAcceptCallHandle", [
+      rawHandle,
+      'acceptCallHandle',
+    ]);
+
+    _channel.setMethodCallHandler(
+      (call) async {
+        if (call.method == "acceptCallHandle") {
+          handler(callActionBody(call.arguments));
+        }
+      },
+    );
+  }
+
+  static Map<dynamic,dynamic> callActionBody(dynamic value) {
+    if (value != null && value is Map) {
+      return value;
+    }
+
+    return {};
   }
 
   /// Show Callkit Incoming.
