@@ -68,8 +68,7 @@ class CallingPageState extends State<CallingPage> {
               const Text('Calling...'),
               TextButton(
                 style: ButtonStyle(
-                  foregroundColor:
-                      WidgetStateProperty.all<Color>(Colors.blue),
+                  foregroundColor: WidgetStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () async {
                   if (calling != null) {
@@ -81,8 +80,7 @@ class CallingPageState extends State<CallingPage> {
               ),
               TextButton(
                 style: ButtonStyle(
-                  foregroundColor:
-                      WidgetStateProperty.all<Color>(Colors.blue),
+                  foregroundColor: WidgetStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () async {
                   if (calling != null) {

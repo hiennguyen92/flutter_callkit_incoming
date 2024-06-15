@@ -52,10 +52,9 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             Handler(Looper.getMainLooper()).postDelayed({
                 val mData = bundle.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA)!!
                 methodChannels.values.forEach {
-                    Log.e("acceptCallHandle", "send data")
                     it.invokeMethod("acceptCallHandle", mData)
                 }
-            }, 1000)
+            }, 750)
         }
 
         public fun sendEventCustom(event: String, body: Map<String, Any>) {

@@ -34,11 +34,6 @@ class HomePageState extends State<HomePage> {
     textEvents = "";
     initCurrentCall();
     listenerEvent(onEvent);
-    FlutterCallkitIncoming.acceptCallHandle(
-      (data) {
-        print("accept call data :${data}");
-      },
-    );
   }
 
   @override

@@ -40,6 +40,11 @@ class FlutterCallkitIncoming {
   static Stream<CallEvent?> get onEvent =>
       _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
 
+  ///## AcceptCallHandle
+  ///
+  /// Event.ACTION_CALL_ACCEPT
+  /// - Accepted an incoming call
+  /// Handle Accept call from background click modifier onEvent ACTION_CALL_ACCEPT not working (kill app)
   static void acceptCallHandle(ActionEvent handler) {
     final rawHandle = PluginUtilities.getCallbackHandle(handler)?.toRawHandle();
     _channel.invokeMethod("setAcceptCallHandle", [
@@ -56,6 +61,10 @@ class FlutterCallkitIncoming {
     );
   }
 
+  ///callActionBody [callActionBody]
+  ///
+  /// Event.ACTION_CALL_ACCEPT - Accepted an incoming call
+  /// pass data to map ot empty map
   static Map<dynamic, dynamic> callActionBody(dynamic value) {
     if (value != null && value is Map) {
       return value;

@@ -473,7 +473,7 @@ Try the Flutter Video Tutorial 📹</a></span>
 4. Properties
 
    | Prop            | Description                                                             | Default     |
-          | --------------- | ----------------------------------------------------------------------- | ----------- |
+             | --------------- | ----------------------------------------------------------------------- | ----------- |
    |  **`id`**       | UUID identifier for each call. UUID should be unique for every call and when the call is  ended, the same UUID for that call to be used. suggest using <a href='https://pub.dev/packages/uuid'>uuid.</a> ACCEPT ONLY UUID    | Required    |
    | **`nameCaller`**| Caller's name.                                                          | _None_      |
    | **`appName`**   | App's name. using for display inside Callkit(iOS).                      |   App Name, `Deprecated for iOS > 14, default using App name`  |
@@ -494,7 +494,7 @@ Try the Flutter Video Tutorial 📹</a></span>
 * Missed Call Notification
 
   | Prop            | Description                                                             | Default     |
-        | --------------- | ----------------------------------------------------------------------- | ----------- |
+          | --------------- | ----------------------------------------------------------------------- | ----------- |
   | **`subtitle`**  | Text `Missed Call` used in Android (show in miss call notification)  |    `Missed Call`  |
   | **`callbackText`**  | Text `Call back` used in Android (show in miss call notification)     |    `Call back`  |
   |       **`showNotification`**      | Show missed call notification when timeout | `true`          |
@@ -502,7 +502,7 @@ Try the Flutter Video Tutorial 📹</a></span>
 * Android
 
   | Prop                        | Description                                                                                          | Default                                                           |
-        | --------------------------- |------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
+          | --------------------------- |------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
   | **`isCustomNotification`**  | Using custom notifications.                                                                          | `false`                                                           |
   | **`isCustomSmallExNotification`**  | Using custom notification small on some devices clipped out in android.                              | `false`                                                           |
   |       **`isShowLogo`**      | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png`               | `false`                                                           |
@@ -521,7 +521,7 @@ Try the Flutter Video Tutorial 📹</a></span>
 * iOS
 
   | Prop                                      | Description                                                             | Default     |
-        | ----------------------------------------- | ----------------------------------------------------------------------- | ----------- |
+          | ----------------------------------------- | ----------------------------------------------------------------------- | ----------- |
   |               **`iconName`**              | App's Icon. using for display inside Callkit(iOS)                       | `CallKitLogo` <br> using from `Images.xcassets/CallKitLogo`    |
   |              **`handleType`**             | Type handle call `generic`, `number`, `email`                           | `generic`   |
   |             **`supportsVideo`**           |                                                                         |   `true`    |
