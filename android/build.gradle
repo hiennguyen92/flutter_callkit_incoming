@@ -11,7 +11,7 @@ buildscript {
     dependencies {
         //classpath 'com.android.tools.build:gradle:4.1.0'
         //classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        
+
         classpath 'com.android.tools.build:gradle:7.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -33,7 +33,7 @@ android {
     if (project.android.hasProperty("namespace")) {
         namespace "com.hiennv.flutter_callkit_incoming"
     }
-    
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }

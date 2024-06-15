@@ -58,6 +58,7 @@ class CallkitSoundPlayerService : Service() {
         when (audioManager?.ringerMode) {
             AudioManager.RINGER_MODE_SILENT -> {
             }
+
             else -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     vibrator?.vibrate(

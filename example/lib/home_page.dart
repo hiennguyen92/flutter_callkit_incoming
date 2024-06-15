@@ -34,12 +34,11 @@ class HomePageState extends State<HomePage> {
     textEvents = "";
     initCurrentCall();
     listenerEvent(onEvent);
-    FlutterCallkitIncoming.callHandleEvent.listen((event){
-      print("accept call data Stream :${event}");
-    });
-    FlutterCallkitIncoming.acceptCallHandle((data) {
-      print("accept call data :${data}");
-    },);
+    FlutterCallkitIncoming.acceptCallHandle(
+      (data) {
+        print("accept call data :${data}");
+      },
+    );
   }
 
   @override
@@ -223,7 +222,6 @@ class HomePageState extends State<HomePage> {
 
   Future<void> listenerEvent(void Function(CallEvent) callback) async {
     try {
-
       FlutterCallkitIncoming.onEvent.listen((event) async {
         print('HOME: $event');
         switch (event!.event) {

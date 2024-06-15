@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
@@ -69,7 +69,7 @@ class CallingPageState extends State<CallingPage> {
               TextButton(
                 style: ButtonStyle(
                   foregroundColor:
-                      MaterialStateProperty.all<Color>(Colors.blue),
+                      WidgetStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () async {
                   if (calling != null) {
@@ -82,7 +82,7 @@ class CallingPageState extends State<CallingPage> {
               TextButton(
                 style: ButtonStyle(
                   foregroundColor:
-                      MaterialStateProperty.all<Color>(Colors.blue),
+                      WidgetStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () async {
                   if (calling != null) {

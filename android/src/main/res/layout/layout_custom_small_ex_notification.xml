@@ -49,8 +49,6 @@
                 android:textSize="@dimen/size_text_action" />
 
 
-
-
         </LinearLayout>
 
 

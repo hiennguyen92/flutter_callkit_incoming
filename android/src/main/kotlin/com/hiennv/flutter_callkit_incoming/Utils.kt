@@ -44,7 +44,7 @@ class Utils {
         fun getNavigationBarHeight(context: Context): Int {
             val resources = context.resources
             val id = resources.getIdentifier(
-                    "navigation_bar_height", "dimen", "android"
+                "navigation_bar_height", "dimen", "android"
             )
             return if (id > 0) {
                 resources.getDimensionPixelSize(id)
@@ -54,7 +54,7 @@ class Utils {
         fun getStatusBarHeight(context: Context): Int {
             val resources = context.resources
             val id: Int =
-                    resources.getIdentifier("status_bar_height", "dimen", "android")
+                resources.getIdentifier("status_bar_height", "dimen", "android")
             return if (id > 0) {
                 resources.getDimensionPixelSize(id)
             } else 0
@@ -62,7 +62,8 @@ class Utils {
 
         fun backToForeground(context: Context) {
             val packageName = context.packageName
-            val intent = context.packageManager.getLaunchIntentForPackage(packageName)?.cloneFilter()
+            val intent =
+                context.packageManager.getLaunchIntentForPackage(packageName)?.cloneFilter()
             intent?.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)

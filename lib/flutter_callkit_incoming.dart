@@ -2,11 +2,10 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/services.dart';
-import 'package:rxdart/rxdart.dart';
 
 import 'entities/entities.dart';
 
-typedef void ActionEvent(Map<dynamic, dynamic> data);
+typedef ActionEvent = void Function(Map<dynamic, dynamic> data);
 
 /// Instance to use library functions.
 /// * showCallkitIncoming(dynamic)
@@ -41,21 +40,6 @@ class FlutterCallkitIncoming {
   static Stream<CallEvent?> get onEvent =>
       _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
 
-  static final _controllerEvent = BehaviorSubject<CallEvent?>();
-
-  static ValueStream<CallEvent?> get subscriptionEvent {
-    onEvent.asBroadcastStream().listen(
-      (event) {
-        _controllerEvent
-          ..sink
-          ..add(event);
-      },
-    );
-
-    return _controllerEvent.stream;
-  }
-
-
   static void acceptCallHandle(ActionEvent handler) {
     final rawHandle = PluginUtilities.getCallbackHandle(handler)?.toRawHandle();
     _channel.invokeMethod("setAcceptCallHandle", [
@@ -72,7 +56,7 @@ class FlutterCallkitIncoming {
     );
   }
 
-  static Map<dynamic,dynamic> callActionBody(dynamic value) {
+  static Map<dynamic, dynamic> callActionBody(dynamic value) {
     if (value != null && value is Map) {
       return value;
     }

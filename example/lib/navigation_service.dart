@@ -11,9 +11,11 @@ class NavigationService {
   RouteObserver<Route<dynamic>> routeObserver = RouteObserver<Route<dynamic>>();
 
   static final NavigationService _instance = NavigationService._private();
+
   factory NavigationService() {
     return _instance;
   }
+
   NavigationService._private();
 
   static NavigationService get instance => _instance;

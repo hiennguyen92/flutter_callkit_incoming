@@ -1,40 +1,51 @@
 ## 2.0.4+1
+
 * Removed `Telecom Framework` (Android)
 
 ## 2.0.4
+
 * Removed `Telecom Framework` (Android)
 * Fixed hide notification for action `CallBack` (Android)
 
 ## 2.0.3
+
 * Fixed linked func `hideCallkitIncoming`
 
 ## 2.0.2+2
+
 * Fixed linked func `hideCallkitIncoming`
 
 ## 2.0.2+1
+
 * Fixed linked func `hideCallkitIncoming`
 
 ## 2.0.2
+
 * Add func `hideCallkitIncoming` clear the incoming notification/ring (after accept/decline/timeout)
 * Add props `isShowFullLockedScreen` on Android
 * Fixed example/Fixed update android 14
 
 ## 2.0.1+2
+
 * Add Action for onDecline
 * Add Action for onEnd
 * add android props `isShowCallID`
 
 ## 2.0.1+1
+
 * Add Callback AVAudioSession for WebRTC setup
 * Fix issue no audio for using WebRTC
 
 ## 2.0.1-dev.2
+
 * Add Action for onAccept
 
 ## 2.0.1-dev.1
+
 * Add AVAudioSession Appdelegate(iOS)
 
 ## 2.0.1-dev
+
 * Add AVAudioSession Appdelegate(iOS)
 
 ## 2.0.1
@@ -44,7 +55,8 @@
 * Add `silenceEvents`
 * Add `normalHandle` props https://github.com/hiennguyen92/flutter_callkit_incoming/pull/403
 * Android add `textColor` props https://github.com/hiennguyen92/flutter_callkit_incoming/pull/398
-* Android invisible avatar for default https://github.com/hiennguyen92/flutter_callkit_incoming/pull/393
+* Android invisible avatar for
+  default https://github.com/hiennguyen92/flutter_callkit_incoming/pull/393
 * Add Method for call API when accept/decline/end/timeout
 
 ## 2.0.0+2
@@ -62,23 +74,23 @@
 
 * Fixed some bugs.
 * Adapt flutter_lints and use lowerCamelCase to Event enum
-* Rename properties 
-        `textMisssedCall` -> `subtitle`,
-        `textCallback` -> `callbackText`,
-        `isShowMissedCallNotification` -> `showNotification`,
-* Move inside properties `missedCallNotification {showNotification, isShowCallback, subtitle, callbackText}`
+* Rename properties
+  `textMisssedCall` -> `subtitle`,
+  `textCallback` -> `callbackText`,
+  `isShowMissedCallNotification` -> `showNotification`,
+* Move inside
+  properties `missedCallNotification {showNotification, isShowCallback, subtitle, callbackText}`
 * Add setCallConnected option iOS `await FlutterCallkitIncoming.setCallConnected(this._currentUuid)`
 * Add hold option iOS
 * Add mute call option iOS
 * Many other issues
     1. Thank @ryojiro
-    https://github.com/hiennguyen92/flutter_callkit_incoming/pull/263
-    https://github.com/hiennguyen92/flutter_callkit_incoming/pull/264
-    https://github.com/hiennguyen92/flutter_callkit_incoming/pull/262
+       https://github.com/hiennguyen92/flutter_callkit_incoming/pull/263
+       https://github.com/hiennguyen92/flutter_callkit_incoming/pull/264
+       https://github.com/hiennguyen92/flutter_callkit_incoming/pull/262
     2. Many Thank @mouEsam
-    https://github.com/hiennguyen92/flutter_callkit_incoming/pull/227
+       https://github.com/hiennguyen92/flutter_callkit_incoming/pull/227
     3. ...
-
 
 ## 1.0.3+3
 
@@ -91,11 +103,17 @@
 
 ## 1.0.3+1
 
-* Dart class models instead using dynamic types and Maps (thank @icodelifee - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/180)
-* Allow to call from native Android (thank @fabiocody - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/185)
-* Add android notification channel name `incomingCallNotificationChannelName` `missedCallNotificationChannelName` (thank @AAkira - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/177)
-* Adding the feature to change template of notification to small `isCustomSmallExNotification` (thank @anocean2 - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/196)
-* Fixed ringtone sound not playing in Release mode on Android (thank @mschudt - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/204)
+* Dart class models instead using dynamic types and Maps (thank
+  @icodelifee - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/180)
+* Allow to call from native Android (thank
+  @fabiocody - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/185)
+* Add android notification channel
+  name `incomingCallNotificationChannelName` `missedCallNotificationChannelName` (thank
+  @AAkira - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/177)
+* Adding the feature to change template of notification to small `isCustomSmallExNotification` (
+  thank @anocean2 - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/196)
+* Fixed ringtone sound not playing in Release mode on Android (thank
+  @mschudt - https://github.com/hiennguyen92/flutter_callkit_incoming/pull/204)
 * Fixed some bugs.
 
 ## 1.0.3
@@ -119,13 +137,14 @@
 ## 1.0.2
 
 * Fixed issue open app(terminated/background state - Android).
-* Completed Example  
+* Completed Example
 * Fixed some bugs.
 
 ## 1.0.1+8
 
 * Add props `isShowMissedCallNotification` using show Missed call notification(Android)
-* Fixed issue decline(terminated/background state - there will be about 3 seconds to call the api before the app is closed.)
+* Fixed issue decline(terminated/background state - there will be about 3 seconds to call the api
+  before the app is closed.)
 * Fixed some bugs.
 
 ## 1.0.1+7
@@ -146,7 +165,7 @@
 
 ## 1.0.1+4
 
-* add `showMissCallNotification` only for Android, using show miss call notification 
+* add `showMissCallNotification` only for Android, using show miss call notification
 * Fixed some bugs.
 
 ## 1.0.1+3
