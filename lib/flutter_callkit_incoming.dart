@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/services.dart';
 
 import 'entities/entities.dart';
+
+typedef ActionEvent = void Function(Map<dynamic, dynamic> data);
+typedef Callback = void Function(dynamic data);
 
 /// Instance to use library functions.
 /// * showCallkitIncoming(dynamic)
@@ -36,6 +40,50 @@ class FlutterCallkitIncoming {
   /// }
   static Stream<CallEvent?> get onEvent =>
       _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
+
+  ///## AcceptCallHandle
+  ///
+  /// Event.ACTION_CALL_ACCEPT
+  /// - Accepted an incoming call
+  /// Handle Accept call from background click modifier onEvent ACTION_CALL_ACCEPT not working (kill app)
+  static void acceptCallHandle(ActionEvent handler) {
+    final rawHandle = PluginUtilities.getCallbackHandle(handler)?.toRawHandle();
+    _channel.invokeMethod("setAcceptCallHandle", [
+      rawHandle,
+      'acceptCallHandle',
+    ]);
+
+    _channel.setMethodCallHandler(
+      (call) async {
+        if (call.method == "acceptCallHandle") {
+          handler(callActionBody(call.arguments));
+        }
+      },
+    );
+  }
+
+  ///send data to flutter from background (kill app)
+  static void invokeFlutter(Callback callback) {
+    _channel.setMethodCallHandler(
+      (call) async {
+        if (call.method == "invokeFlutter") {
+          callback(call.arguments ?? null);
+        }
+      },
+    );
+  }
+
+  ///callActionBody [callActionBody]
+  ///
+  /// Event.ACTION_CALL_ACCEPT - Accepted an incoming call
+  /// pass data to map ot empty map
+  static Map<dynamic, dynamic> callActionBody(dynamic value) {
+    if (value != null && value is Map) {
+      return value;
+    }
+
+    return {};
+  }
 
   /// Show Callkit Incoming.
   /// On iOS, using Callkit. On Android, using a custom UI.

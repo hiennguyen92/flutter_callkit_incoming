@@ -23,5 +23,6 @@ class NotificationParams {
 
   factory NotificationParams.fromJson(Map<String, dynamic> json) =>
       _$NotificationParamsFromJson(json);
+
   Map<String, dynamic> toJson() => _$NotificationParamsToJson(this);
 }

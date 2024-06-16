@@ -21,9 +21,9 @@ fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
     val arrayData: ArrayList<Data> = Utils.getGsonInstance()
         .readValue(json, object : TypeReference<ArrayList<Data>>() {})
     val currentData = arrayData.find { it == data }
-    if(currentData != null) {
+    if (currentData != null) {
         currentData.isAccepted = isAccepted
-    }else {
+    } else {
         arrayData.add(data)
     }
     putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))
@@ -51,7 +51,8 @@ fun getDataActiveCalls(context: Context?): ArrayList<Data> {
 
 fun getDataActiveCallsForFlutter(context: Context?): ArrayList<Map<String, Any?>> {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    return Utils.getGsonInstance().readValue(json, object : TypeReference<ArrayList<Map<String, Any?>>>() {})
+    return Utils.getGsonInstance()
+        .readValue(json, object : TypeReference<ArrayList<Map<String, Any?>>>() {})
 }
 
 fun putString(context: Context?, key: String, value: String?) {
@@ -72,4 +73,17 @@ fun remove(context: Context?, key: String) {
     initInstance(context)
     editor?.remove(key)
     editor?.commit()
+}
+
+fun saveHandle(context: Context?, key: String, handle: Int) {
+    if (context == null) return
+    initInstance(context)
+    editor?.putInt(key, handle)
+    editor?.commit()
+}
+
+fun getRawHandle(context: Context?, key: String): Int? {
+    if (context == null) return null
+    initInstance(context)
+    return prefs?.getInt(key, 0)
 }

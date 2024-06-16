@@ -6,7 +6,7 @@
 #import <Flutter/Flutter.h>
 #import <PushKit/PushKit.h>
 
-@interface AppDelegate : FlutterAppDelegate<UIApplicationDelegate, PKPushRegistryDelegate>
+@interface AppDelegate : FlutterAppDelegate <UIApplicationDelegate, PKPushRegistryDelegate>
 
 
 @end
