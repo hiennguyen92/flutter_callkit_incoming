@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'entities/entities.dart';
 
 typedef ActionEvent = void Function(Map<dynamic, dynamic> data);
-typedef Callback = void Function();
+typedef Callback = void Function(dynamic data);
 
 /// Instance to use library functions.
 /// * showCallkitIncoming(dynamic)
@@ -62,11 +62,12 @@ class FlutterCallkitIncoming {
     );
   }
 
+  ///send data to flutter from background (kill app)
   static void invokeFlutter(Callback callback) {
     _channel.setMethodCallHandler(
       (call) async {
         if (call.method == "invokeFlutter") {
-          callback();
+          callback(call.arguments ?? null);
         }
       },
     );

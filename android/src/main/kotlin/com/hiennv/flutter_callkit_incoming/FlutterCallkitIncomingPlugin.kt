@@ -57,10 +57,10 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             }, 750)
         }
 
-        fun invokeFlutterCallback() {
+        fun invokeFlutterCallback(data:Any) {
             Handler(Looper.getMainLooper()).postDelayed({
                 methodChannels.values.forEach {
-                    it.invokeMethod("invokeFlutter",null)
+                    it.invokeMethod("invokeFlutter",data)
                 }
             }, 750)
         }
