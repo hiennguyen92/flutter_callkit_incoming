@@ -204,22 +204,27 @@ class CallkitIncomingActivity : Activity() {
         try {
             tvNameCaller.setTextColor(Color.parseColor(textColor))
             tvNumber.setTextColor(Color.parseColor(textColor))
-        } catch (error: Exception) {
+        } catch (_: Exception) {
         }
 
         val isShowLogo = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO, false)
         ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
 
         val avatarUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-        if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+        if (!avatarUrl.isNullOrEmpty()) {
             ivAvatar.visibility = View.VISIBLE
             val headers =
-                data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
-            getPicassoInstance(this@CallkitIncomingActivity, headers)
-                .load(avatarUrl)
-                .placeholder(R.drawable.ic_default_avatar)
-                .error(R.drawable.ic_default_avatar)
-                .into(ivAvatar)
+                data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as? HashMap<String, Any?>
+
+            headers?.let {
+                Handler(Looper.getMainLooper()).post {
+                    getPicassoInstance(this@CallkitIncomingActivity, headers)
+                        .load(avatarUrl)
+                        .placeholder(R.drawable.ic_default_avatar)
+                        .error(R.drawable.ic_default_avatar)
+                        .into(ivAvatar)
+                }
+            }
         }
 
         val callType = data?.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, 0) ?: 0
