@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'entities/entities.dart';
 
 typedef ActionEvent = void Function(Map<dynamic, dynamic> data);
+typedef Callback = void Function();
 
 /// Instance to use library functions.
 /// * showCallkitIncoming(dynamic)
@@ -56,6 +57,16 @@ class FlutterCallkitIncoming {
       (call) async {
         if (call.method == "acceptCallHandle") {
           handler(callActionBody(call.arguments));
+        }
+      },
+    );
+  }
+
+  static void invokeFlutter(Callback callback) {
+    _channel.setMethodCallHandler(
+      (call) async {
+        if (call.method == "invokeFlutter") {
+          callback();
         }
       },
     );

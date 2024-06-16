@@ -57,6 +57,14 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             }, 750)
         }
 
+        fun invokeFlutterCallback(bundle: Bundle) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                methodChannels.values.forEach {
+                    it.invokeMethod("invokeFlutter",null)
+                }
+            }, 750)
+        }
+
         public fun sendEventCustom(event: String, body: Map<String, Any>) {
             eventHandlers.reapCollection().forEach {
                 it.get()?.send(event, body)
