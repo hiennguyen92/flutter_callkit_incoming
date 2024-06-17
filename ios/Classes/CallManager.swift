@@ -64,15 +64,24 @@ class CallManager: NSObject {
     }
     
     func connectedCall(call: Call) {
-        let answerAction = CXAnswerCallAction(call: call.uuid)        
-        let transaction = CXTransaction(action: answerAction)
 
-        callController.request(transaction) { error in
-            if let error = error {
-                print("Error answering call: \(error.localizedDescription)")
+        if let callItem = self.callWithUUID(uuid: call.uuid) {
+            if let direction = callItem.data.extra["direction"] as? String, direction == "OUTGOING" {
+                callItem.connectedCall(completion: nil)
             } else {
-                // Call successfully answered
+                let answerAction = CXAnswerCallAction(call: call.uuid)
+                let transaction = CXTransaction(action: answerAction)
+
+                callController.request(transaction) { error in
+                    if let error = error {
+                        print("Error answering call: \(error.localizedDescription)")
+                    } else {
+                        // Call successfully answered
+                    }
+                }
             }
+        } else {
+            print("Call item not found")
         }
     }
     
