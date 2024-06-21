@@ -160,6 +160,8 @@ class HomePageState extends State<HomePage> {
           textColor: '#ffffff',
           incomingCallNotificationChannelName: 'Incoming Call',
           missedCallNotificationChannelName: 'Missed Call',
+          isImportant: true,
+          isBot: false,
         ),
         ios: const IOSParams(
           iconName: 'CallKitLogo',
