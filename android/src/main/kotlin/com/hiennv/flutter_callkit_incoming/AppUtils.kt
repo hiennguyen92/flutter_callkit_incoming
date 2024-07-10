@@ -28,7 +28,8 @@ object AppUtils {
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent.putExtra(FlutterCallkitIncomingPlugin.EXTRA_CALLKIT_CALL_DATA, data)
         val authorizationToken = JSONObject(data?.getSerializable("EXTRA_CALLKIT_EXTRA").toString()).getString("authorization_token")
-        intent.putExtra("route","/intercom-call/$authorizationToken")
+        val unitToken = JSONObject(data?.getSerializable("EXTRA_CALLKIT_EXTRA").toString()).getString("unit_token")
+        intent.putExtra("route","/intercom-call/$authorizationToken/$unitToken")
         intent.action = action
         return intent
     }
