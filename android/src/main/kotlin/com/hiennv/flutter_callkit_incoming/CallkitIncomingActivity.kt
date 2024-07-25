@@ -38,14 +38,14 @@ class CallkitIncomingActivity : Activity() {
     companion object {
 
         const val ACTION_ENDED_CALL_INCOMING =
-            "com.hiennv.flutter_callkit_incoming.ACTION_ENDED_CALL_INCOMING"
+                "com.hiennv.flutter_callkit_incoming.ACTION_ENDED_CALL_INCOMING"
 
         fun getIntent(data: Bundle) = Intent(ACTION_CALL_INCOMING).apply {
-            action = ACTION_CALL_INCOMING
-            putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
-            flags =
+                    action = ACTION_CALL_INCOMING
+                    putExtra(EXTRA_CALLKIT_INCOMING_DATA, data)
+                    flags =
                 Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-        }
+                }
 
         fun getIntentEnded() =
             Intent(ACTION_ENDED_CALL_INCOMING)
@@ -93,10 +93,18 @@ class CallkitIncomingActivity : Activity() {
         setContentView(R.layout.activity_callkit_incoming)
         initView()
         incomingData(intent)
-        registerReceiver(
-            endedCallkitIncomingBroadcastReceiver,
-            IntentFilter(ACTION_ENDED_CALL_INCOMING)
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                    endedCallkitIncomingBroadcastReceiver,
+                    IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}"),
+                    Context.RECEIVER_EXPORTED,
+            )
+        } else {
+            registerReceiver(
+                    endedCallkitIncomingBroadcastReceiver,
+                    IntentFilter(ACTION_ENDED_CALL_INCOMING)
+            )
+        }
     }
 
     private fun wakeLockRequest(duration: Long) {
@@ -104,8 +112,8 @@ class CallkitIncomingActivity : Activity() {
         val pm = applicationContext.getSystemService(POWER_SERVICE) as PowerManager
         val wakeLock = pm.newWakeLock(
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-            "Callkit:PowerManager"
-        )
+                        "Callkit:PowerManager"
+                )
         wakeLock.acquire(duration)
     }
 
@@ -155,17 +163,17 @@ class CallkitIncomingActivity : Activity() {
         ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
         val avatarUrl = data?.getString(EXTRA_CALLKIT_AVATAR, null)
         var temp = data?.getString(EXTRA_CALLKIT_NAME_CALLER, "")?.split(' ')
-            ?.mapNotNull { it.firstOrNull()?.toString() }
-            ?.reduce { acc, s -> acc + s }
+                        ?.mapNotNull { it.firstOrNull()?.toString() }
+                        ?.reduce { acc, s -> acc + s }
         if (temp?.length!! < 2) temp =
             data?.getString(EXTRA_CALLKIT_NAME_CALLER, "")?.substring(0, 2)
         ivAvatarPlaceholder.text = temp
         if (avatarUrl != null && avatarUrl.isNotEmpty() && avatarUrl != "null") {
             val headers = data.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
             getPicassoInstance(this@CallkitIncomingActivity, headers)
-                .load(avatarUrl)
-                .error(R.drawable.ic_default_avatar)
-                .into(ivAvatar)
+                    .load(avatarUrl)
+                    .error(R.drawable.ic_default_avatar)
+                    .into(ivAvatar)
             ivAvatar.visibility = View.VISIBLE
 
         }
@@ -189,32 +197,32 @@ class CallkitIncomingActivity : Activity() {
                 )
             ) {
                 backgroundUrl =
-                    String.format("file:///android_asset/flutter_assets/%s", backgroundUrl)
+                        String.format("file:///android_asset/flutter_assets/%s", backgroundUrl)
             }
             val headers = data?.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
             getPicassoInstance(this@CallkitIncomingActivity, headers)
-                .load(backgroundUrl)
-                .placeholder(R.drawable.transparent)
-                .error(R.drawable.transparent)
-                .into(ivBackground)
+                    .load(backgroundUrl)
+                    .placeholder(R.drawable.transparent)
+                    .error(R.drawable.transparent)
+                    .into(ivBackground)
         }
     }
 
     private fun finishTimeout(data: Bundle?, duration: Long) {
         val currentSystemTime = System.currentTimeMillis()
         val timeStartCall =
-            data?.getLong(CallkitNotificationManager.EXTRA_TIME_START_CALL, currentSystemTime)
-                ?: currentSystemTime
+                data?.getLong(CallkitNotificationManager.EXTRA_TIME_START_CALL, currentSystemTime)
+                        ?: currentSystemTime
 
         val timeOut = duration - abs(currentSystemTime - timeStartCall)
         Handler(Looper.getMainLooper()).postDelayed({
-            if (!isFinishing) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    finishAndRemoveTask()
-                } else {
-                    finish()
-                }
-            }
+                            if (!isFinishing) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    finishAndRemoveTask()
+                                } else {
+                                    finish()
+                                }
+                            }
         }, timeOut)
     }
 
@@ -249,7 +257,7 @@ class CallkitIncomingActivity : Activity() {
 
     private fun animateAcceptCall() {
         val shakeAnimation =
-            AnimationUtils.loadAnimation(this@CallkitIncomingActivity, R.anim.shake_anim)
+                AnimationUtils.loadAnimation(this@CallkitIncomingActivity, R.anim.shake_anim)
         ivAcceptCall.animation = shakeAnimation
     }
 
@@ -268,7 +276,7 @@ class CallkitIncomingActivity : Activity() {
         }
         if (intent != null) {
             val intentTransparent =
-                TransparentActivity.getIntentAccept(this@CallkitIncomingActivity, data)
+                    TransparentActivity.getIntentAccept(this@CallkitIncomingActivity, data)
             startActivities(arrayOf(intent, intentTransparent))
         } else {
             val acceptIntent =
@@ -296,14 +304,14 @@ class CallkitIncomingActivity : Activity() {
 
     private fun getPicassoInstance(context: Context, headers: HashMap<String, Any?>): Picasso {
         val client = OkHttpClient.Builder()
-            .addNetworkInterceptor { chain ->
+                        .addNetworkInterceptor { chain ->
                 val newRequestBuilder: okhttp3.Request.Builder = chain.request().newBuilder()
-                for ((key, value) in headers) {
-                    newRequestBuilder.addHeader(key, value.toString())
-                }
-                chain.proceed(newRequestBuilder.build())
-            }
-            .build()
+                            for ((key, value) in headers) {
+                                newRequestBuilder.addHeader(key, value.toString())
+                            }
+                            chain.proceed(newRequestBuilder.build())
+                        }
+                        .build()
         return Picasso.Builder(context)
             .downloader(OkHttp3Downloader(client))
             .build()
