@@ -410,7 +410,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             CXHandle.HandleType.phoneNumber
         ]
         if #available(iOS 11.0, *) {
-            configuration.includesCallsInRecents = data.includesCallsInRecents
+            configuration.includesCallsInRecents = false
         }
         if !data.iconName.isEmpty {
             if let image = UIImage(named: data.iconName) {
