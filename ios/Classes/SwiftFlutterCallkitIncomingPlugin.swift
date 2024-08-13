@@ -513,7 +513,10 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
-        guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else{
+        let call: Call
+        if let existingCall = self.callManager.callWithUUID(uuid: action.callUUID) {
+            call = existingCall
+        } else {
             call = Call(uuid: action.callUUID, data: self.data!)
         }
         self.configurAudioSession()
