@@ -34,8 +34,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private var answerCall : Call?
     
     private var data: Data?
-    private var data1: Data?
-    private(set) var datas = [Data]()
     private var isFromPushKit: Bool = false
     private var silenceEvents: Bool = false
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
@@ -98,7 +96,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             }
             if let getArgs = args as? [String: Any] {
                  self.data = Data(args: getArgs)
-                 self.data1 = Data(args: getArgs)
                  showCallkitIncoming(self.data!, fromPushKit: false)
             }
             result("OK")
@@ -234,7 +231,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         
         var handle: CXHandle?
         handle = CXHandle(type: self.getHandleType(data.handleType), value: data.getEncryptHandle())
-        data.supportsHolding = false
         let callUpdate = CXCallUpdate()
         callUpdate.remoteHandle = handle
         callUpdate.supportsDTMF = data.supportsDTMF
@@ -255,8 +251,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 let call = Call(uuid: uuid!, data: data)
                 call.handle = data.handle
                 self.callManager.addCall(call)
+                print("callManager.calls showCallkitIncoming \(self.callManager.calls.count)")
                 self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_INCOMING, data.toJSON())
-                self.endCallNotExist(data)
             }
         }
     }
@@ -398,8 +394,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     func createConfiguration(_ data: Data) -> CXProviderConfiguration {
         let configuration = CXProviderConfiguration(localizedName: data.appName)
         configuration.supportsVideo = data.supportsVideo
-        configuration.maximumCallGroups = data.maximumCallGroups
-        configuration.maximumCallsPerCallGroup = data.maximumCallsPerCallGroup
+        configuration.maximumCallGroups = 1
+        configuration.maximumCallsPerCallGroup = 1
         
         configuration.supportedHandleTypes = [
             CXHandle.HandleType.generic,
@@ -519,10 +515,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         } else {
             call = Call(uuid: action.callUUID, data: self.data!)
         }
-        self.configurAudioSession()
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
-            self.configurAudioSession()
-        }
         call.hasConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
         }
@@ -538,21 +530,20 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
-            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, self.data?.toJSON())
             action.fail()
             return
         }
+
         call.endCall()
         self.callManager.removeCall(call)
         if (self.answerCall == nil && self.outgoingCall == nil) {
-        print(self.data?.toJSON())
-            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
+            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
                 appDelegate.onDecline(call, action)
             } else {
                 action.fulfill()
             }
-        }else {
+        } else {
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
                 appDelegate.onEnd(call, action)
@@ -564,7 +555,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
-        action.fulfill()
+        action.fail()
     }
     
     public func provider(_ provider: CXProvider, perform action: CXSetMutedCallAction) {
@@ -654,8 +645,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         if(self.answerCall != nil){
             self.answerCall = nil
         }
-        self.callManager.removeAllCalls()
-        
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": false ])
     }
     
