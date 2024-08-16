@@ -234,7 +234,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         
         var handle: CXHandle?
         handle = CXHandle(type: self.getHandleType(data.handleType), value: data.getEncryptHandle())
-        
+        data.supportsHolding = false
         let callUpdate = CXCallUpdate()
         callUpdate.remoteHandle = handle
         callUpdate.supportsDTMF = data.supportsDTMF
@@ -564,15 +564,16 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
-        guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
-            action.fail()
-            return
-        }
-        call.isOnHold = action.isOnHold
-        call.isMuted = action.isOnHold
-        self.callManager.setHold(call: call, onHold: action.isOnHold)
-        sendHoldEvent(action.callUUID.uuidString, action.isOnHold)
-        action.fulfill()
+//         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
+//             action.fail()
+//             return
+//         }
+//         print(action.callUUID)
+//         call.isOnHold = action.isOnHold
+//         call.isMuted = action.isOnHold
+//         self.callManager.setHold(call: call, onHold: action.isOnHold)
+//         sendHoldEvent(action.callUUID.uuidString, action.isOnHold)
+//         action.fulfill()
     }
     
     public func provider(_ provider: CXProvider, perform action: CXSetMutedCallAction) {
