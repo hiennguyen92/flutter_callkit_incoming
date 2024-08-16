@@ -564,16 +564,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
-//         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
-//             action.fail()
-//             return
-//         }
-//         print(action.callUUID)
-//         call.isOnHold = action.isOnHold
-//         call.isMuted = action.isOnHold
-//         self.callManager.setHold(call: call, onHold: action.isOnHold)
-//         sendHoldEvent(action.callUUID.uuidString, action.isOnHold)
-//         action.fulfill()
+        action.fulfill()
     }
     
     public func provider(_ provider: CXProvider, perform action: CXSetMutedCallAction) {
