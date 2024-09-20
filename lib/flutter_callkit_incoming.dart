@@ -135,8 +135,8 @@ class FlutterCallkitIncoming {
 
   /// Request permisstion show notification for Android(14)+
   /// Only Android: show request permission for ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT
-  static Future requestFullIntentPermission(dynamic data) async {
-    return await _channel.invokeMethod("requestFullIntentPermission", data);
+  static Future requestFullIntentPermission() async {
+    return await _channel.invokeMethod("requestFullIntentPermission");
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {
