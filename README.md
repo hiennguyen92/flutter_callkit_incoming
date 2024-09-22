@@ -510,7 +510,7 @@ Our top sponsors are shown below!
     |  **`incomingCallNotificationChannelName`** | Notification channel name of incoming call.                                                          | `Incoming call`                                                   |
     |  **`missedCallNotificationChannelName`** | Notification channel name of missed call.                                                            | `Missed call`                                                     |
     |  **`isShowCallID`** | Show call id app inside full screen/notification.                                                    | false                                                             |
-    |  **`isShowFullLockedScreen`** | Show full screen on Locked Screen.                                                                   | true                                                              |
+    |  **`isShowFullLockedScreen`** | Show full screen on Locked Screen(please make sure call `requestFullIntentPermission` for android 14+).                                                                   | true                                                              |
 
     <br>
 
