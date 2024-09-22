@@ -1,4 +1,4 @@
-## 2.0.4+1
+## 2.0.4+2
 * add func `requestFullIntentPermission` (Android 14+) thank @Spyspyspy https://github.com/hiennguyen92/flutter_callkit_incoming/pull/584
 * set Notification call style (Android) thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/553
 * Many other issues
