@@ -200,6 +200,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         case "requestNotificationPermission": 
             result("OK")
             break
+         case "requestFullIntentPermission": 
+            result("OK")
+            break
         case "hideCallkitIncoming":
             result("OK")
             break
