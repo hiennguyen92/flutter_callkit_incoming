@@ -147,6 +147,12 @@ Our top sponsors are shown below!
       });
     ```
 
+  * request permission for full intent Notification/full screen locked screen Android 14+
+  For Android 14+, please `requestFullIntentPermission`
+    ```dart
+      await FlutterCallkitIncoming.requestFullIntentPermission();
+    ```
+
   * Show miss call notification
     ```dart
       this._currentUuid = _uuid.v4();
