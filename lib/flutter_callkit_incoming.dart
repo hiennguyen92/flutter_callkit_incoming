@@ -133,6 +133,12 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("requestNotificationPermission", data);
   }
 
+  /// Request permisstion show notification for Android(14)+
+  /// Only Android: show request permission for ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT
+  static Future requestFullIntentPermission() async {
+    return await _channel.invokeMethod("requestFullIntentPermission");
+  }
+
   static CallEvent? _receiveCallEvent(dynamic data) {
     Event? event;
     Map<String, dynamic> body = {};
