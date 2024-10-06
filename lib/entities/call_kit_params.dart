@@ -13,6 +13,10 @@ class CallKitParams {
     this.id,
     this.nameCaller,
     this.appName,
+    this.pickup,
+    this.dropOff,
+    this.estimationTime,
+    this.estimationPrice,
     this.avatar,
     this.handle,
     this.type,
@@ -30,6 +34,10 @@ class CallKitParams {
   final String? id;
   final String? nameCaller;
   final String? appName;
+  final String? pickup;
+  final String? dropOff;
+  final String? estimationTime;
+  final String? estimationPrice;
   final String? avatar;
   final String? handle;
   final int? type;
