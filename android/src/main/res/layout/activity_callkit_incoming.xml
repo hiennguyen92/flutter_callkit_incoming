@@ -82,38 +82,41 @@
                 tools:targetApi="o"
                 tools:text="Caller Name"
                  />
-                 <TextView
+                <TextView
+                android:id="@+id/tvdropOffLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
                 android:textSize="@dimen/size_text_action"
                 tools:targetApi="o"
                 tools:text="Caller Name"/>
+                <TextView
+                android:id="@+id/tcEstimationTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textSize="@dimen/size_text_action"
+                tools:targetApi="o"
+                tools:text="Caller Name" />
                  <TextView
-                 android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
-                   android:textSize="@dimen/size_text_action"
-                    tools:targetApi="o"
-                    tools:text="Caller Name" />
-                 <TextView
-                 android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
-                   android:textSize="@dimen/size_text_action"
-                    tools:targetApi="o"
-                    tools:text="Caller Name" />
+                android:id="@+id/tvEstimationPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textSize="@dimen/size_text_action"
+                tools:targetApi="o"
+                tools:text="Caller Name" />
 
                 <TextView
-                    android:id="@+id/tvNumber"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textColor="@color/action_text"
-                    android:textSize="0sp"
-                    tools:text="Some info" />
+                android:id="@+id/tvNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/action_text"
+                android:textSize="0sp"
+                tools:text="Some info" />
 
             </LinearLayout>
 
