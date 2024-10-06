@@ -15,6 +15,14 @@ data class Data(val args: Map<String, Any?>) {
     var uuid: String = (args["id"] as? String) ?: ""
     @JsonProperty("nameCaller")
     var nameCaller: String = (args["nameCaller"] as? String) ?: ""
+    @JsonProperty("pickup")
+    var pickup: String = (args["pickup"] as? String) ?: ""
+    @JsonProperty("dropOff")
+    var dropOff: String = (args["dropOff"] as? String) ?: ""
+    @JsonProperty("estimationTime")
+    var estimationTime: String = (args["estimationTime"] as? String) ?: ""
+    @JsonProperty("estimationPrice")
+    var estimationPrice: String = (args["estimationPrice"] as? String) ?: ""
     @JsonProperty("appName")
     var appName: String = (args["appName"] as? String) ?: ""
     @JsonProperty("handle")
@@ -144,6 +152,10 @@ data class Data(val args: Map<String, Any?>) {
         val bundle = Bundle()
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_ID, id)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, nameCaller)
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_PICKUP, pickup)
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_DROP_OFF, dropOff)
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_ESTIMATION_TIME, estimationTime)
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_ESTIMATION_PRICE, estimationPrice)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_HANDLE, handle)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_AVATAR, avatar)
         bundle.putInt(CallkitConstants.EXTRA_CALLKIT_TYPE, type)
@@ -239,6 +251,14 @@ data class Data(val args: Map<String, Any?>) {
             data.id = bundle.getString(CallkitConstants.EXTRA_CALLKIT_ID, "")
             data.nameCaller =
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
+            data.pickup =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_PICKUP, "")
+            data.dropOff =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_DROP_OFF, "")
+            data.estimationTime =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_ESTIMATION_TIME, "")
+            data.estimationPrice =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_ESTIMATION_PRICE, "")   
             data.appName =
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_APP_NAME, "")
             data.handle =
