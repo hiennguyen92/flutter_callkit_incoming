@@ -22,7 +22,30 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
                 android:textSize="@dimen/size_text_action" />
-
+                 <TextView
+                android:id="@+id/tvPickUpLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textSize="@dimen/size_text_action" />
+                 <TextView
+                android:id="@+id/tvdropOffLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textSize="@dimen/size_text_action" />
+                 <TextView
+                android:id="@+id/tcEstimationTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textSize="@dimen/size_text_action" />
+                 <TextView
+                android:id="@+id/tvEstimationPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textSize="@dimen/size_text_action" />
 
             <TextView
                 android:id="@+id/tvNumber"
