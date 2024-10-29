@@ -147,6 +147,12 @@ Our top sponsors are shown below!
       });
     ```
 
+  * request permission for full intent Notification/full screen locked screen Android 14+
+  For Android 14+, please `requestFullIntentPermission`
+    ```dart
+      await FlutterCallkitIncoming.requestFullIntentPermission();
+    ```
+
   * Show miss call notification
     ```dart
       this._currentUuid = _uuid.v4();
@@ -504,7 +510,7 @@ Our top sponsors are shown below!
     |  **`incomingCallNotificationChannelName`** | Notification channel name of incoming call.                                                          | `Incoming call`                                                   |
     |  **`missedCallNotificationChannelName`** | Notification channel name of missed call.                                                            | `Missed call`                                                     |
     |  **`isShowCallID`** | Show call id app inside full screen/notification.                                                    | false                                                             |
-    |  **`isShowFullLockedScreen`** | Show full screen on Locked Screen.                                                                   | true                                                              |
+    |  **`isShowFullLockedScreen`** | Show full screen on Locked Screen(please make sure call `requestFullIntentPermission` for android 14+).                                                                   | true                                                              |
 
     <br>
 
