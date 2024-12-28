@@ -10,7 +10,6 @@ import 'package:flutter_callkit_incoming_example/navigation_service.dart';
 import 'package:uuid/uuid.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message: ${message.messageId}");
   await Firebase
       .initializeApp(); //make sure firebase is initialized before using it (showCallkitIncoming)
   showCallkitIncoming(const Uuid().v4());
