@@ -13,10 +13,8 @@ enum Event {
   actionCallIncoming,
   actionCallStart,
   actionCallAccept,
-  actionCallDecline,
   actionCallEnded,
   actionCallTimeout,
-  actionCallCallback,
   actionCallToggleHold,
   actionCallToggleMute,
   actionCallToggleDmtf,
@@ -37,14 +35,10 @@ extension EventX on Event {
         return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_START';
       case Event.actionCallAccept:
         return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT';
-      case Event.actionCallDecline:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE';
       case Event.actionCallEnded:
         return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED';
       case Event.actionCallTimeout:
         return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT';
-      case Event.actionCallCallback:
-        return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK';
       case Event.actionCallToggleHold:
         return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD';
       case Event.actionCallToggleMute:

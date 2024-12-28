@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.fasterxml.jackson.core.type.TypeReference
 
-
 private const val CALLKIT_PREFERENCES_FILE_NAME = "flutter_callkit_incoming"
 private var prefs: SharedPreferences? = null
 private var editor: SharedPreferences.Editor? = null
@@ -14,7 +13,6 @@ private fun initInstance(context: Context) {
     prefs = context.getSharedPreferences(CALLKIT_PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
     editor = prefs?.edit()
 }
-
 
 fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
     val json = getString(context, "ACTIVE_CALLS", "[]")

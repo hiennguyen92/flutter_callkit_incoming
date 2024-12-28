@@ -94,7 +94,6 @@ Our top sponsors are shown below!
         handle: '0123456789',
         type: 0,
         textAccept: 'Accept',
-        textDecline: 'Decline',
         missedCallNotification: NotificationParams(
             showNotification: true,
             isShowCallback: true,
@@ -259,17 +258,11 @@ Our top sponsors are shown below!
             // TODO: accepted an incoming call
             // TODO: show screen calling in Flutter
             break;
-          case Event.actionCallDecline:
-            // TODO: declined an incoming call
-            break;
           case Event.actionCallEnded:
             // TODO: ended an incoming/outgoing call
             break;
           case Event.actionCallTimeout:
             // TODO: missed an incoming call
-            break;
-          case Event.actionCallCallback:
-            // TODO: only Android - click action `Call back` from missed call notification
             break;
           case Event.actionCallToggleHold:
             // TODO: only iOS
@@ -357,7 +350,6 @@ Our top sponsors are shown below!
         //Kotlin/Java Android
         FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(body: Map<String, Any>)
     ```
-    * 3.1 Call API when accept/decline/end/timeout
     ```swift
     //Appdelegate
     ...
@@ -394,23 +386,6 @@ Our top sponsors are shown below!
             case .success(let data):
                 print("Received data: \(data)")
                 //Make sure call action.fulfill() when you are done(connected WebRTC - Start counting seconds)
-                action.fulfill()
-
-            case .failure(let error):
-                print("Error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    // Func Call API for Decline
-    func onDecline(_ call: Call, _ action: CXEndCallAction) {
-        let json = ["action": "DECLINE", "data": call.data.toJSON()] as [String: Any]
-        print("LOG: onDecline")
-        self.performRequest(parameters: json) { result in
-            switch result {
-            case .success(let data):
-                print("Received data: \(data)")
-                //Make sure call action.fulfill() when you are done
                 action.fulfill()
 
             case .failure(let error):
@@ -478,7 +453,6 @@ Our top sponsors are shown below!
     |   **`type`**    |  0 - Audio Call, 1 - Video Call                                         |     `0`     |
     | **`duration`**  | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed.                                                                                     |    `30000`  |
    | **`textAccept`**  | Text `Accept` used in Android                                            |    `Accept`  |
-   | **`textDecline`**  | Text `Decline` used in Android                                           |    `Decline`  |
     |   **`extra`**   | Any data added to the event when received.                              |     `{}`    |
     |   **`headers`** | Any data for custom header avatar/background image.                     |     `{}`    |
     |  **`missedCallNotification`**  | Android data needed to customize Miss Call Notification.                                    |    Below    |

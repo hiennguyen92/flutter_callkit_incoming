@@ -6,8 +6,6 @@ object CallkitConstants {
     const val ACTION_CALL_START = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_START"
     const val ACTION_CALL_ACCEPT =
             "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT"
-    const val ACTION_CALL_DECLINE =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE"
     const val ACTION_CALL_ENDED =
             "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED"
     const val ACTION_CALL_TOGGLE_MUTE =
@@ -35,7 +33,6 @@ object CallkitConstants {
     const val EXTRA_CALLKIT_AVATAR = "EXTRA_CALLKIT_AVATAR"
     const val EXTRA_CALLKIT_DURATION = "EXTRA_CALLKIT_DURATION"
     const val EXTRA_CALLKIT_TEXT_ACCEPT = "EXTRA_CALLKIT_TEXT_ACCEPT"
-    const val EXTRA_CALLKIT_TEXT_DECLINE = "EXTRA_CALLKIT_TEXT_DECLINE"
 
     const val EXTRA_CALLKIT_MISSED_CALL_ID = "EXTRA_CALLKIT_MISSED_CALL_ID"
     const val EXTRA_CALLKIT_MISSED_CALL_SHOW = "EXTRA_CALLKIT_MISSED_CALL_SHOW"

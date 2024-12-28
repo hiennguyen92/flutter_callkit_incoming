@@ -21,7 +21,6 @@
         android:fitsSystemWindows="false"
         android:orientation="vertical">
 
-
         <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
             android:id="@+id/llBackgroundAnimation"
             android:layout_width="match_parent"
@@ -99,7 +98,6 @@
 
         </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
 
-
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -113,50 +111,6 @@
             android:layout_marginBottom="0dp"
             android:fitsSystemWindows="true"
             android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
-
-                <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
-                    android:layout_width="@dimen/size_button_x2_5"
-                    android:layout_height="@dimen/size_button_x2_5"
-                    app:ripple_amount="4"
-                    app:ripple_radius="@dimen/base_margin_x1_5"
-                    app:ripple_scale="4.5">
-
-                    <ImageView
-                        android:id="@+id/ivDeclineCall"
-                        android:layout_width="@dimen/size_button"
-                        android:layout_height="@dimen/size_button"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/bg_button_decline"
-                        android:padding="@dimen/base_margin_x1_5"
-                        android:src="@drawable/ic_decline"
-                        tools:ignore="ContentDescription" />
-
-                    <TextView
-                        android:id="@+id/tvDecline"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/ivDeclineCall"
-                        android:layout_marginBottom="@dimen/base_margin"
-                        android:gravity="center"
-                        android:text="@string/text_decline"
-                        android:textColor="@color/action_text"
-                        android:textSize="@dimen/size_text_action" />
-
-                </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
-
-            </LinearLayout>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -164,7 +118,6 @@
                 android:orientation="vertical"
                 tools:ignore="UseCompoundDrawables">
 
-
                 <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
                     android:layout_width="@dimen/size_button_x2_5"
                     android:layout_height="@dimen/size_button_x2_5"
@@ -172,28 +125,15 @@
                     app:ripple_radius="@dimen/base_margin_x1_5"
                     app:ripple_scale="4.5">
 
-
-                    <ImageView
-                        android:id="@+id/ivAcceptCall"
-                        android:layout_width="@dimen/size_button"
-                        android:layout_height="@dimen/size_button"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/bg_button_accept"
-                        android:padding="@dimen/base_margin_x1_5"
-                        android:src="@drawable/ic_accept"
-                        tools:ignore="ContentDescription" />
-
                     <TextView
                         android:id="@+id/tvAccept"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_below="@id/ivAcceptCall"
                         android:layout_marginBottom="@dimen/base_margin"
                         android:gravity="center"
                         android:text="@string/text_accept"
                         android:textColor="@color/action_text"
                         android:textSize="@dimen/size_text_action" />
-
 
                 </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
 

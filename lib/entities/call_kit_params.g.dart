@@ -17,7 +17,6 @@ CallKitParams _$CallKitParamsFromJson(Map<String, dynamic> json) =>
       normalHandle: json['normalHandle'] as int?,
       duration: json['duration'] as int?,
       textAccept: json['textAccept'] as String?,
-      textDecline: json['textDecline'] as String?,
       missedCallNotification: json['missedCallNotification'] == null
           ? null
           : NotificationParams.fromJson(
@@ -43,7 +42,6 @@ Map<String, dynamic> _$CallKitParamsToJson(CallKitParams instance) =>
       'normalHandle': instance.normalHandle,
       'duration': instance.duration,
       'textAccept': instance.textAccept,
-      'textDecline': instance.textDecline,
       'missedCallNotification': instance.missedCallNotification?.toJson(),
       'extra': instance.extra,
       'headers': instance.headers,
