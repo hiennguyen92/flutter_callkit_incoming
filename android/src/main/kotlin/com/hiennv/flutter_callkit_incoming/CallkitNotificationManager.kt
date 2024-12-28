@@ -194,27 +194,27 @@ class CallkitNotificationManager(private val context: Context) {
                     )
                     .setBot(data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_BOT, false))
                     .build()
+                val dummyIntent = PendingIntent.getActivity(
+                    context,
+                    0,
+                    Intent(),
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+                    
                 notificationBuilder.setStyle(
                     NotificationCompat.CallStyle.forIncomingCall(
                         person,
-                        getDeclinePendingIntent(notificationId, data),
+                        dummyIntent,
                         getAcceptPendingIntent(notificationId, data),
                     )
                         .setIsVideo(typeCall > 0)
                 )
             } else {
                 notificationBuilder.setContentTitle(caller)
-                val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
-                val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
-                    R.drawable.ic_decline,
-                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline,
-                    getDeclinePendingIntent(notificationId, data)
-                ).build()
-                notificationBuilder.addAction(declineAction)
                 val textAccept = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
                 val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                     R.drawable.ic_accept,
-                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
+                    if (TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept,
                     getAcceptPendingIntent(notificationId, data)
                 ).build()
                 notificationBuilder.addAction(acceptAction)
@@ -237,10 +237,6 @@ class CallkitNotificationManager(private val context: Context) {
                 data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
             )
         }
-        remoteViews.setOnClickPendingIntent(
-            R.id.llDecline,
-            getDeclinePendingIntent(notificationId, data)
-        )
         remoteViews.setOnClickPendingIntent(
             R.id.llAccept,
             getAcceptPendingIntent(notificationId, data)
@@ -491,11 +487,6 @@ class CallkitNotificationManager(private val context: Context) {
             data
         )
         return PendingIntent.getActivity(context, id, intentTransparent, getFlagPendingIntent())
-    }
-
-    private fun getDeclinePendingIntent(id: Int, data: Bundle): PendingIntent {
-        val declineIntent = CallkitIncomingBroadcastReceiver.getIntentDecline(context, data)
-        return PendingIntent.getBroadcast(context, id, declineIntent, getFlagPendingIntent())
     }
 
     private fun getTimeOutPendingIntent(id: Int, data: Bundle): PendingIntent {

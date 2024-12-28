@@ -4,7 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.fasterxml.jackson.core.type.TypeReference
-
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 
 private const val CALLKIT_PREFERENCES_FILE_NAME = "flutter_callkit_incoming"
 private var prefs: SharedPreferences? = null
@@ -15,27 +16,33 @@ private fun initInstance(context: Context) {
     editor = prefs?.edit()
 }
 
+private val objectMapper: ObjectMapper by lazy {
+    ObjectMapper().apply {
+        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    }
+}
 
 fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    val arrayData: ArrayList<Data> = Utils.getGsonInstance()
-        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
+    val arrayData: ArrayList<Data> = objectMapper
+        .readValue(json ?: "[]", object : TypeReference<ArrayList<Data>>() {})
+
     val currentData = arrayData.find { it == data }
-    if(currentData != null) {
+    if (currentData != null) {
         currentData.isAccepted = isAccepted
-    }else {
+    } else {
         arrayData.add(data)
     }
-    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))
+    putString(context, "ACTIVE_CALLS", objectMapper.writeValueAsString(arrayData))
 }
 
 fun removeCall(context: Context?, data: Data) {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    Log.d("JSON", json!!)
-    val arrayData: ArrayList<Data> = Utils.getGsonInstance()
-        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
+    Log.d("JSON", json ?: "No data")
+    val arrayData: ArrayList<Data> = objectMapper
+        .readValue(json ?: "[]", object : TypeReference<ArrayList<Data>>() {})
     arrayData.remove(data)
-    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))
+    putString(context, "ACTIVE_CALLS", objectMapper.writeValueAsString(arrayData))
 }
 
 fun removeAllCalls(context: Context?) {
@@ -45,13 +52,12 @@ fun removeAllCalls(context: Context?) {
 
 fun getDataActiveCalls(context: Context?): ArrayList<Data> {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    return Utils.getGsonInstance()
-        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
+    return objectMapper.readValue(json ?: "[]", object : TypeReference<ArrayList<Data>>() {})
 }
 
 fun getDataActiveCallsForFlutter(context: Context?): ArrayList<Map<String, Any?>> {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    return Utils.getGsonInstance().readValue(json, object : TypeReference<ArrayList<Map<String, Any?>>>() {})
+    return objectMapper.readValue(json ?: "[]", object : TypeReference<ArrayList<Map<String, Any?>>>() {})
 }
 
 fun putString(context: Context?, key: String, value: String?) {
@@ -72,4 +78,16 @@ fun remove(context: Context?, key: String) {
     initInstance(context)
     editor?.remove(key)
     editor?.commit()
+}
+
+fun cleanLegacyData(context: Context?) {
+    val json = getString(context, "ACTIVE_CALLS", "[]")
+    val arrayData: ArrayList<Map<String, Any?>> = objectMapper
+        .readValue(json ?: "[]", object : TypeReference<ArrayList<Map<String, Any?>>>() {})
+
+    val updatedData = arrayData.map { data ->
+        data.filterKeys { it != "textDecline" }
+    }
+
+    putString(context, "ACTIVE_CALLS", objectMapper.writeValueAsString(updatedData))
 }

@@ -141,12 +141,11 @@ class HomePageState extends State<HomePage> {
         type: 0,
         duration: 30000,
         textAccept: 'Accept',
-        textDecline: 'Decline',
         missedCallNotification: const NotificationParams(
           showNotification: true,
           isShowCallback: true,
-          subtitle: 'Missed call',
-          callbackText: 'Call back',
+          subtitle: '',
+          callbackText: '',
         ),
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
         headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
@@ -234,10 +233,6 @@ class HomePageState extends State<HomePage> {
             // TODO: show screen calling in Flutter
             NavigationService.instance
                 .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
-            break;
-          case Event.actionCallDecline:
-            // TODO: declined an incoming call
-            await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
             break;
           case Event.actionCallEnded:
             // TODO: ended an incoming/outgoing call

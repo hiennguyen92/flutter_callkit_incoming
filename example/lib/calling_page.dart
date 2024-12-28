@@ -50,7 +50,6 @@ class CallingPageState extends State<CallingPage> {
   Widget build(BuildContext context) {
     final params = jsonDecode(jsonEncode(
         ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>));
-    print(ModalRoute.of(context)!.settings.arguments);
     calling = CallKitParams.fromJson(params);
 
     var timeDisplay = intToTimeLeft(_start);

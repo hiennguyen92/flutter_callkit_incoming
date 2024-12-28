@@ -38,12 +38,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
             }
 
-        fun getIntentDecline(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
-                action = "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}"
-                putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
-            }
-
         fun getIntentEnded(context: Context, data: Bundle?) =
             Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}"
@@ -113,17 +107,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data, true)
                     addCall(context, Data.fromBundle(data), true)
-                } catch (error: Exception) {
-                    Log.e(TAG, null, error)
-                }
-            }
-
-            "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
-                try {
-                    sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
-                    context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data, false)
-                    removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -209,7 +192,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 "type" to data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, 0),
                 "duration" to data.getLong(CallkitConstants.EXTRA_CALLKIT_DURATION, 0L),
                 "textAccept" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, ""),
-                "textDecline" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, ""),
                 "extra" to data.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA)!!,
                 "missedCallNotification" to notification,
                 "android" to android

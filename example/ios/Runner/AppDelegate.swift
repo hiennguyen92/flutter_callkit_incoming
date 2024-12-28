@@ -106,23 +106,6 @@ import flutter_callkit_incoming
         }
     }
     
-    // Func Call API for Decline
-    func onDecline(_ call: Call, _ action: CXEndCallAction) {
-        let json = ["action": "DECLINE", "data": call.data.toJSON()] as [String: Any]
-        print("LOG: onDecline")
-        self.performRequest(parameters: json) { result in
-            switch result {
-            case .success(let data):
-                print("Received data: \(data)")
-                //Make sure call action.fulfill() when you are done
-                action.fulfill()
-
-            case .failure(let error):
-                print("Error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
     // Func Call API for End
     func onEnd(_ call: Call, _ action: CXEndCallAction) {
         let json = ["action": "END", "data": call.data.toJSON()] as [String: Any]

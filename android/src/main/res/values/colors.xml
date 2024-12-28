@@ -3,8 +3,6 @@
 
     <color name="accept">#1976D2</color>
     <color name="accept_ripple">#1976D2</color>
-    <color name="decline">#F44336</color>
-    <color name="decline_ripple">#FB8D85</color>
 
     <color name="action_text">#FFFFFF</color>
     <color name="ripple_main_color">#80ffffff</color>

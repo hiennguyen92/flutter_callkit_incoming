@@ -25,12 +25,11 @@ Future<void> showCallkitIncoming(String uuid) async {
     type: 0,
     duration: 30000,
     textAccept: 'Accept',
-    textDecline: 'Decline',
     missedCallNotification: const NotificationParams(
       showNotification: true,
       isShowCallback: true,
-      subtitle: 'Missed call',
-      callbackText: 'Call back',
+      subtitle: 'Informacion',
+      callbackText: '',
     ),
     extra: <String, dynamic>{'userId': '1a2b3c4d'},
     headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
@@ -38,10 +37,9 @@ Future<void> showCallkitIncoming(String uuid) async {
       isCustomNotification: true,
       isShowLogo: false,
       ringtonePath: 'system_ringtone_default',
-      backgroundColor: '#0955fa',
-      backgroundUrl: 'assets/test.png',
-      actionColor: '#4CAF50',
-      textColor: '#ffffff',
+      backgroundColor: '#FFFFFF',
+      actionColor: '#1976D2',
+      textColor: '#000000',
     ),
     ios: const IOSParams(
       iconName: 'CallKitLogo',
@@ -60,6 +58,7 @@ Future<void> showCallkitIncoming(String uuid) async {
       ringtonePath: 'system_ringtone_default',
     ),
   );
+
   await FlutterCallkitIncoming.showCallkitIncoming(params);
 }
 
