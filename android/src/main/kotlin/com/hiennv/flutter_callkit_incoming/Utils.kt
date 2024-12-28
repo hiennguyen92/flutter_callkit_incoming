@@ -3,23 +3,11 @@ package com.hiennv.flutter_callkit_incoming
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import com.fasterxml.jackson.databind.ObjectMapper
 import java.lang.ref.WeakReference
-
 
 class Utils {
 
     companion object {
-
-        private var mapper: ObjectMapper? = null
-
-
-        fun getGsonInstance(): ObjectMapper {
-            if (mapper == null) {
-                mapper = ObjectMapper()
-            }
-            return mapper!!
-        }
 
         @JvmStatic
         fun dpToPx(dp: Float): Float {
@@ -44,7 +32,7 @@ class Utils {
         fun getNavigationBarHeight(context: Context): Int {
             val resources = context.resources
             val id = resources.getIdentifier(
-                    "navigation_bar_height", "dimen", "android"
+                "navigation_bar_height", "dimen", "android"
             )
             return if (id > 0) {
                 resources.getDimensionPixelSize(id)
@@ -54,7 +42,7 @@ class Utils {
         fun getStatusBarHeight(context: Context): Int {
             val resources = context.resources
             val id: Int =
-                    resources.getIdentifier("status_bar_height", "dimen", "android")
+                resources.getIdentifier("status_bar_height", "dimen", "android")
             return if (id > 0) {
                 resources.getDimensionPixelSize(id)
             } else 0

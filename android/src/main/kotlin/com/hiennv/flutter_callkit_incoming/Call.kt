@@ -1,90 +1,53 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.os.Bundle
-import com.fasterxml.jackson.annotation.JsonProperty
 
 @Suppress("UNCHECKED_CAST")
 data class Data(val args: Map<String, Any?>) {
 
     constructor() : this(emptyMap())
 
-    @JsonProperty("id")
     var id: String = (args["id"] as? String) ?: ""
-    @JsonProperty("uuid")
     var uuid: String = (args["id"] as? String) ?: ""
-    @JsonProperty("nameCaller")
     var nameCaller: String = (args["nameCaller"] as? String) ?: ""
-    @JsonProperty("appName")
     var appName: String = (args["appName"] as? String) ?: ""
-    @JsonProperty("handle")
     var handle: String = (args["handle"] as? String) ?: ""
-    @JsonProperty("avatar")
     var avatar: String = (args["avatar"] as? String) ?: ""
-    @JsonProperty("type")
     var type: Int = (args["type"] as? Int) ?: 0
-    @JsonProperty("duration")
     var duration: Long = (args["duration"] as? Long) ?: ((args["duration"] as? Int)?.toLong() ?: 30000L)
-    @JsonProperty("textAccept")
     var textAccept: String = (args["textAccept"] as? String) ?: ""
-    @JsonProperty("extra")
     var extra: HashMap<String, Any?> =
         (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
-    @JsonProperty("headers")
     var headers: HashMap<String, Any?> =
         (args["headers"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
-    @JsonProperty("from")
     var from: String = ""
 
-    @JsonProperty("isCustomNotification")
     var isCustomNotification: Boolean = false
-    @JsonProperty("isCustomSmallExNotification")
     var isCustomSmallExNotification: Boolean = false
-    @JsonProperty("isShowLogo")
     var isShowLogo: Boolean = false
-    @JsonProperty("isShowCallID")
     var isShowCallID: Boolean = false
-    @JsonProperty("ringtonePath")
     var ringtonePath: String
-    @JsonProperty("backgroundColor")
     var backgroundColor: String
-    @JsonProperty("backgroundUrl")
     var backgroundUrl: String
-    @JsonProperty("textColor")
     var textColor: String
-    @JsonProperty("actionColor")
     var actionColor: String
-    @JsonProperty("incomingCallNotificationChannelName")
     var incomingCallNotificationChannelName: String? = null
-    @JsonProperty("missedCallNotificationChannelName")
     var missedCallNotificationChannelName: String? = null
-    @JsonProperty("missedNotificationId")
     var missedNotificationId: Int? = null
-    @JsonProperty("isShowMissedCallNotification")
     var isShowMissedCallNotification: Boolean = true
-    @JsonProperty("missedNotificationCount")
     var missedNotificationCount: Int = 1
-    @JsonProperty("missedNotificationSubtitle")
     var missedNotificationSubtitle: String? = null
-    @JsonProperty("missedNotificationCallbackText")
     var missedNotificationCallbackText: String? = null
-    @JsonProperty("isShowCallback")
     var isShowCallback: Boolean = true
-    @JsonProperty("isAccepted")
     var isAccepted: Boolean = false
 
-    @JsonProperty("isOnHold")
     var isOnHold: Boolean = (args["isOnHold"] as? Boolean) ?: false
-    @JsonProperty("audioRoute")
     var audioRoute: Int = (args["audioRoute"] as? Int) ?: 1
-    @JsonProperty("isMuted")
     var isMuted: Boolean = (args["isMuted"] as? Boolean) ?: false
 
-    @JsonProperty("isShowFullLockedScreen")
     var isShowFullLockedScreen: Boolean = true
 
-    @JsonProperty("isImportant")
     var isImportant: Boolean = false
-    @JsonProperty("isBot")
     var isBot: Boolean = false
 
     init {
@@ -135,7 +98,6 @@ data class Data(val args: Map<String, Any?>) {
         val e: Data = other as Data
         return this.id == e.id
     }
-
 
     fun toBundle(): Bundle {
         val bundle = Bundle()
@@ -319,5 +281,4 @@ data class Data(val args: Map<String, Any?>) {
             return data
         }
     }
-
 }

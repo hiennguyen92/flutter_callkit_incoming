@@ -3,7 +3,8 @@ package com.hiennv.flutter_callkit_incoming
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import com.fasterxml.jackson.core.type.TypeReference
+import org.json.JSONArray
+import org.json.JSONObject
 
 private const val CALLKIT_PREFERENCES_FILE_NAME = "flutter_callkit_incoming"
 private var prefs: SharedPreferences? = null
@@ -16,24 +17,42 @@ private fun initInstance(context: Context) {
 
 fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    val arrayData: ArrayList<Data> = Utils.getGsonInstance()
-        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
-    val currentData = arrayData.find { it == data }
-    if(currentData != null) {
-        currentData.isAccepted = isAccepted
-    }else {
-        arrayData.add(data)
+    val arrayData = JSONArray(json)
+    var found = false
+
+    for (i in 0 until arrayData.length()) {
+        val item = arrayData.getJSONObject(i)
+        if (item.getString("id") == data.id) {
+            item.put("isAccepted", isAccepted)
+            found = true
+            break
+        }
     }
-    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))
+
+    if (!found) {
+        val newData = JSONObject()
+        newData.put("id", data.id)
+        newData.put("isAccepted", isAccepted)
+        arrayData.put(newData)
+    }
+
+    putString(context, "ACTIVE_CALLS", arrayData.toString())
 }
 
 fun removeCall(context: Context?, data: Data) {
     val json = getString(context, "ACTIVE_CALLS", "[]")
     Log.d("JSON", json!!)
-    val arrayData: ArrayList<Data> = Utils.getGsonInstance()
-        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
-    arrayData.remove(data)
-    putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))
+    val arrayData = JSONArray(json)
+    val filteredArray = JSONArray()
+
+    for (i in 0 until arrayData.length()) {
+        val item = arrayData.getJSONObject(i)
+        if (item.getString("id") != data.id) {
+            filteredArray.put(item)
+        }
+    }
+
+    putString(context, "ACTIVE_CALLS", filteredArray.toString())
 }
 
 fun removeAllCalls(context: Context?) {
@@ -43,13 +62,38 @@ fun removeAllCalls(context: Context?) {
 
 fun getDataActiveCalls(context: Context?): ArrayList<Data> {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    return Utils.getGsonInstance()
-        .readValue(json, object : TypeReference<ArrayList<Data>>() {})
+    val arrayData = JSONArray(json)
+    val result = ArrayList<Data>()
+
+    for (i in 0 until arrayData.length()) {
+        val item = arrayData.getJSONObject(i)
+        val data = Data(
+            mapOf(
+                "id" to item.getString("id"),
+                "isAccepted" to item.optBoolean("isAccepted", false)
+            )
+        )
+        result.add(data)
+    }
+
+    return result
 }
 
 fun getDataActiveCallsForFlutter(context: Context?): ArrayList<Map<String, Any?>> {
     val json = getString(context, "ACTIVE_CALLS", "[]")
-    return Utils.getGsonInstance().readValue(json, object : TypeReference<ArrayList<Map<String, Any?>>>() {})
+    val arrayData = JSONArray(json)
+    val result = ArrayList<Map<String, Any?>>()
+
+    for (i in 0 until arrayData.length()) {
+        val item = arrayData.getJSONObject(i)
+        val map = mapOf(
+            "id" to item.getString("id"),
+            "isAccepted" to item.optBoolean("isAccepted", false)
+        )
+        result.add(map)
+    }
+
+    return result
 }
 
 fun putString(context: Context?, key: String, value: String?) {
