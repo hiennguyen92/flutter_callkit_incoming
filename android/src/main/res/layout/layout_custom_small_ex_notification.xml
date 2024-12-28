@@ -6,23 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center_vertical">
 
-        <ImageView
-            android:id="@+id/ivAvatar"
-            android:layout_width="@dimen/base_margin_x4"
-            android:layout_height="@dimen/base_margin_x4"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_default_avatar"
-            android:visibility="invisible" />
-        <LinearLayout
-            android:layout_width="@dimen/base_margin_half"
-            android:layout_height="match_parent"
-            android:orientation="vertical" />
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -35,7 +25,6 @@
                 android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:ellipsize="end"
-
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
                 android:textSize="@dimen/size_text_action" />
 
@@ -45,7 +34,6 @@
                 android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:ellipsize="end"
-
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
                 android:textSize="@dimen/size_text_action" />
         </LinearLayout>
@@ -71,11 +59,9 @@
                     style="@style/Widget.Compat.NotificationActionText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:layout_marginStart="@dimen/base_margin_half"
                     android:layout_marginEnd="@dimen/base_margin_half"
                     android:gravity="center"
-
                     android:text="@string/text_accept"
                     android:textAllCaps="false"
                     android:textColor="@color/action_text"
@@ -83,5 +69,4 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
 </LinearLayout>

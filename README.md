@@ -264,9 +264,6 @@ Our top sponsors are shown below!
           case Event.actionCallTimeout:
             // TODO: missed an incoming call
             break;
-          case Event.actionCallCallback:
-            // TODO: only Android - click action `Call back` from missed call notification
-            break;
           case Event.actionCallToggleHold:
             // TODO: only iOS
             break;

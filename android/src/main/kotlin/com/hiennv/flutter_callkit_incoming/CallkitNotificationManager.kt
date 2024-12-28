@@ -114,6 +114,7 @@ class CallkitNotificationManager(private val context: Context) {
         notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         notificationBuilder.setOngoing(true)
         notificationBuilder.setWhen(0)
+        notificationBuilder.setSmallIcon(R.drawable.app_icon)
         notificationBuilder.setTimeoutAfter(
             data.getLong(
                 CallkitConstants.EXTRA_CALLKIT_DURATION,
@@ -128,15 +129,6 @@ class CallkitNotificationManager(private val context: Context) {
         notificationBuilder.setContentIntent(getActivityPendingIntent(notificationId, data))
         notificationBuilder.setDeleteIntent(getTimeOutPendingIntent(notificationId, data))
         val typeCall = data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
-        var smallIcon = context.applicationInfo.icon
-        if (typeCall > 0) {
-            smallIcon = R.drawable.ic_video
-        } else {
-            if (smallIcon >= 0) {
-                smallIcon = R.drawable.ic_accept
-            }
-        }
-        notificationBuilder.setSmallIcon(smallIcon)
         val actionColor = data.getString(CallkitConstants.EXTRA_CALLKIT_ACTION_COLOR, "#4CAF50")
         try {
             notificationBuilder.color = Color.parseColor(actionColor)
@@ -186,37 +178,15 @@ class CallkitNotificationManager(private val context: Context) {
                     .into(targetLoadAvatarDefault)
             }
             val caller = data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val person = Person.Builder()
-                    .setName(caller)
-                    .setImportant(
-                        data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_IMPORTANT, false)
-                    )
-                    .setBot(data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_BOT, false))
-                    .build()
-                val dummyIntent = PendingIntent.getActivity(
-                    context,
-                    0,
-                    Intent(),
-                    PendingIntent.FLAG_IMMUTABLE
-                )
-                    
-                notificationBuilder.setStyle(
-                    NotificationCompat.CallStyle.forIncomingCall(
-                        person,
-                        dummyIntent,
-                        getAcceptPendingIntent(notificationId, data),
-                    )
-                        .setIsVideo(typeCall > 0)
-                )
-            } else {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
                 notificationBuilder.setContentTitle(caller)
                 val textAccept = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
                 val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
-                    R.drawable.ic_accept,
+                    R.drawable.app_icon,
                     if (TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept,
                     getAcceptPendingIntent(notificationId, data)
                 ).build()
+
                 notificationBuilder.addAction(acceptAction)
             }
         }
@@ -273,15 +243,6 @@ class CallkitNotificationManager(private val context: Context) {
             ),
         )
         val missedCallSound: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val typeCall = data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
-        var smallIcon = context.applicationInfo.icon
-        if (typeCall > 0) {
-            smallIcon = R.drawable.ic_video_missed
-        } else {
-            if (smallIcon >= 0) {
-                smallIcon = R.drawable.ic_call_missed
-            }
-        }
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_MISSED)
         notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_MISSED)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -291,7 +252,7 @@ class CallkitNotificationManager(private val context: Context) {
         }
         val textMissedCall = data.getString(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_SUBTITLE, "")
         notificationBuilder.setSubText(if (TextUtils.isEmpty(textMissedCall)) context.getString(R.string.text_missed_call) else textMissedCall)
-        notificationBuilder.setSmallIcon(smallIcon)
+        notificationBuilder.setSmallIcon(R.drawable.app_icon)
         val isCustomNotification =
             data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
         val count = data.getInt(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_COUNT, 1)
@@ -313,25 +274,6 @@ class CallkitNotificationManager(private val context: Context) {
                     data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
                 )
             }
-            notificationViews?.setOnClickPendingIntent(
-                R.id.llCallback,
-                getCallbackPendingIntent(notificationId, data)
-            )
-            val isShowCallback = data.getBoolean(
-                CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_CALLBACK_SHOW,
-                true
-            )
-            notificationViews?.setViewVisibility(
-                R.id.llCallback,
-                if (isShowCallback) View.VISIBLE else View.GONE
-            )
-            val textCallback =
-                data.getString(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_CALLBACK_TEXT, "")
-            notificationViews?.setTextViewText(
-                R.id.tvCallback,
-                if (TextUtils.isEmpty(textCallback)) context.getString(R.string.text_call_back) else textCallback
-            )
-
             val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
                 val headers =
@@ -372,7 +314,7 @@ class CallkitNotificationManager(private val context: Context) {
                 val textCallback =
                     data.getString(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_CALLBACK_TEXT, "")
                 val callbackAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
-                    R.drawable.ic_accept,
+                    R.drawable.app_icon,
                     if (TextUtils.isEmpty(textCallback)) context.getString(R.string.text_call_back) else textCallback,
                     getCallbackPendingIntent(notificationId, data)
                 ).build()
