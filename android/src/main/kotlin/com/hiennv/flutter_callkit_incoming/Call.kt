@@ -8,7 +8,6 @@ data class Data(val args: Map<String, Any?>) {
 
     constructor() : this(emptyMap())
 
-
     @JsonProperty("id")
     var id: String = (args["id"] as? String) ?: ""
     @JsonProperty("uuid")
