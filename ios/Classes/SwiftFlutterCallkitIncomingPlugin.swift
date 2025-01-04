@@ -537,6 +537,18 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
     }
     
+//    private func checkUnlockedAndFulfill(action: CXAnswerCallAction, counter: Int) {
+//        if UIApplication.shared.isProtectedDataAvailable {
+//            action.fulfill()
+//        } else if counter > 180 { // fail if waiting for more then 3 minutes
+//            action.fail()
+//        } else {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                self.checkUnlockedAndFulfill(action: action, counter: counter + 1)
+//            }
+//        }
+//    }
+    
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
@@ -662,15 +674,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             print("Call is on hold")
             return
         }
-        self.outgoingCall?.endCall()
-        if(self.outgoingCall != nil){
-            self.outgoingCall = nil
-        }
-        self.answerCall?.endCall()
-        if(self.answerCall != nil){
-            self.answerCall = nil
-        }
-        self.callManager.removeAllCalls()
         
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": false ])
     }
