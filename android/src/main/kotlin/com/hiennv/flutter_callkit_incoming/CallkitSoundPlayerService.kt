@@ -128,44 +128,20 @@ class CallkitSoundPlayerService : Service() {
         mediaPlayer?.setDataSource(applicationContext, uri)
     }
 
-    private fun getRingtoneUri(fileName: String) = try {
-        if (TextUtils.isEmpty(fileName)) {
-            RingtoneManager.getActualDefaultRingtoneUri(
-                this@CallkitSoundPlayerService,
-                RingtoneManager.TYPE_RINGTONE
-            )
-        }
-        val resId = resources.getIdentifier(fileName, "raw", packageName)
-        if (resId != 0) {
-            Uri.parse("android.resource://${packageName}/$resId")
-        } else {
-            if (fileName.equals("system_ringtone_default", true)) {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
+    private fun getRingtoneUri(fileName: String): Uri? {
+        return try {
+            if (TextUtils.isEmpty(fileName)) {
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
             } else {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
-            }
-        }
-    } catch (e: Exception) {
-        try {
-            if (fileName.equals("system_ringtone_default", true)) {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
-            } else {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
+                val resId = resources.getIdentifier(fileName, "raw", packageName)
+                if (resId != 0) {
+                    Uri.parse("android.resource://${packageName}/$resId")
+                } else {
+                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+                }
             }
         } catch (e: Exception) {
-            null
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
         }
     }
 }
