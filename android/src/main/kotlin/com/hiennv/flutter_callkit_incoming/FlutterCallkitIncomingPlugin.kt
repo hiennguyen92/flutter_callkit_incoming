@@ -148,6 +148,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             when (call.method) {
                 "showCallkitIncoming" -> {
                     val data = Data(call.arguments() ?: HashMap())
+                    
                     data.from = "notification"
                     //send BroadcastReceiver
                     context?.sendBroadcast(
