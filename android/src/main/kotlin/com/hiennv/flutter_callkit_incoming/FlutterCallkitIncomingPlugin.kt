@@ -51,6 +51,14 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                         Log.d(EXTRA_CALLKIT_CALL_DATA, e.toString())
                     }
                 }
+            } else if (event == CallkitConstants.ACTION_CALL_SNOOZE) {
+                for ((name, channel) in methodChannels) {
+                    try {
+                        channel.invokeMethod("CALL_SNOOZED_CUSTOM", "")
+                    } catch (e: Exception) {
+                        Log.d(EXTRA_CALLKIT_CALL_DATA, e.toString())
+                    }
+                }
             }
         }
 

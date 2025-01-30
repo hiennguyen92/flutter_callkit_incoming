@@ -24,6 +24,7 @@ class FlutterCallkitIncoming {
   /// Event.ACTION_CALL_START - Started an outgoing call
   /// Event.ACTION_CALL_ACCEPT - Accepted an incoming call
   /// Event.ACTION_CALL_DECLINE - Declined an incoming call
+  /// Event.ACTION_CALL_SNOOZE - Snoozed an incoming call
   /// Event.ACTION_CALL_ENDED - Ended an incoming/outgoing call
   /// Event.ACTION_CALL_TIMEOUT - Missed an incoming call
   /// Event.ACTION_CALL_CALLBACK - only Android (click action `Call back` from missed call notification)
@@ -44,6 +45,11 @@ class FlutterCallkitIncoming {
     _channel.setMethodCallHandler((call) async {
       if (call.method == 'CALL_DECLINED_CUSTOM') {
         params.onDecline?.call(call.arguments);
+      }
+    });
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'CALL_SNOOZED_CUSTOM') {
+        params.onSnooze?.call(call.arguments);
       }
     });
   }

@@ -204,6 +204,13 @@ class CallkitNotificationManager(private val context: Context) {
                 )
             } else {
                 notificationBuilder.setContentTitle(caller)
+                val textSnooze = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_SNOOZE, "")
+                val snoozeAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
+                    R.drawable.ic_moon_stars,
+                    if (TextUtils.isEmpty(textSnooze)) context.getString(R.string.text_snooze) else textSnooze,
+                    getSnoozePendingIntent(notificationId, data)
+                ).build()
+                notificationBuilder.addAction(snoozeAction)
                 val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
                 val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                     R.drawable.ic_decline,
@@ -503,6 +510,11 @@ class CallkitNotificationManager(private val context: Context) {
         return PendingIntent.getBroadcast(context, id, declineIntent, getFlagPendingIntent())
     }
 
+    private fun getSnoozePendingIntent(id: Int, data: Bundle): PendingIntent {
+        val snoozeIntent = CallkitIncomingBroadcastReceiver.getIntentSnooze(context, data)
+        return PendingIntent.getBroadcast(context, id, snoozeIntent, getFlagPendingIntent())
+    }
+
     private fun getTimeOutPendingIntent(id: Int, data: Bundle): PendingIntent {
         val timeOutIntent = CallkitIncomingBroadcastReceiver.getIntentTimeout(context, data)
         return PendingIntent.getBroadcast(context, id, timeOutIntent, getFlagPendingIntent())
@@ -572,8 +584,8 @@ class CallkitNotificationManager(private val context: Context) {
 
     fun requestFullIntentPermission(activity: Activity?) {
         if (Build.VERSION.SDK_INT > 33) {
-           val intent = Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
-                data =  Uri.fromParts("package", activity?.packageName, null)
+            val intent = Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
+                data = Uri.fromParts("package", activity?.packageName, null)
             }
             activity?.startActivity(intent)
         }

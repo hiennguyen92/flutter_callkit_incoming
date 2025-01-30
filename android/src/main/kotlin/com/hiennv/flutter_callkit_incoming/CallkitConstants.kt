@@ -2,25 +2,28 @@ package com.hiennv.flutter_callkit_incoming
 
 object CallkitConstants {
     const val ACTION_CALL_INCOMING =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING"
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING"
     const val ACTION_CALL_START = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_START"
     const val ACTION_CALL_ACCEPT =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT"
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT"
     const val ACTION_CALL_DECLINE =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE"
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE"
+    const val ACTION_CALL_SNOOZE =
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_SNOOZE"
     const val ACTION_CALL_ENDED =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED"
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED"
     const val ACTION_CALL_TOGGLE_MUTE =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE"
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE"
     const val ACTION_CALL_TOGGLE_HOLD =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD"
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD"
     const val ACTION_CALL_TIMEOUT =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT"
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT"
     const val ACTION_CALL_CALLBACK =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK"
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK"
     const val ACTION_CALL_CUSTOM =
-            "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CUSTOM"
-    const val ACTION_CALL_AUDIO_STATE_CHANGE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_AUDIO_STATE_CHANGE"
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CUSTOM"
+    const val ACTION_CALL_AUDIO_STATE_CHANGE =
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_AUDIO_STATE_CHANGE"
     const val ACTION_CALL_HELD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_HELD"
     const val ACTION_CALL_UNHELD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_UNHELD"
 
@@ -36,6 +39,7 @@ object CallkitConstants {
     const val EXTRA_CALLKIT_DURATION = "EXTRA_CALLKIT_DURATION"
     const val EXTRA_CALLKIT_TEXT_ACCEPT = "EXTRA_CALLKIT_TEXT_ACCEPT"
     const val EXTRA_CALLKIT_TEXT_DECLINE = "EXTRA_CALLKIT_TEXT_DECLINE"
+    const val EXTRA_CALLKIT_TEXT_SNOOZE = "EXTRA_CALLKIT_TEXT_SNOOZE"
 
     const val EXTRA_CALLKIT_MISSED_CALL_ID = "EXTRA_CALLKIT_MISSED_CALL_ID"
     const val EXTRA_CALLKIT_MISSED_CALL_SHOW = "EXTRA_CALLKIT_MISSED_CALL_SHOW"
@@ -43,13 +47,13 @@ object CallkitConstants {
     const val EXTRA_CALLKIT_MISSED_CALL_SUBTITLE = "EXTRA_CALLKIT_MISSED_CALL_SUBTITLE"
     const val EXTRA_CALLKIT_MISSED_CALL_CALLBACK_SHOW = "EXTRA_CALLKIT_MISSED_CALL_CALLBACK_SHOW"
     const val EXTRA_CALLKIT_MISSED_CALL_CALLBACK_TEXT =
-            "EXTRA_CALLKIT_MISSED_CALL_CALLBACK_TEXT"
+        "EXTRA_CALLKIT_MISSED_CALL_CALLBACK_TEXT"
 
     const val EXTRA_CALLKIT_EXTRA = "EXTRA_CALLKIT_EXTRA"
     const val EXTRA_CALLKIT_HEADERS = "EXTRA_CALLKIT_HEADERS"
     const val EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION = "EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION"
     const val EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION =
-            "EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION"
+        "EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION"
     const val EXTRA_CALLKIT_IS_SHOW_LOGO = "EXTRA_CALLKIT_IS_SHOW_LOGO"
     const val EXTRA_CALLKIT_IS_SHOW_CALL_ID = "EXTRA_CALLKIT_IS_SHOW_CALL_ID"
     const val EXTRA_CALLKIT_RINGTONE_PATH = "EXTRA_CALLKIT_RINGTONE_PATH"
@@ -58,9 +62,9 @@ object CallkitConstants {
     const val EXTRA_CALLKIT_ACTION_COLOR = "EXTRA_CALLKIT_ACTION_COLOR"
     const val EXTRA_CALLKIT_TEXT_COLOR = "EXTRA_CALLKIT_TEXT_COLOR"
     const val EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME =
-            "EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME"
+        "EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME"
     const val EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME =
-            "EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME"
+        "EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME"
 
     const val EXTRA_CALLKIT_ACTION_FROM = "EXTRA_CALLKIT_ACTION_FROM"
 
