@@ -32,11 +32,17 @@ class TransparentActivity : Activity() {
 
         val data = intent.getBundleExtra("data")
 
-        val broadcastIntent = CallkitIncomingBroadcastReceiver.getIntent(this, intent.action!!, data)
+        val broadcastIntent =
+            CallkitIncomingBroadcastReceiver.getIntent(this, intent.action!!, data)
         broadcastIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
         sendBroadcast(broadcastIntent)
 
-        val activityIntent = AppUtils.getAppIntent(this, intent.action, data)
+        val activityIntent = AppUtils.getAppIntent(this, intent.action, data)?.apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
         startActivity(activityIntent)
 
         finish()

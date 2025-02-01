@@ -146,6 +146,7 @@
             android:src="@drawable/ic_moon_stars" />
 
         <TextView
+            android:id="@+id/tvSnooze"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

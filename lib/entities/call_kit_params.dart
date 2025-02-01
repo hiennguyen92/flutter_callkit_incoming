@@ -20,6 +20,7 @@ class CallKitParams {
     this.duration,
     this.textAccept,
     this.textDecline,
+    this.textSnooze,
     this.missedCallNotification,
     this.extra,
     this.headers,
@@ -39,6 +40,7 @@ class CallKitParams {
   final int? duration;
   final String? textAccept;
   final String? textDecline;
+  final String? textSnooze;
   final NotificationParams? missedCallNotification;
   final Map<String, dynamic>? extra;
   final Map<String, dynamic>? headers;

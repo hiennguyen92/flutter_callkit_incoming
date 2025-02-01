@@ -29,6 +29,8 @@ data class Data(val args: Map<String, Any?>) {
     var textAccept: String = (args["textAccept"] as? String) ?: ""
     @JsonProperty("textDecline")
     var textDecline: String = (args["textDecline"] as? String) ?: ""
+    @JsonProperty("textSnooze")
+    var textSnooze: String = (args["textSnooze"] as? String) ?: ""
     @JsonProperty("extra")
     var extra: HashMap<String, Any?> =
         (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
@@ -150,6 +152,7 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putLong(CallkitConstants.EXTRA_CALLKIT_DURATION, duration)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, textAccept)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, textDecline)
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_TEXT_SNOOZE, textSnooze)
 
         missedNotificationId?.let {
             bundle.putInt(
@@ -252,6 +255,8 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
             data.textDecline =
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
+            data.textSnooze =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_SNOOZE, "")
             data.isImportant =
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_IMPORTANT, false)
             data.isBot =

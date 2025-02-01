@@ -77,6 +77,7 @@ class CallkitIncomingActivity : Activity() {
     private lateinit var tvDecline: TextView
 
     private lateinit var llSnooze: LinearLayout
+    private lateinit var tvSnooze: TextView
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -208,10 +209,19 @@ class CallkitIncomingActivity : Activity() {
         val textDecline = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
         tvDecline.text =
             if (TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
+        val textSnooze = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_SNOOZE, "")
+
+        if (TextUtils.isEmpty(textSnooze)) {
+            llSnooze.visibility = View.GONE
+        } else {
+            llSnooze.visibility = View.VISIBLE
+            tvSnooze.text = textSnooze
+        }
 
         try {
             tvAccept.setTextColor(Color.parseColor(textColor))
             tvDecline.setTextColor(Color.parseColor(textColor))
+            tvSnooze.setTextColor(Color.parseColor(textColor))
         } catch (error: Exception) {
         }
 
@@ -266,6 +276,7 @@ class CallkitIncomingActivity : Activity() {
         ivDeclineCall = findViewById(R.id.ivDeclineCall)
         tvDecline = findViewById(R.id.tvDecline)
         llSnooze = findViewById(R.id.llSnooze)
+        tvSnooze = findViewById(R.id.tvSnooze)
         animateAcceptCall()
 
         ivAcceptCall.setOnClickListener {
