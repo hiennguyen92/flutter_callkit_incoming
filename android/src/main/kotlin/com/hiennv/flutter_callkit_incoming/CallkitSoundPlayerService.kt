@@ -8,8 +8,14 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.IBinder
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.text.TextUtils
+import java.io.File
 
 class CallkitSoundPlayerService : Service() {
 
@@ -27,7 +33,7 @@ class CallkitSoundPlayerService : Service() {
         this.prepare()
         this.playSound(intent)
         this.playVibrator()
-        return START_STICKY;
+        return START_STICKY
     }
 
     override fun onDestroy() {
@@ -58,6 +64,7 @@ class CallkitSoundPlayerService : Service() {
         when (audioManager?.ringerMode) {
             AudioManager.RINGER_MODE_SILENT -> {
             }
+
             else -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     vibrator?.vibrate(
@@ -78,18 +85,36 @@ class CallkitSoundPlayerService : Service() {
         val sound = this.data?.getString(
             CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH,
             ""
-        )
-        var uri = sound?.let { getRingtoneUri(it) }
+        ) ?: ""
+        var uri: Uri? = null
+
+        // Check if the sound path is valid and the file exists
+        if (sound.isNotEmpty()) {
+            val file = File(sound)
+            if (file.exists()) {
+                uri = Uri.fromFile(file)
+            } else {
+                // Fallback to raw resource or default ringtone
+                uri = getRingtoneUri(sound)
+            }
+        } else {
+            // Use default if no path is provided
+            uri = getRingtoneUri(sound)
+        }
+
+        // Ensure URI is valid, fallback to default if necessary
         if (uri == null) {
             uri = RingtoneManager.getActualDefaultRingtoneUri(
                 this@CallkitSoundPlayerService,
                 RingtoneManager.TYPE_RINGTONE
             )
         }
+
         try {
             mediaPlayer(uri!!)
         } catch (e: Exception) {
             try {
+                // Fallback to default ringtone if custom URI fails
                 uri = getRingtoneUri("ringtone_default")
                 mediaPlayer(uri!!)
             } catch (e2: Exception) {

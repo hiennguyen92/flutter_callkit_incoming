@@ -45,10 +45,7 @@ class FlutterCallkitIncoming {
     _channel.setMethodCallHandler((call) async {
       if (call.method == 'CALL_DECLINED_CUSTOM') {
         params.onDecline?.call(call.arguments);
-      }
-    });
-    _channel.setMethodCallHandler((call) async {
-      if (call.method == 'CALL_SNOOZED_CUSTOM') {
+      } else if (call.method == 'CALL_SNOOZED_CUSTOM') {
         params.onSnooze?.call(call.arguments);
       }
     });
