@@ -1,3 +1,6 @@
+## 2.5.1
+* Fix issue security Android, thanks @datpt11 https://github.com/hiennguyen92/flutter_callkit_incoming/issues/651
+
 ## 2.5.0
 * update jvmToolchain(17) for Android
 
