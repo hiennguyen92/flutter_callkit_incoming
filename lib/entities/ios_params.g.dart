@@ -10,8 +10,9 @@ IOSParams _$IOSParamsFromJson(Map<String, dynamic> json) => IOSParams(
       iconName: json['iconName'] as String?,
       handleType: json['handleType'] as String?,
       supportsVideo: json['supportsVideo'] as bool?,
-      maximumCallGroups: json['maximumCallGroups'] as int?,
-      maximumCallsPerCallGroup: json['maximumCallsPerCallGroup'] as int?,
+      maximumCallGroups: (json['maximumCallGroups'] as num?)?.toInt(),
+      maximumCallsPerCallGroup:
+          (json['maximumCallsPerCallGroup'] as num?)?.toInt(),
       audioSessionMode: json['audioSessionMode'] as String?,
       audioSessionActive: json['audioSessionActive'] as bool?,
       audioSessionPreferredSampleRate:

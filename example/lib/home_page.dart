@@ -50,8 +50,17 @@ class HomePageState extends State<HomePage> {
               children: [
                 ElevatedButton.icon(
                   icon: const Icon(Icons.call),
-                  label: Text('Make fake call incoming'),
+                  label: Text('Notification Incoming Call'),
                   onPressed: makeFakeCallInComing,
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.call),
+                  label: Text('Full screen Incoming Call'),
+                  onPressed: () {
+                    makeFakeCallInComing(
+                      fullScreen: true,
+                    );
+                  },
                 ),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.call_end),
@@ -128,7 +137,7 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> makeFakeCallInComing() async {
+  Future<void> makeFakeCallInComing({bool fullScreen = false}) async {
     await Future.delayed(const Duration(seconds: 10), () async {
       _currentUuid = _uuid.v4();
 
@@ -150,7 +159,7 @@ class HomePageState extends State<HomePage> {
         ),
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
         headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
-        android: const AndroidParams(
+        android: AndroidParams(
           isCustomNotification: true,
           isShowLogo: false,
           ringtonePath: 'system_ringtone_default',
@@ -162,6 +171,7 @@ class HomePageState extends State<HomePage> {
           missedCallNotificationChannelName: 'Missed Call',
           isImportant: true,
           isBot: false,
+          isFullScreen: fullScreen,
         ),
         ios: const IOSParams(
           iconName: 'CallKitLogo',

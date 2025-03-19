@@ -84,14 +84,21 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         when (action) {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
                 try {
-                    callkitNotificationManager.showIncomingNotification(data)
-                    sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
-                    addCall(context, Data.fromBundle(data))
-                    if (callkitNotificationManager.incomingChannelEnabled()) {
-                        val soundPlayerServiceIntent =
-                                Intent(context, CallkitSoundPlayerService::class.java)
-                        soundPlayerServiceIntent.putExtras(data)
-                        context.startService(soundPlayerServiceIntent)
+                    
+                    val incomingData = Data.fromBundle(data);
+                    if(incomingData.isFullScreen){
+                        val intent = CallkitIncomingActivity.getIntent(context, data)
+                        context.startActivity(intent)
+                    }else{
+                        callkitNotificationManager.showIncomingNotification(data)
+                        sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
+                        addCall(context, Data.fromBundle(data))
+                        if (callkitNotificationManager.incomingChannelEnabled()) {
+                            val soundPlayerServiceIntent =
+                                    Intent(context, CallkitSoundPlayerService::class.java)
+                            soundPlayerServiceIntent.putExtras(data)
+                            context.startService(soundPlayerServiceIntent)
+                        }
                     }
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)

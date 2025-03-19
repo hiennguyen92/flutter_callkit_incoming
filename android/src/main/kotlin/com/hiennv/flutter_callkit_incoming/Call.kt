@@ -89,6 +89,8 @@ data class Data(val args: Map<String, Any?>) {
     var isImportant: Boolean = false
     @JsonProperty("isBot")
     var isBot: Boolean = false
+    @JsonProperty("isFullScreen")
+    var isFullScreen: Boolean = false
 
     init {
         var android: Map<String, Any?>? = args["android"] as? HashMap<String, Any?>?
@@ -108,6 +110,7 @@ data class Data(val args: Map<String, Any?>) {
         isShowFullLockedScreen = android["isShowFullLockedScreen"] as? Boolean ?: true
         isImportant = android["isImportant"] as? Boolean ?: false
         isBot = android["isBot"] as? Boolean ?: false
+        isFullScreen = android["isFullScreen"] as? Boolean ?: false
 
         val missedNotification: Map<String, Any?>? =
             args["missedCallNotification"] as? Map<String, Any?>?
@@ -229,6 +232,10 @@ data class Data(val args: Map<String, Any?>) {
             CallkitConstants.EXTRA_CALLKIT_IS_BOT,
             isBot,
         )
+        bundle.putBoolean(
+            CallkitConstants.EXTRA_CALLKIT_IS_FULL_SCREEN,
+            isFullScreen,
+        )
         return bundle
     }
 
@@ -256,6 +263,8 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_IMPORTANT, false)
             data.isBot =
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_BOT, false)
+            data.isFullScreen =
+                bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_FULL_SCREEN, false)
 
             data.missedNotificationId =
                 bundle.getInt(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_ID)
