@@ -26,14 +26,14 @@ Our top sponsors are shown below!
 
   <br>
 
-## iOS: ONLY WORKING ON REAL DEVICE, not on simulator(Callkit framework not working on simulator)
+## iOS: ONLY WORKING ON REAL DEVICE PLEASE MAKE SURE SETUP/USING <a href="https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/PUSHKIT.md" target="_blank">PUSHKIT</a> FOR VOIP
+* please not using on simulator(Callkit framework not working on simulator)
 
 <br>
 
 ## 🚀&nbsp; Installation
 
-1. Install Packages
-
+1. Install Packages(for version >=v2.5.0, please make sure install and use java sdk version >= 17(Android))
   * Run this command:
     ```console
     flutter pub add flutter_callkit_incoming
@@ -43,40 +43,40 @@ Our top sponsors are shown below!
           dependencies:
             flutter_callkit_incoming: any
       ```
-      2. Configure Project
-         * Android
-            * AndroidManifest.xml
-            ```
-             <manifest...>
-                 ...
-                 <!--
-                     Using for load image from internet
-                 -->
-                 <uses-permission android:name="android.permission.INTERNET"/>
+2. Configure Project
+    * Android
+      * AndroidManifest.xml
+      ```
+        <manifest...>
+            ...
+            <!--
+                Using for load image from internet
+            -->
+            <uses-permission android:name="android.permission.INTERNET"/>
 
-               <application ...>
-                   <activity ...
-                      android:name=".MainActivity"
-                      android:launchMode="singleInstance">
-                    ...
-               ...
-    
-             </manifest>
-            ```
-            The following rule needs to be added in the proguard-rules.pro to avoid obfuscated keys.
-            ```
-             -keep class com.hiennv.flutter_callkit_incoming.** { *; }
-            ```
-  * iOS
-     * Info.plist
+          <application ...>
+              <activity ...
+                android:name=".MainActivity"
+                android:launchMode="singleInstance">
+              ...
+          ...
+
+        </manifest>
       ```
-      <key>UIBackgroundModes</key>
-      <array>
-          <string>voip</string>
-          <string>remote-notification</string>
-          <string>processing</string> //you can add this if needed
-      </array>
+      The following rule needs to be added in the proguard-rules.pro to avoid obfuscated keys.
       ```
+        -keep class com.hiennv.flutter_callkit_incoming.** { *; }
+      ```
+    * iOS
+      * Info.plist
+        ```
+        <key>UIBackgroundModes</key>
+        <array>
+            <string>voip</string>
+            <string>remote-notification</string>
+            <string>processing</string> //you can add this if needed
+        </array>
+        ```
 
 3. Usage
   * Import
@@ -214,7 +214,7 @@ Our top sponsors are shown below!
     After the call is ACCEPT or startCall please call this func.
     normally it should be called when webrtc/p2p.... is established.
 
-  * Get device push token VoIP. iOS: return deviceToken, Android: Empty
+  * Get device push token VoIP. iOS: return deviceToken, Android: none
 
     ```dart
       await FlutterCallkitIncoming.getDevicePushTokenVoIP();
@@ -553,7 +553,8 @@ Our top sponsors are shown below!
 7. Todo
   * Run background
   * Simplify the setup process
-
+  * Custom notification for iOS(Missing notification)
+  * Keep notification when calling
     <br>
 
 ## :bulb: Demo

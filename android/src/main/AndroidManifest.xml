@@ -18,7 +18,9 @@
             android:noHistory="true"
             android:turnScreenOn="true"
             android:configChanges="orientation"
-            android:exported="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:allowTaskReparenting="false"
             android:theme="@style/CallkitIncomingTheme">
             <intent-filter>
                 <action android:name="${applicationId}.com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING" />
