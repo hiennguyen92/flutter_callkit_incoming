@@ -502,7 +502,7 @@ Our top sponsors are shown below!
     | **`isCustomNotification`**  | Using custom notifications.                                                                          | `false`                                                           |
     | **`isCustomSmallExNotification`**  | Using custom notification small on some devices clipped out in android.                              | `false`                                                           |
     |       **`isShowLogo`**      | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png`               | `false`                                                           |
-    |      **`ringtonePath`**     | File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`               | `system_ringtone_default` <br>using ringtone default of the phone |
+    |      **`ringtonePath`**     | File name of a ringtone ex: `ringtone_default`. Put file into `/android/app/src/main/res/raw/ringtone_default.mp3`               | `system_ringtone_default` <br>using ringtone default of the phone |
     |     **`backgroundColor`**   | Incoming call screen background color.                                                               | `#0955fa`                                                         |
     |      **`backgroundUrl`**    | Using image background for Incoming call screen. example: http://... https://... or "assets/abc.png" | _None_                                                            |
     |      **`actionColor`**      | Color used in button/text on notification.                                                           | `#4CAF50`                                                         |

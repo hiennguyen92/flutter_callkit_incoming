@@ -34,7 +34,7 @@ class AndroidParams {
   /// Show call id app inside full screen.
   final bool? isShowCallID;
 
-  /// File name ringtone, put file into /android/app/src/main/res/raw/ringtone_default.pm3 -> value: `ringtone_default.pm3`
+  /// File name ringtone, put file into /android/app/src/main/res/raw/ringtone_default.mp3 -> value: `ringtone_default`
   final String? ringtonePath;
 
   /// Incoming call screen background color.
