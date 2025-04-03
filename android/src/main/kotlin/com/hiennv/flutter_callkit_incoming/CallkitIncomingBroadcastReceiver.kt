@@ -112,6 +112,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data, true)
+                    // show ongoing call when call is accepted
+                    val intent = Intent(context, OngoingNotificationService::class.java);
+                    intent.putExtras(data)
+                    context.startService(intent)
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
@@ -131,6 +135,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
                 try {
+                    context.stopService(Intent(context, OngoingNotificationService::class.java))
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data, false)

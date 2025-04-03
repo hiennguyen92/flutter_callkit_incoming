@@ -44,6 +44,7 @@ class CallkitNotificationManager(private val context: Context) {
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
         private const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
+        private const val NOTIFICATION_CHANNEL_ID_ONGOING = "callkit_ongoing_channel_id"
         private const val NOTIFICATION_CHANNEL_ID_MISSED = "callkit_missed_channel_id"
     }
 
@@ -85,24 +86,13 @@ class CallkitNotificationManager(private val context: Context) {
         }
     }
 
-
     @SuppressLint("MissingPermission")
     fun showIncomingNotification(data: Bundle) {
         data.putLong(EXTRA_TIME_START_CALL, System.currentTimeMillis())
 
         notificationId =
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
-        createNotificationChanel(
-            data.getString(
-                CallkitConstants.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME,
-                "Incoming Call"
-            ),
-            data.getString(
-                CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME,
-                "Missed Call"
-            ),
-        )
-
+        createNotificationChanel(data)
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.setAutoCancel(false)
         notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
@@ -271,16 +261,7 @@ class CallkitNotificationManager(private val context: Context) {
             CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_ID,
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode() + 1
         )
-        createNotificationChanel(
-            data.getString(
-                CallkitConstants.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME,
-                "Incoming Call"
-            ),
-            data.getString(
-                CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME,
-                "Missed Call"
-            ),
-        )
+        createNotificationChanel(data);
         val missedCallSound: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val typeCall = data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
         var smallIcon = context.applicationInfo.icon
@@ -442,10 +423,20 @@ class CallkitNotificationManager(private val context: Context) {
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.O
     }
 
-    private fun createNotificationChanel(
-        incomingCallChannelName: String,
-        missedCallChannelName: String,
-    ) {
+    private fun createNotificationChanel(data: Bundle) {
+       val incomingCallChannelName =     data.getString(
+                CallkitConstants.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME,
+                "Incoming Call"
+            )
+          val missedCallChannelName=  data.getString(
+                CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME,
+                "Missed Call"
+            )
+          val ongoingCallChannelName=  data.getString(
+                CallkitConstants.EXTRA_CALLKIT_ONGOING_CALL_NOTIFICATION_CHANNEL_NAME,
+                "Ongoing Call"
+            );
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getNotificationManager().apply {
                 var channelCall = getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
@@ -485,6 +476,13 @@ class CallkitNotificationManager(private val context: Context) {
                 }
                 channelMissedCall.importance = NotificationManager.IMPORTANCE_DEFAULT
                 createNotificationChannel(channelMissedCall)
+
+                val channelOngoingCall = NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID_ONGOING,
+                    ongoingCallChannelName,
+                    NotificationManager.IMPORTANCE_LOW // disables notification popup for ongoing call
+                )
+                createNotificationChannel(channelOngoingCall)
             }
         }
     }
@@ -525,6 +523,11 @@ class CallkitNotificationManager(private val context: Context) {
     private fun getAppPendingIntent(id: Int, data: Bundle): PendingIntent {
         val intent: Intent? = AppUtils.getAppIntent(context, data = data)
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
+    }
+
+    private  fun getHangUpIntent(id: Int, data: Bundle): PendingIntent {
+        val  intent = CallkitIncomingActivity.getIntentEnded(context, true)
+        return  PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
     }
 
     private fun getFlagPendingIntent(): Int {
@@ -662,8 +665,6 @@ class CallkitNotificationManager(private val context: Context) {
                 .show()
         }
     }
-
-
 }
 
 
