@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL"/>
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS"/>
 
     <application>
 
@@ -49,6 +51,13 @@
             android:enabled="true"
             android:exported="true"
             android:name="com.hiennv.flutter_callkit_incoming.CallkitSoundPlayerService"/>
+
+        <service
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="phoneCall"
+            android:permission="android.permission.FOREGROUND_SERVICE_PHONE_CALL"
+            android:name=".OngoingNotificationService"/>
 
     </application>
 </manifest>
