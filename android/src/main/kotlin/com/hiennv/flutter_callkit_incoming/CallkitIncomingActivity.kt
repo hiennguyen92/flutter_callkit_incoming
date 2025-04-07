@@ -93,9 +93,11 @@ class CallkitIncomingActivity : Activity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             setTurnScreenOn(true)
+            setShowWhenLocked(true)
         } else {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
             window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
         transparentStatusAndNavigation()
@@ -187,6 +189,18 @@ class CallkitIncomingActivity : Activity() {
 
         val isShowLogo = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO, false)
         ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
+        var logoUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_LOGO_URL, "")
+        if (logoUrl != null && logoUrl.isNotEmpty()) {
+            if (!logoUrl.startsWith("http://", true) && !logoUrl.startsWith("https://", true)){
+                logoUrl = String.format("file:///android_asset/flutter_assets/%s", logoUrl)
+            }
+            val headers = data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            getPicassoInstance(this@CallkitIncomingActivity, headers)
+                .load(logoUrl)
+                .placeholder(R.drawable.transparent)
+                .error(R.drawable.transparent)
+                .into(ivLogo)
+        }
 
         val avatarUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {

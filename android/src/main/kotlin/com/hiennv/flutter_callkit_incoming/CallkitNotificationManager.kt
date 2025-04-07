@@ -54,36 +54,41 @@ class CallkitNotificationManager(private val context: Context) {
     private var dataNotificationPermission: Map<String, Any> = HashMap()
 
     @SuppressLint("MissingPermission")
-    private var targetLoadAvatarDefault = object : Target {
+    private fun createAvatarTargetDefault(notificationId: Int) : Target {
+        return object : Target {
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                notificationBuilder.setLargeIcon(bitmap)
+                getNotificationManager().notify(notificationId, notificationBuilder.build())
+            }
 
-        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-            notificationBuilder.setLargeIcon(bitmap)
-            getNotificationManager().notify(notificationId, notificationBuilder.build())
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+            }
+
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+            }
         }
 
-        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-        }
-
-        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-        }
     }
 
     @SuppressLint("MissingPermission")
-    private var targetLoadAvatarCustomize = object : Target {
-        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-            notificationViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
-            notificationViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
-            notificationSmallViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
-            notificationSmallViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
-            getNotificationManager().notify(notificationId, notificationBuilder.build())
-        }
+    private fun createAvatarTargetCustom(notificationId: Int): Target {
+        return object : Target {
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                notificationViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
+                notificationViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
+                notificationSmallViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
+                notificationSmallViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
+                getNotificationManager().notify(notificationId, notificationBuilder.build())
+            }
 
-        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-        }
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+            }
 
-        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+            }
         }
     }
+
 
 
     @SuppressLint("MissingPermission")
@@ -183,7 +188,7 @@ class CallkitNotificationManager(private val context: Context) {
                 val headers =
                     data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
                 getPicassoInstance(context, headers).load(avatarUrl)
-                    .into(targetLoadAvatarDefault)
+                    .into(createAvatarTargetDefault(notificationId))
             }
             val caller = data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -261,7 +266,7 @@ class CallkitNotificationManager(private val context: Context) {
                 data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
             getPicassoInstance(context, headers).load(avatarUrl)
                 .transform(CircleTransform())
-                .into(targetLoadAvatarCustomize)
+                .into(createAvatarTargetCustom(notificationId))
         }
     }
 
@@ -347,7 +352,7 @@ class CallkitNotificationManager(private val context: Context) {
                     data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
                 getPicassoInstance(context, headers).load(avatarUrl)
-                    .transform(CircleTransform()).into(targetLoadAvatarCustomize)
+                    .transform(CircleTransform()).into(createAvatarTargetCustom(notificationId))
             }
             notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
             notificationBuilder.setCustomContentView(notificationViews)
@@ -371,7 +376,7 @@ class CallkitNotificationManager(private val context: Context) {
                     data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
                 getPicassoInstance(context, headers).load(avatarUrl)
-                    .into(targetLoadAvatarDefault)
+                    .into(createAvatarTargetDefault(notificationId))
             }
             val isShowCallback = data.getBoolean(
                 CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_CALLBACK_SHOW,
@@ -571,7 +576,8 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     fun requestFullIntentPermission(activity: Activity?) {
-        if (Build.VERSION.SDK_INT > 33) {
+        val canUseFullScreenIntent = getNotificationManager().canUseFullScreenIntent();
+        if (!canUseFullScreenIntent && Build.VERSION.SDK_INT > 33) {
            val intent = Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
                 data =  Uri.fromParts("package", activity?.packageName, null)
             }

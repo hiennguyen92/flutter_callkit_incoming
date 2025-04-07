@@ -152,7 +152,8 @@ class HomePageState extends State<HomePage> {
         headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
         android: const AndroidParams(
           isCustomNotification: true,
-          isShowLogo: false,
+          isShowLogo: true,
+          logoUrl: 'assets/test.png',
           ringtonePath: 'system_ringtone_default',
           backgroundColor: '#0955fa',
           backgroundUrl: 'assets/test.png',

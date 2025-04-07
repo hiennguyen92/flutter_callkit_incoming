@@ -36,7 +36,8 @@ Future<void> showCallkitIncoming(String uuid) async {
     headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
     android: const AndroidParams(
       isCustomNotification: true,
-      isShowLogo: false,
+      isShowLogo: true,
+      logoUrl: 'assets/test.png',
       ringtonePath: 'system_ringtone_default',
       backgroundColor: '#0955fa',
       backgroundUrl: 'assets/test.png',
@@ -87,6 +88,8 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     _uuid = const Uuid();
     initFirebase();
     WidgetsBinding.instance.addObserver(this);
+    FlutterCallkitIncoming.requestFullIntentPermission();
+
     //Check call when open app from terminated
     checkAndNavigationCallingPage();
   }
