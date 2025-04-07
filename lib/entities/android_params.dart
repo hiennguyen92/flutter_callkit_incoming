@@ -9,6 +9,7 @@ class AndroidParams {
     this.isCustomNotification,
     this.isCustomSmallExNotification,
     this.isShowLogo,
+    this.logoUrl,
     this.isShowCallID,
     this.ringtonePath,
     this.backgroundColor,
@@ -31,10 +32,13 @@ class AndroidParams {
   /// Show logo app inside full screen.
   final bool? isShowLogo;
 
+  /// Logo aoo inside full screen, example: http://... https://... or "assets/abc.png"
+  final String? logoUrl;
+
   /// Show call id app inside full screen.
   final bool? isShowCallID;
 
-  /// File name ringtone, put file into /android/app/src/main/res/raw/ringtone_default.pm3 -> value: `ringtone_default.pm3`
+  /// File name ringtone, put file into /android/app/src/main/res/raw/ringtone_default.mp3 -> value: `ringtone_default`
   final String? ringtonePath;
 
   /// Incoming call screen background color.

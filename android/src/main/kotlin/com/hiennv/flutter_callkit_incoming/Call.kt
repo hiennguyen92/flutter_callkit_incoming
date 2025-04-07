@@ -11,74 +11,124 @@ data class Data(val args: Map<String, Any?>) {
 
     @JsonProperty("id")
     var id: String = (args["id"] as? String) ?: ""
+
     @JsonProperty("uuid")
     var uuid: String = (args["id"] as? String) ?: ""
+
     @JsonProperty("nameCaller")
     var nameCaller: String = (args["nameCaller"] as? String) ?: ""
+
     @JsonProperty("appName")
     var appName: String = (args["appName"] as? String) ?: ""
+
     @JsonProperty("handle")
     var handle: String = (args["handle"] as? String) ?: ""
+
     @JsonProperty("avatar")
     var avatar: String = (args["avatar"] as? String) ?: ""
+
     @JsonProperty("type")
     var type: Int = (args["type"] as? Int) ?: 0
+
     @JsonProperty("duration")
-    var duration: Long = (args["duration"] as? Long) ?: ((args["duration"] as? Int)?.toLong() ?: 30000L)
+    var duration: Long =
+        (args["duration"] as? Long) ?: ((args["duration"] as? Int)?.toLong() ?: 30000L)
+
     @JsonProperty("textAccept")
     var textAccept: String = (args["textAccept"] as? String) ?: ""
+
     @JsonProperty("textDecline")
     var textDecline: String = (args["textDecline"] as? String) ?: ""
+
     @JsonProperty("extra")
     var extra: HashMap<String, Any?> =
         (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
+
     @JsonProperty("headers")
     var headers: HashMap<String, Any?> =
         (args["headers"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
+
     @JsonProperty("from")
     var from: String = ""
 
     @JsonProperty("isCustomNotification")
     var isCustomNotification: Boolean = false
+
     @JsonProperty("isCustomSmallExNotification")
     var isCustomSmallExNotification: Boolean = false
+
     @JsonProperty("isShowLogo")
     var isShowLogo: Boolean = false
+
+    @JsonProperty("logoUrl")
+    var logoUrl: String
+
     @JsonProperty("isShowCallID")
     var isShowCallID: Boolean = false
+
     @JsonProperty("ringtonePath")
     var ringtonePath: String
+
     @JsonProperty("backgroundColor")
     var backgroundColor: String
+
     @JsonProperty("backgroundUrl")
     var backgroundUrl: String
+
     @JsonProperty("textColor")
     var textColor: String
+
     @JsonProperty("actionColor")
     var actionColor: String
+
     @JsonProperty("incomingCallNotificationChannelName")
     var incomingCallNotificationChannelName: String? = null
+
     @JsonProperty("missedCallNotificationChannelName")
     var missedCallNotificationChannelName: String? = null
+
     @JsonProperty("missedNotificationId")
     var missedNotificationId: Int? = null
+
     @JsonProperty("isShowMissedCallNotification")
     var isShowMissedCallNotification: Boolean = true
+
     @JsonProperty("missedNotificationCount")
     var missedNotificationCount: Int = 1
+
     @JsonProperty("missedNotificationSubtitle")
     var missedNotificationSubtitle: String? = null
+
     @JsonProperty("missedNotificationCallbackText")
     var missedNotificationCallbackText: String? = null
+
     @JsonProperty("isShowCallback")
     var isShowCallback: Boolean = true
+
     @JsonProperty("isAccepted")
     var isAccepted: Boolean = false
 
+    @JsonProperty("callingNotificationId")
+    var callingNotificationId: Int? = null
+
+    @JsonProperty("isShowCallingNotification")
+    var isShowCallingNotification: Boolean = true
+
+    @JsonProperty("callingNotificationSubtitle")
+    var callingNotificationSubtitle: String? = null
+
+    @JsonProperty("callingNotificationCallbackText")
+    var callingNotificationHangupText: String? = null
+
+    @JsonProperty("isShowHangup")
+    var isShowHangup: Boolean = true
+
     @JsonProperty("isOnHold")
     var isOnHold: Boolean = (args["isOnHold"] as? Boolean) ?: false
+
     @JsonProperty("audioRoute")
     var audioRoute: Int = (args["audioRoute"] as? Int) ?: 1
+
     @JsonProperty("isMuted")
     var isMuted: Boolean = (args["isMuted"] as? Boolean) ?: false
 
@@ -87,6 +137,7 @@ data class Data(val args: Map<String, Any?>) {
 
     @JsonProperty("isImportant")
     var isImportant: Boolean = false
+
     @JsonProperty("isBot")
     var isBot: Boolean = false
 
@@ -96,6 +147,7 @@ data class Data(val args: Map<String, Any?>) {
         isCustomNotification = android["isCustomNotification"] as? Boolean ?: false
         isCustomSmallExNotification = android["isCustomSmallExNotification"] as? Boolean ?: false
         isShowLogo = android["isShowLogo"] as? Boolean ?: false
+        logoUrl = android["logoUrl"] as? String ?: ""
         isShowCallID = android["isShowCallID"] as? Boolean ?: false
         ringtonePath = android["ringtonePath"] as? String ?: ""
         backgroundColor = android["backgroundColor"] as? String ?: "#0955fa"
@@ -112,6 +164,7 @@ data class Data(val args: Map<String, Any?>) {
         val missedNotification: Map<String, Any?>? =
             args["missedCallNotification"] as? Map<String, Any?>?
 
+
         if (missedNotification != null) {
             missedNotificationId = missedNotification["id"] as? Int?
             missedNotificationSubtitle = missedNotification["subtitle"] as? String?
@@ -127,6 +180,21 @@ data class Data(val args: Map<String, Any?>) {
             isShowMissedCallNotification =
                 android["isShowMissedCallNotification"] as? Boolean ?: true
         }
+
+        val callingNotification: Map<String, Any?>? =
+            args["callingNotification"] as? Map<String, Any?>?
+
+        if (callingNotification != null) {
+            callingNotificationId = callingNotification["id"] as? Int?
+            callingNotificationSubtitle = callingNotification["subtitle"] as? String?
+            //callingNotificationCount = missedNotification["count"] as? Int? ?: 1
+            callingNotificationHangupText = callingNotification["callbackText"] as? String?
+            isShowHangup = callingNotification["isShowCallback"] as? Boolean ?: true
+            isShowCallingNotification =
+                callingNotification["showNotification"] as? Boolean ?: true
+        }
+
+
     }
 
     override fun hashCode(): Int {
@@ -178,6 +246,30 @@ data class Data(val args: Map<String, Any?>) {
             missedNotificationCallbackText
         )
 
+        callingNotificationId?.let {
+            bundle.putInt(
+                CallkitConstants.EXTRA_CALLKIT_CALLING_ID,
+                it
+            )
+        }
+        bundle.putBoolean(
+            CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW,
+            isShowCallingNotification
+        )
+        bundle.putString(
+            CallkitConstants.EXTRA_CALLKIT_CALLING_SUBTITLE,
+            callingNotificationSubtitle
+        )
+        bundle.putBoolean(
+            CallkitConstants.EXTRA_CALLKIT_CALLING_HANG_UP_SHOW,
+            isShowHangup
+        )
+        bundle.putString(
+            CallkitConstants.EXTRA_CALLKIT_CALLING_HANG_UP_TEXT,
+            callingNotificationHangupText
+        )
+
+
         bundle.putSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA, extra)
         bundle.putSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS, headers)
 
@@ -192,6 +284,10 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putBoolean(
             CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO,
             isShowLogo
+        )
+        bundle.putString(
+            CallkitConstants.EXTRA_CALLKIT_LOGO_URL,
+            logoUrl
         )
         bundle.putBoolean(
             CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID,
@@ -270,6 +366,18 @@ data class Data(val args: Map<String, Any?>) {
             data.missedNotificationCallbackText =
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_CALLBACK_TEXT, "")
 
+
+            data.callingNotificationId = bundle.getInt(CallkitConstants.EXTRA_CALLKIT_CALLING_ID)
+            data.isShowCallingNotification =
+                bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)
+            data.callingNotificationSubtitle =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_CALLING_SUBTITLE, "")
+            data.isShowHangup =
+                bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_HANG_UP_SHOW, false)
+            data.callingNotificationHangupText =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_CALLING_HANG_UP_TEXT, "")
+
+
             data.extra =
                 bundle.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>
             data.headers =
@@ -287,6 +395,8 @@ data class Data(val args: Map<String, Any?>) {
                 CallkitConstants.EXTRA_CALLKIT_IS_SHOW_LOGO,
                 false
             )
+            data.logoUrl =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_LOGO_URL, "")
             data.isShowCallID = bundle.getBoolean(
                 CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID,
                 false
