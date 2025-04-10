@@ -437,23 +437,25 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     func configurAudioSession(){
-        if data?.configureAudioSession != false {
-            let session = AVAudioSession.sharedInstance()
-            do{
-                try session.setCategory(AVAudioSession.Category.playAndRecord, options: [
-                    .allowBluetoothA2DP,
-                    .duckOthers,
-                    .allowBluetooth,
-                ])
-                
-                try session.setMode(self.getAudioSessionMode(data?.audioSessionMode))
-                try session.setActive(data?.audioSessionActive ?? true)
-                try session.setPreferredSampleRate(data?.audioSessionPreferredSampleRate ?? 44100.0)
-                try session.setPreferredIOBufferDuration(data?.audioSessionPreferredIOBufferDuration ?? 0.005)
-            }catch{
-                print(error)
-            }
-        }
+        print("Ignoring audio session configuration")
+        return
+//        if data?.configureAudioSession != false {
+//            let session = AVAudioSession.sharedInstance()
+//            do{
+//                try session.setCategory(AVAudioSession.Category.playAndRecord, options: [
+//                    .allowBluetoothA2DP,
+//                    .duckOthers,
+//                    .allowBluetooth,
+//                ])
+//
+//                try session.setMode(self.getAudioSessionMode(data?.audioSessionMode))
+//                try session.setActive(data?.audioSessionActive ?? true)
+//                try session.setPreferredSampleRate(data?.audioSessionPreferredSampleRate ?? 44100.0)
+//                try session.setPreferredIOBufferDuration(data?.audioSessionPreferredIOBufferDuration ?? 0.005)
+//            }catch{
+//                print(error)
+//            }
+//        }
     }
     
     func getAudioSessionMode(_ audioSessionMode: String?) -> AVAudioSession.Mode {
