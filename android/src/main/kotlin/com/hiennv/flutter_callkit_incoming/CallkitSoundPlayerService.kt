@@ -58,6 +58,7 @@ class CallkitSoundPlayerService : Service() {
         when (audioManager?.ringerMode) {
             AudioManager.RINGER_MODE_SILENT -> {
             }
+
             else -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     vibrator?.vibrate(
@@ -81,20 +82,13 @@ class CallkitSoundPlayerService : Service() {
         )
         var uri = sound?.let { getRingtoneUri(it) }
         if (uri == null) {
-            uri = RingtoneManager.getActualDefaultRingtoneUri(
-                this@CallkitSoundPlayerService,
-                RingtoneManager.TYPE_RINGTONE
-            )
+            // Failed to get ringtone url, can't play sound
+            return
         }
         try {
             mediaPlayer(uri!!)
         } catch (e: Exception) {
-            try {
-                uri = getRingtoneUri("ringtone_default")
-                mediaPlayer(uri!!)
-            } catch (e2: Exception) {
-                e2.printStackTrace()
-            }
+            e.printStackTrace()
         }
     }
 
@@ -128,44 +122,49 @@ class CallkitSoundPlayerService : Service() {
         mediaPlayer?.setDataSource(applicationContext, uri)
     }
 
-    private fun getRingtoneUri(fileName: String) = try {
+    private fun getRingtoneUri(fileName: String): Uri? {
         if (TextUtils.isEmpty(fileName)) {
-            RingtoneManager.getActualDefaultRingtoneUri(
+            return getDefaultRingtoneUri()
+        }
+        
+        // If system_ringtone_default is explicitly requested, bypass resource check
+        if (fileName.equals("system_ringtone_default", true)) {
+            return getDefaultRingtoneUri(useSystemDefault = true)
+        }
+
+        try {
+            val resId = resources.getIdentifier(fileName, "raw", packageName)
+            if (resId != 0) {
+                return Uri.parse("android.resource://${packageName}/$resId")
+            }
+
+            // For any other unresolved filename, return the default ringtone
+            return getDefaultRingtoneUri()
+        } catch (e: Exception) {
+            // If anything fails, try to return the system default ringtone
+            return getDefaultRingtoneUri()
+        }
+    }
+
+    private fun getDefaultRingtoneUri(useSystemDefault: Boolean = false): Uri? {
+        try {
+            if (!useSystemDefault) {
+                // First try to use ringtone_default resource if it exists
+                val resId = resources.getIdentifier("ringtone_default", "raw", packageName)
+                if (resId != 0) {
+                    return Uri.parse("android.resource://${packageName}/$resId")
+                }
+            }
+
+            // Fall back to system default ringtone
+            return RingtoneManager.getActualDefaultRingtoneUri(
                 this@CallkitSoundPlayerService,
                 RingtoneManager.TYPE_RINGTONE
             )
-        }
-        val resId = resources.getIdentifier(fileName, "raw", packageName)
-        if (resId != 0) {
-            Uri.parse("android.resource://${packageName}/$resId")
-        } else {
-            if (fileName.equals("system_ringtone_default", true)) {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
-            } else {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
-            }
-        }
-    } catch (e: Exception) {
-        try {
-            if (fileName.equals("system_ringtone_default", true)) {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
-            } else {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
-            }
         } catch (e: Exception) {
-            null
+            // getActualDefaultRingtoneUri can throw an exception on some devices
+            // for custom ringtones
+            return null
         }
     }
 }

@@ -26,14 +26,14 @@ Our top sponsors are shown below!
 
   <br>
 
-## iOS: ONLY WORKING ON REAL DEVICE, not on simulator(Callkit framework not working on simulator)
+## iOS: ONLY WORKING ON REAL DEVICE PLEASE MAKE SURE SETUP/USING <a href="https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/PUSHKIT.md" target="_blank">PUSHKIT</a> FOR VOIP
+* please not using on simulator(Callkit framework not working on simulator)
 
 <br>
 
 ## 🚀&nbsp; Installation
 
-1. Install Packages
-
+1. Install Packages(for version >=v2.5.0, please make sure install and use java sdk version >= 17(Android))
   * Run this command:
     ```console
     flutter pub add flutter_callkit_incoming
@@ -43,40 +43,40 @@ Our top sponsors are shown below!
           dependencies:
             flutter_callkit_incoming: any
       ```
-      2. Configure Project
-         * Android
-            * AndroidManifest.xml
-            ```
-             <manifest...>
-                 ...
-                 <!--
-                     Using for load image from internet
-                 -->
-                 <uses-permission android:name="android.permission.INTERNET"/>
+2. Configure Project
+    * Android
+      * AndroidManifest.xml
+      ```
+        <manifest...>
+            ...
+            <!--
+                Using for load image from internet
+            -->
+            <uses-permission android:name="android.permission.INTERNET"/>
 
-               <application ...>
-                   <activity ...
-                      android:name=".MainActivity"
-                      android:launchMode="singleInstance">
-                    ...
-               ...
-    
-             </manifest>
-            ```
-            The following rule needs to be added in the proguard-rules.pro to avoid obfuscated keys.
-            ```
-             -keep class com.hiennv.flutter_callkit_incoming.** { *; }
-            ```
-  * iOS
-     * Info.plist
+          <application ...>
+              <activity ...
+                android:name=".MainActivity"
+                android:launchMode="singleInstance">
+              ...
+          ...
+
+        </manifest>
       ```
-      <key>UIBackgroundModes</key>
-      <array>
-          <string>voip</string>
-          <string>remote-notification</string>
-          <string>processing</string> //you can add this if needed
-      </array>
+      The following rule needs to be added in the proguard-rules.pro to avoid obfuscated keys.
       ```
+        -keep class com.hiennv.flutter_callkit_incoming.** { *; }
+      ```
+    * iOS
+      * Info.plist
+        ```
+        <key>UIBackgroundModes</key>
+        <array>
+            <string>voip</string>
+            <string>remote-notification</string>
+            <string>processing</string> //you can add this if needed
+        </array>
+        ```
 
 3. Usage
   * Import
@@ -101,12 +101,19 @@ Our top sponsors are shown below!
             subtitle: 'Missed call',
             callbackText: 'Call back',
         ),
+        callingNotification: const NotificationParams(
+          showNotification: true,
+          isShowCallback: true,
+          subtitle: 'Calling...',
+          callbackText: 'Hang Up',
+        ),
         duration: 30000,
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
         headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
         android: const AndroidParams(
             isCustomNotification: true,
             isShowLogo: false,
+            logoUrl: 'https://i.pravatar.cc/100',
             ringtonePath: 'system_ringtone_default',
             backgroundColor: '#0955fa',
             backgroundUrl: 'https://i.pravatar.cc/500',
@@ -161,8 +168,16 @@ Our top sponsors are shown below!
         nameCaller: 'Hien Nguyen',
         handle: '0123456789',
         type: 1,
-        textMissedCall: 'Missed call',
-        textCallback: 'Call back',
+        missedCallNotification: const NotificationParams(
+          showNotification: true,
+          isShowCallback: true,
+          subtitle: 'Missed call',
+          callbackText: 'Call back',
+        ),
+        android: const AndroidParams(
+          isCustomNotification: true,
+          isShowCallID: true,
+        )
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
       );
       await FlutterCallkitIncoming.showMissCallNotification(params);
@@ -184,7 +199,17 @@ Our top sponsors are shown below!
         handle: '0123456789',
         type: 1,
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
-        ios: IOSParams(handleType: 'generic')
+        ios: IOSParams(handleType: 'generic'),
+        callingNotification: const NotificationParams(
+          showNotification: true,
+          isShowCallback: true,
+          subtitle: 'Calling...',
+          callbackText: 'Hang Up',
+        ),
+        android: const AndroidParams(
+          isCustomNotification: true,
+          isShowCallID: true,
+        )
       );
       await FlutterCallkitIncoming.startCall(params);
     ```
@@ -214,7 +239,7 @@ Our top sponsors are shown below!
     After the call is ACCEPT or startCall please call this func.
     normally it should be called when webrtc/p2p.... is established.
 
-  * Get device push token VoIP. iOS: return deviceToken, Android: Empty
+  * Get device push token VoIP. iOS: return deviceToken, Android: none
 
     ```dart
       await FlutterCallkitIncoming.getDevicePushTokenVoIP();
@@ -466,7 +491,7 @@ Our top sponsors are shown below!
     ``` 
     <a href='https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/ios/Runner/AppDelegate.swift'>Please check full: Example</a>
 
-4. Properties
+ Properties
 
     | Prop            | Description                                                             | Default     |
     | --------------- | ----------------------------------------------------------------------- | ----------- |
@@ -481,7 +506,8 @@ Our top sponsors are shown below!
    | **`textDecline`**  | Text `Decline` used in Android                                           |    `Decline`  |
     |   **`extra`**   | Any data added to the event when received.                              |     `{}`    |
     |   **`headers`** | Any data for custom header avatar/background image.                     |     `{}`    |
-    |  **`missedCallNotification`**  | Android data needed to customize Miss Call Notification.                                    |    Below    |
+    |  **`missedCallNotification`**  | Android data needed to customize Miss Call Notification.                                    |    Below    | 
+    |  **`callingNotification`**  | Android data needed to customize Calling Notification.                                    |    Below    |
     |  **`android`**  | Android data needed to customize UI.                                    |    Below    |
     |    **`ios`**    | iOS data needed.                                                        |    Below    |
 
@@ -489,28 +515,38 @@ Our top sponsors are shown below!
 
 * Missed Call Notification
 
-    | Prop            | Description                                                             | Default     |
-    | --------------- | ----------------------------------------------------------------------- | ----------- |
-    | **`subtitle`**  | Text `Missed Call` used in Android (show in miss call notification)  |    `Missed Call`  |
-   | **`callbackText`**  | Text `Call back` used in Android (show in miss call notification)     |    `Call back`  |
-   |       **`showNotification`**      | Show missed call notification when timeout | `true`          |
-    |       **`isShowCallback`**      | Show callback action from miss call notification. | `true`          |
+    | Prop            | Description                                                              | Default     |
+    | --------------- |--------------------------------------------------------------------------| ----------- |
+    | **`subtitle`**  | Text `Missed Call` used in Android (show in miss call notification)      |    `Missed Call`  |
+   | **`callbackText`**  | Text `Call back` used in Android (show in miss call notification action) |    `Call back`  |
+   |       **`showNotification`**      | Show missed call notification when timeout                               | `true`          |
+    |       **`isShowCallback`**      | Show callback action from miss call notification.                        | `true`          |
+
+* Calling Notification
+
+  | Prop            | Description                                                            | Default      |
+      | --------------- |------------------------------------------------------------------------|--------------|
+  | **`subtitle`**  | Text `Missed Call` used in Android (show in calling notification)      | `Calling...` |
+  | **`callbackText`**  | Text `Call back` used in Android (show in calling notification action) | `Hang up`    |
+  |       **`showNotification`**      | Show calling notification when start call/accept call                  | `true`       |
+  |       **`isShowCallback`**      | Show hang up action from calling notification.                         | `true`       |
 * Android
 
-    | Prop                        | Description                                                                                          | Default                                                           |
-    | --------------------------- |------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
-    | **`isCustomNotification`**  | Using custom notifications.                                                                          | `false`                                                           |
-    | **`isCustomSmallExNotification`**  | Using custom notification small on some devices clipped out in android.                              | `false`                                                           |
-    |       **`isShowLogo`**      | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png`               | `false`                                                           |
-    |      **`ringtonePath`**     | File name ringtone. put file into `/android/app/src/main/res/raw/ringtone_default.pm3`               | `system_ringtone_default` <br>using ringtone default of the phone |
-    |     **`backgroundColor`**   | Incoming call screen background color.                                                               | `#0955fa`                                                         |
-    |      **`backgroundUrl`**    | Using image background for Incoming call screen. example: http://... https://... or "assets/abc.png" | _None_                                                            |
-    |      **`actionColor`**      | Color used in button/text on notification.                                                           | `#4CAF50`                                                         |
-    |      **`textColor`**      | Color used for the text in full screen notification.                                                 | `#ffffff`                                                         |
-    |  **`incomingCallNotificationChannelName`** | Notification channel name of incoming call.                                                          | `Incoming call`                                                   |
-    |  **`missedCallNotificationChannelName`** | Notification channel name of missed call.                                                            | `Missed call`                                                     |
-    |  **`isShowCallID`** | Show call id app inside full screen/notification.                                                    | false                                                             |
-    |  **`isShowFullLockedScreen`** | Show full screen on Locked Screen(please make sure call `requestFullIntentPermission` for android 14+).                                                                   | true                                                              |
+    | Prop                                      | Description                                                                                                        | Default                                                           |
+    |-------------------------------------------|--------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
+    | **`isCustomNotification`**                | Using custom notifications.                                                                                        | `false`                                                           |
+    | **`isCustomSmallExNotification`**         | Using custom notification small on some devices clipped out in android.                                            | `false`                                                           |
+    | **`isShowLogo`**                          | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png`                             | `false`                                                           |
+    | **`logoUrl`**                             | Logo app inside full screen. example: http://... https://... or "assets/abc.png"                                   | _None_                                                            |
+    | **`ringtonePath`**                        | File name of a ringtone ex: `ringtone_default`. Put file into `/android/app/src/main/res/raw/ringtone_default.mp3` | `system_ringtone_default` <br>using ringtone default of the phone |
+    | **`backgroundColor`**                     | Incoming call screen background color.                                                                             | `#0955fa`                                                         |
+    | **`backgroundUrl`**                       | Using image background for Incoming call screen. example: http://... https://... or "assets/abc.png"               | _None_                                                            |
+    | **`actionColor`**                         | Color used in button/text on notification.                                                                         | `#4CAF50`                                                         |
+    | **`textColor`**                           | Color used for the text in full screen notification.                                                               | `#ffffff`                                                         |
+    | **`incomingCallNotificationChannelName`** | Notification channel name of incoming call.                                                                        | `Incoming call`                                                   |
+    | **`missedCallNotificationChannelName`**   | Notification channel name of missed call.                                                                          | `Missed call`                                                     |
+    | **`isShowCallID`**                        | Show call id app inside full screen/notification.                                                                  | false                                                             |
+    | **`isShowFullLockedScreen`**              | Show full screen on Locked Screen(please make sure call `requestFullIntentPermission` for android 14+).            | true                                                              |
 
     <br>
 
@@ -553,7 +589,8 @@ Our top sponsors are shown below!
 7. Todo
   * Run background
   * Simplify the setup process
-
+  * Custom notification for iOS(Missing notification)
+  * Keep notification when calling
     <br>
 
 ## :bulb: Demo

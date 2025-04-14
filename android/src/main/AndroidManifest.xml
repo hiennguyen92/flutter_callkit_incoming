@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application>
 
@@ -18,7 +18,9 @@
             android:noHistory="true"
             android:turnScreenOn="true"
             android:configChanges="orientation"
-            android:exported="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:allowTaskReparenting="false"
             android:theme="@style/CallkitIncomingTheme">
             <intent-filter>
                 <action android:name="${applicationId}.com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING" />
@@ -47,6 +49,12 @@
             android:enabled="true"
             android:exported="true"
             android:name="com.hiennv.flutter_callkit_incoming.CallkitSoundPlayerService"/>
+
+        <service
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="phoneCall"
+            android:name="com.hiennv.flutter_callkit_incoming.OngoingNotificationService"/>
 
     </application>
 </manifest>
