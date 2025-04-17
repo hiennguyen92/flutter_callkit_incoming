@@ -18,7 +18,7 @@
             android:noHistory="true"
             android:turnScreenOn="true"
             android:configChanges="orientation"
-            android:exported="false"
+            android:exported="true"
             android:launchMode="singleInstance"
             android:allowTaskReparenting="false"
             android:theme="@style/CallkitIncomingTheme">
