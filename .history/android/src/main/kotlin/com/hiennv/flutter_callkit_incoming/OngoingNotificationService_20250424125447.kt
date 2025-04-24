@@ -61,7 +61,7 @@ class OngoingNotificationService : Service() {
         }
         val textCalling = data.getString(CallkitConstants.EXTRA_CALLKIT_CALLING_SUBTITLE, "")
         notificationBuilder.setSubText(if (TextUtils.isEmpty(textCalling)) getString(R.string.text_calling) else textCalling)
-        notificationBuilder.setSmallIcon(0)
+        notificationBuilder.setSmallIcon(R.drawable.ic_accept)
         val isCustomNotification =
             data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
         if (isCustomNotification) {

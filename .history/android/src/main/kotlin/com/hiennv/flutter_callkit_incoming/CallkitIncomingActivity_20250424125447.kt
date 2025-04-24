@@ -70,13 +70,16 @@ class CallkitIncomingActivity : Activity() {
 
     private lateinit var ivBackground: ImageView
     private lateinit var llBackgroundAnimation: RippleRelativeLayout
+
     private lateinit var tvNameCaller: TextView
     private lateinit var tvNumber: TextView
     private lateinit var ivLogo: ImageView
     private lateinit var ivAvatar: CircleImageView
+
     private lateinit var llAction: LinearLayout
     private lateinit var ivAcceptCall: ImageView
     private lateinit var tvAccept: TextView
+
     private lateinit var ivDeclineCall: ImageView
     private lateinit var tvDecline: TextView
 
@@ -300,10 +303,10 @@ class CallkitIncomingActivity : Activity() {
         tvDecline = findViewById(R.id.tvDecline)
         animateAcceptCall()
 
-        tvAccept.setOnClickListener {
+        ivAcceptCall.setOnClickListener {
             onAcceptClick()
         }
-        tvDecline.setOnClickListener {
+        ivDeclineCall.setOnClickListener {
             onDeclineClick()
         }
     }
