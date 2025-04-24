@@ -183,8 +183,6 @@ class CallkitIncomingActivity : Activity() {
         try {
             tvNameCaller.setTextColor(Color.parseColor(textColor))
             tvNumber.setTextColor(Color.parseColor(textColor))
-            tvAccept.setTextColor(Color.parseColor(textColor))
-            tvDecline.setTextColor(Color.parseColor(textColor))
         } catch (error: Exception) {
         }
 
@@ -231,6 +229,12 @@ class CallkitIncomingActivity : Activity() {
         val textDecline = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
         tvDecline.text =
             if (TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
+
+        try {
+            tvAccept.setTextColor(Color.parseColor(textColor))
+            tvDecline.setTextColor(Color.parseColor(textColor))
+        } catch (error: Exception) {
+        }
 
         val backgroundColor =
             data?.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
