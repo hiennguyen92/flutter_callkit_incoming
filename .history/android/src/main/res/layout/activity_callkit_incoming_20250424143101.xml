@@ -180,7 +180,7 @@
                         android:layout_centerInParent="true"
                         android:background="@drawable/bg_button_accept"
                         android:padding="@dimen/base_margin_x1_5"
-                       
+                        <!-- android:src="@drawable/ic_accept" -->
                         tools:ignore="ContentDescription" />
 
                     <TextView

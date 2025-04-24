@@ -100,11 +100,6 @@
         </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
 
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
         <LinearLayout
             android:id="@+id/llAction"
             android:layout_width="match_parent"
@@ -112,6 +107,7 @@
             android:layout_gravity="bottom"
             android:layout_marginBottom="0dp"
             android:fitsSystemWindows="true"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -153,9 +149,8 @@
             </LinearLayout>
 
             <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_width="@dimen/base_margin_x5"
+                android:layout_height="0dp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -180,7 +175,7 @@
                         android:layout_centerInParent="true"
                         android:background="@drawable/bg_button_accept"
                         android:padding="@dimen/base_margin_x1_5"
-                       
+                        android:src="@drawable/ic_accept"
                         tools:ignore="ContentDescription" />
 
                     <TextView
