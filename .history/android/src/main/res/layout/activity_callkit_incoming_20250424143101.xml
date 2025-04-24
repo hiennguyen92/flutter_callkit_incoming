@@ -127,15 +127,7 @@
                     app:ripple_radius="@dimen/base_margin_x1_5"
                     app:ripple_scale="4.5">
 
-                    <ImageView
-                        android:id="@+id/ivDeclineCall"
-                        android:layout_width="@dimen/size_button"
-                        android:layout_height="@dimen/size_button"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/bg_button_decline"
-                        android:padding="@dimen/base_margin_x1_5"
-                        android:src="@drawable/ic_decline"
-                        tools:ignore="ContentDescription" />
+                  
 
                     <TextView
                         android:id="@+id/tvDecline"
@@ -173,15 +165,7 @@
                     app:ripple_scale="4.5">
 
 
-                    <ImageView
-                        android:id="@+id/ivAcceptCall"
-                        android:layout_width="@dimen/size_button"
-                        android:layout_height="@dimen/size_button"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/bg_button_accept"
-                        android:padding="@dimen/base_margin_x1_5"
-                        <!-- android:src="@drawable/ic_accept" -->
-                        tools:ignore="ContentDescription" />
+                    
 
                     <TextView
                         android:id="@+id/tvAccept"

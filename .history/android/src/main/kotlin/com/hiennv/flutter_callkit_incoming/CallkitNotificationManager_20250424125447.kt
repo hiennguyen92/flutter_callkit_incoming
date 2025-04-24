@@ -207,7 +207,7 @@ class CallkitNotificationManager(private val context: Context) {
                 notificationBuilder.addAction(declineAction)
                 val textAccept = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
                 val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
-                    R.drawable.ic_accept,
+                   
                     if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
                     getAcceptPendingIntent(notificationId, data)
                 ).build()
