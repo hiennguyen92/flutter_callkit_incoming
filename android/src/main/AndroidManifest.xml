@@ -53,7 +53,7 @@
         <service
             android:enabled="true"
             android:exported="true"
-            android:foregroundServiceType="phoneCall"
+            android:foregroundServiceType="phoneCall|microphone|camera"
             android:name="com.hiennv.flutter_callkit_incoming.OngoingNotificationService"/>
 
     </application>
