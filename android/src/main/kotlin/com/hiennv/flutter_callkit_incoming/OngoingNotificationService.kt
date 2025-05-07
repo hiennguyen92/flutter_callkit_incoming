@@ -169,12 +169,19 @@ class OngoingNotificationService : Service() {
         }
         notificationBuilder.setOngoing(true)
         val notification = notificationBuilder.build()
-
+        val typeCall = data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            var serviceType = ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+            if (typeCall > 0){
+                serviceType = serviceType or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+            }
+            else {
+                serviceType = serviceType or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            }
             startForeground(
                 onGoingNotificationId,
                 notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                serviceType
             )
         } else {
             startForeground(onGoingNotificationId, notification)
