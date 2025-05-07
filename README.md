@@ -53,6 +53,18 @@ Our top sponsors are shown below!
                 Using for load image from internet
             -->
             <uses-permission android:name="android.permission.INTERNET"/>
+            <!--
+                Additional permissions for Android 14+ (API level 34+)
+            -->
+            <!-- for phone call service -->
+            <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+            <!-- for using the microphone -->
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+            <!-- for video calls -->
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+            <!-- for wakelock turning the screen on -->
+            <uses-permission android:name="android.permission.TURN_SCREEN_ON "/>
 
           <application ...>
               <activity ...
