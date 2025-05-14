@@ -135,6 +135,7 @@ public class Call: NSObject {
     @objc public var type: Int
     @objc public var normalHandle: Int
     @objc public var duration: Int
+    @objc public var isAccepted: Bool
     @objc public var extra: NSDictionary
     
     //iOS
@@ -164,6 +165,7 @@ public class Call: NSObject {
         self.type = type
         self.normalHandle = 0
         self.duration = 30000
+        self.isAccepted = false
         self.extra = [:]
         self.iconName = "CallKitLogo"
         self.handleType = ""
@@ -200,6 +202,7 @@ public class Call: NSObject {
         self.type = args["type"] as? Int ?? 0
         self.normalHandle = args["normalHandle"] as? Int ?? 0
         self.duration = args["duration"] as? Int ?? 30000
+        self.isAccepted = args["isAccepted"] as? Bool ?? false
         self.extra = args["extra"] as? NSDictionary ?? [:]
         
         
@@ -269,6 +272,7 @@ public class Call: NSObject {
             "type": type,
             "normalHandle": normalHandle,
             "duration": duration,
+            "isAccepted": isAccepted,
             "extra": extra,
             "ios": ios
         ]
