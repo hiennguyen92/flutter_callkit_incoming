@@ -303,11 +303,12 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     @objc public func endCall(_ data: Data) {
+       self.data = data
         var call: Call? = nil
         if(self.isFromPushKit){
             call = Call(uuid: UUID(uuidString: self.data!.uuid)!, data: data)
             self.isFromPushKit = false
-            self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
+//            self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
         }else {
             call = Call(uuid: UUID(uuidString: data.uuid)!, data: data)
         }
@@ -413,7 +414,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             CXHandle.HandleType.phoneNumber
         ]
         if #available(iOS 11.0, *) {
-            configuration.includesCallsInRecents = data.includesCallsInRecents
+            configuration.includesCallsInRecents = false
         }
         if !data.iconName.isEmpty {
             if let image = UIImage(named: data.iconName) {
@@ -501,20 +502,40 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
-        let call = Call(uuid: action.callUUID, data: self.data!, isOutGoing: true)
-        call.handle = action.handle.value
-        configurAudioSession()
-        call.hasStartedConnectDidChange = { [weak self] in
-            self?.sharedProvider?.reportOutgoingCall(with: call.uuid, startedConnectingAt: call.connectData)
-        }
-        call.hasConnectDidChange = { [weak self] in
-            self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
-        }
-        self.outgoingCall = call;
-        self.callManager.addCall(call)
-        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_START, self.data?.toJSON())
-        action.fulfill()
-    }
+          NSLog("STARTIING CALL .............. ")
+          // Make sure data object has includesCallsInRecents set to false
+          let callData = self.data!
+          callData.includesCallsInRecents = false
+
+          let call = Call(uuid: action.callUUID, data: callData, isOutGoing: true)
+          call.handle = action.handle.value
+
+          // Configure audio session
+          configurAudioSession()
+
+          // Set up callbacks for call connection status changes
+          call.hasStartedConnectDidChange = { [weak self] in
+              guard let self = self else { return }
+              self.sharedProvider?.reportOutgoingCall(with: call.uuid, startedConnectingAt: call.connectData)
+          }
+
+          call.hasConnectDidChange = { [weak self] in
+              guard let self = self else { return }
+              self.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
+          }
+
+          // Store the outgoing call reference
+          self.outgoingCall = call
+
+          // Add call to call manager
+          self.callManager.addCall(call)
+
+          // Send event notification
+          self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_START, callData.toJSON())
+
+          // Mark action as fulfilled
+          action.fulfill()
+      }
     
     public func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else{
@@ -562,7 +583,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         call.endCall()
         self.callManager.removeCall(call)
-        if (self.answerCall == nil && self.outgoingCall == nil) {
+        let isSellerEnded = (self.data?.extra["isSellerEnded"] as? Int) ?? 0
+        if (self.answerCall == nil && self.outgoingCall == nil && isSellerEnded == 0) {
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
                 appDelegate.onDecline(call, action)
