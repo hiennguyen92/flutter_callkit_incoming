@@ -5,7 +5,7 @@ import PushKit
 import Flutter
 import flutter_callkit_incoming
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate, CallkitIncomingAppDelegate {
 
     
