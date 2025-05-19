@@ -28,6 +28,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace 'com.hiennv.flutter_callkit_incoming'
     compileSdk 34
 
     sourceSets {
