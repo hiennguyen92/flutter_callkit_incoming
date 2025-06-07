@@ -70,6 +70,9 @@ Our top sponsors are shown below!
               <activity ...
                 android:name=".MainActivity"
                 android:launchMode="singleInstance">
+                <!-- Add this so your Flutter UI can be rendered without unlocking the device -->
+                android:showWhenLocked="true"
+                android:turnScreenOn="true"
               ...
           ...
 
