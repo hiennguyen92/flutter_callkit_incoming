@@ -15,63 +15,83 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         var silenceEvents = false
 
         fun getIntent(context: Context, action: String, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 this.action = "${context.packageName}.${action}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
 
         fun getIntentIncoming(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
 
         fun getIntentStart(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_START}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
 
         fun getIntentAccept(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
 
         fun getIntentDecline(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
 
         fun getIntentEnded(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
 
         fun getIntentTimeout(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_TIMEOUT}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
 
         fun getIntentCallback(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_CALLBACK}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
 
         fun getIntentHeldByCell(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_HELD}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
 
         fun getIntentUnHeldByCell(context: Context, data: Bundle?) =
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_UNHELD}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
             }
     }
 
