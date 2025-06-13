@@ -92,11 +92,13 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         sharePluginWithRegister(flutterPluginBinding)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            InAppCallManager(flutterPluginBinding.applicationContext).registerPhoneAccount()
+        }
     }
 
     public fun showIncomingNotification(data: Data) {
         data.from = "notification"
-        callkitNotificationManager?.showIncomingNotification(data.toBundle())
         //send BroadcastReceiver
         context?.sendBroadcast(
             CallkitIncomingBroadcastReceiver.getIntentIncoming(
@@ -107,7 +109,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     public fun showMissCallNotification(data: Data) {
-        callkitNotificationManager?.showIncomingNotification(data.toBundle())
+        callkitNotificationManager?.showMissCallNotification(data.toBundle())
     }
 
     public fun startCall(data: Data) {
@@ -231,6 +233,16 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 }
 
                 "callConnected" -> {
+                    val calls = getDataActiveCalls(context)
+                    val data = Data(call.arguments() ?: HashMap())
+                    val currentCall = calls.firstOrNull { it.id == data.id }
+                    if (currentCall != null && context != null) {
+                        CallkitNotificationService.startServiceWithAction(
+                            context!!,
+                            CallkitNotificationService.CALLKIT_NOTIFICATION_SERVICE_ACTION_CONNECTED,
+                            currentCall.toBundle()
+                        )
+                    }
                     result.success("OK")
                 }
 
@@ -283,6 +295,10 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
                 "requestFullIntentPermission" -> {
                     callkitNotificationManager?.requestFullIntentPermission(activity)
+                }
+
+                "canUseFullScreenIntent" -> {
+                    result.success(callkitNotificationManager?.canUseFullScreenIntent() ?: true)
                 }
                 // EDIT - clear the incoming notification/ring (after accept/decline/timeout)
                 "hideCallkitIncoming" -> {

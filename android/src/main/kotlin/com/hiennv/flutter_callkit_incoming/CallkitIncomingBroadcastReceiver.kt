@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
@@ -75,7 +77,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
     }
 
-
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
         val callkitNotificationManager = CallkitNotificationManager(context)
@@ -85,7 +86,11 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
                 try {
                     callkitNotificationManager.createNotificationChanel(data)
-                    callkitNotificationManager.showIncomingNotification(data)
+                    CallkitNotificationService.startServiceWithAction(
+                        context,
+                        CallkitNotificationService.CALLKIT_NOTIFICATION_SERVICE_ACTION_INCOMING,
+                        data
+                    )
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
                     if (callkitNotificationManager.incomingChannelEnabled()) {
@@ -104,10 +109,11 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     callkitNotificationManager.createNotificationChanel(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_START, data)
                     if (data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
-                        val onGoingNotificationIntent =
-                            Intent(context, OngoingNotificationService::class.java);
-                        onGoingNotificationIntent.putExtras(data)
-                        context.startService(onGoingNotificationIntent)
+                        CallkitNotificationService.startServiceWithAction(
+                            context,
+                            CallkitNotificationService.CALLKIT_NOTIFICATION_SERVICE_ACTION_STARTED,
+                            data
+                        )
                     }
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
@@ -122,10 +128,11 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     callkitNotificationManager.clearIncomingNotification(data, true)
                     // show ongoing call when call is accepted
                     if (data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
-                        val onGoingNotificationIntent =
-                            Intent(context, OngoingNotificationService::class.java);
-                        onGoingNotificationIntent.putExtras(data)
-                        context.startService(onGoingNotificationIntent)
+                        CallkitNotificationService.startServiceWithAction(
+                            context,
+                            CallkitNotificationService.CALLKIT_NOTIFICATION_SERVICE_ACTION_STARTED,
+                            data
+                        )
                     }
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
@@ -147,7 +154,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
-                    context.stopService(Intent(context, OngoingNotificationService::class.java))
+                    context.stopService(Intent(context, CallkitNotificationService::class.java))
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data, false)
                     removeCall(context, Data.fromBundle(data))
@@ -212,10 +219,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME,
                 ""
             ),
-            "isImportant" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_IMPORTANT, false),
+            "isImportant" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_IMPORTANT, true),
             "isBot" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_BOT, false),
         )
-        val notification = mapOf(
+        val missedCallNotification = mapOf(
             "id" to data.getInt(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_ID),
             "showNotification" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_SHOW),
             "count" to data.getInt(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_COUNT),
@@ -224,7 +231,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "isShowCallback" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_CALLBACK_SHOW),
         )
         val callingNotification = mapOf(
-            "id" to data.getInt(CallkitConstants.EXTRA_CALLKIT_CALLING_ID),
+            "id" to data.getString(CallkitConstants.EXTRA_CALLKIT_CALLING_ID),
             "showNotification" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW),
             "subtitle" to data.getString(CallkitConstants.EXTRA_CALLKIT_CALLING_SUBTITLE),
             "callbackText" to data.getString(CallkitConstants.EXTRA_CALLKIT_CALLING_HANG_UP_TEXT),
@@ -240,7 +247,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "textAccept" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, ""),
             "textDecline" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, ""),
             "extra" to data.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA)!!,
-            "missedCallNotification" to notification,
+            "missedCallNotification" to missedCallNotification,
             "callingNotification" to callingNotification,
             "android" to android
         )
