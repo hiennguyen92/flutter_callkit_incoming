@@ -206,7 +206,7 @@ class CallkitIncomingActivity : Activity() {
         }
 
         val avatarUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-        if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+        if (!avatarUrl.isNullOrEmpty()) {
             ivAvatar.visibility = View.VISIBLE
             val headers =
                 data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
@@ -246,7 +246,7 @@ class CallkitIncomingActivity : Activity() {
         } catch (error: Exception) {
         }
         var backgroundUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_URL, "")
-        if (backgroundUrl != null && backgroundUrl.isNotEmpty()) {
+        if (!backgroundUrl.isNullOrEmpty()) {
             if (!backgroundUrl.startsWith("http://", true) && !backgroundUrl.startsWith(
                     "https://",
                     true

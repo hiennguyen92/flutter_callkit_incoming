@@ -127,16 +127,22 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("silenceEvents", false);
   }
 
-  /// Request permisstion show notification for Android(13)
+  /// Request permission show notification for Android(13)
   /// Only Android: show request permission post notification for Android 13+
   static Future requestNotificationPermission(dynamic data) async {
     return await _channel.invokeMethod("requestNotificationPermission", data);
   }
 
-  /// Request permisstion show notification for Android(14)+
+  /// Request permission show notification for Android(14)+
   /// Only Android: show request permission for ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT
   static Future requestFullIntentPermission() async {
     return await _channel.invokeMethod("requestFullIntentPermission");
+  }
+
+  /// Check can use full screen intent for Android(14)+
+  /// Only Android: canUseFullScreenIntent permission for ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT
+  static Future canUseFullScreenIntent() async {
+    return await _channel.invokeMethod("canUseFullScreenIntent");
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {

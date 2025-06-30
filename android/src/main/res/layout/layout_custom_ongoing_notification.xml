@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
@@ -10,37 +11,25 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvNameCaller"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/tvNameCaller"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
-                    android:textSize="@dimen/size_text_action" />
-
-
-                <TextView
-                    android:id="@+id/tvNumber"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
-                    android:textSize="@dimen/size_text_action" />
-            </LinearLayout>
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textSize="@dimen/size_text_action" />
 
 
             <TextView
-                android:id="@+id/tvTapOpen"
+                android:id="@+id/tvNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
-                android:textSize="@dimen/size_text_sub" />
+                android:textSize="@dimen/size_text_action" />
+
 
         </LinearLayout>
 
@@ -50,8 +39,8 @@
             android:layout_width="@dimen/base_margin_x4"
             android:layout_height="@dimen/base_margin_x4"
             android:scaleType="centerCrop"
-            android:visibility="visible"
-            android:src="@drawable/ic_default_avatar"/>
+            android:src="@drawable/ic_default_avatar"
+            android:visibility="visible" />
     </LinearLayout>
 
     <LinearLayout
@@ -67,7 +56,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:background="@drawable/rounded_button_accept"
+            android:background="@drawable/rounded_button_decline"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
@@ -89,11 +78,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:background="@drawable/rounded_button_accept"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="horizontal"/>
+            android:orientation="horizontal" />
 
     </LinearLayout>
 

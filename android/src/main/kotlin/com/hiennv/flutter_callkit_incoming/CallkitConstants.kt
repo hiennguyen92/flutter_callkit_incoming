@@ -24,6 +24,7 @@ object CallkitConstants {
         "com.hiennv.flutter_callkit_incoming.ACTION_CALL_AUDIO_STATE_CHANGE"
     const val ACTION_CALL_HELD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_HELD"
     const val ACTION_CALL_UNHELD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_UNHELD"
+    const val ACTION_CALL_CONNECTED = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CONNECTED"
 
 
     const val EXTRA_CALLKIT_INCOMING_DATA = "EXTRA_CALLKIT_INCOMING_DATA"
@@ -52,8 +53,6 @@ object CallkitConstants {
     const val EXTRA_CALLKIT_CALLING_HANG_UP_SHOW = "EXTRA_CALLKIT_CALLING_HANG_UP_SHOW"
     const val EXTRA_CALLKIT_CALLING_HANG_UP_TEXT =
         "EXTRA_CALLKIT_CALLING_HANG_UP_TEXT"
-    const val EXTRA_CALLKIT_CALLING_TAP_OPEN_TEXT =
-        "EXTRA_CALLKIT_CALLING_TAP_OPEN_TEXT"
 
     const val EXTRA_CALLKIT_EXTRA = "EXTRA_CALLKIT_EXTRA"
     const val EXTRA_CALLKIT_HEADERS = "EXTRA_CALLKIT_HEADERS"

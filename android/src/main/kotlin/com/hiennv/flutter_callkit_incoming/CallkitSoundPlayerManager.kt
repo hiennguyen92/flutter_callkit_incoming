@@ -1,8 +1,6 @@
 package com.hiennv.flutter_callkit_incoming
 
-import android.app.Service
 import android.content.Context
-import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -11,27 +9,29 @@ import android.net.Uri
 import android.os.*
 import android.text.TextUtils
 
-class CallkitSoundPlayerService : Service() {
+class CallkitSoundPlayerManager(private val context: Context) {
 
     private var vibrator: Vibrator? = null
     private var audioManager: AudioManager? = null
 
     private var mediaPlayer: MediaPlayer? = null
-    private var data: Bundle? = null
 
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    fun play(data: Bundle) {
         this.prepare()
-        this.playSound(intent)
+        this.playSound(data)
         this.playVibrator()
-        return START_STICKY;
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    fun stop() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        vibrator?.cancel()
+
+        mediaPlayer = null
+        vibrator = null
+    }
+
+    fun destroy() {
         mediaPlayer?.stop()
         mediaPlayer?.release()
         vibrator?.cancel()
@@ -49,12 +49,12 @@ class CallkitSoundPlayerService : Service() {
     private fun playVibrator() {
         vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vibratorManager =
-                this.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
             vibratorManager.defaultVibrator
         } else {
-            getSystemService(VIBRATOR_SERVICE) as Vibrator
+            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
-        audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
+        audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         when (audioManager?.ringerMode) {
             AudioManager.RINGER_MODE_SILENT -> {
             }
@@ -74,19 +74,18 @@ class CallkitSoundPlayerService : Service() {
         }
     }
 
-    private fun playSound(intent: Intent?) {
-        this.data = intent?.extras
-        val sound = this.data?.getString(
+    private fun playSound(data: Bundle?) {
+        val sound = data?.getString(
             CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH,
             ""
         )
-        var uri = sound?.let { getRingtoneUri(it) }
+        val uri = sound?.let { getRingtoneUri(it) }
         if (uri == null) {
             // Failed to get ringtone url, can't play sound
             return
         }
         try {
-            mediaPlayer(uri!!)
+            mediaPlayer(uri)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -113,13 +112,13 @@ class CallkitSoundPlayerService : Service() {
     private fun setDataSource(uri: Uri) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val assetFileDescriptor =
-                applicationContext.contentResolver.openAssetFileDescriptor(uri, "r")
+                context.contentResolver.openAssetFileDescriptor(uri, "r")
             if (assetFileDescriptor != null) {
                 mediaPlayer?.setDataSource(assetFileDescriptor)
             }
             return
         }
-        mediaPlayer?.setDataSource(applicationContext, uri)
+        mediaPlayer?.setDataSource(context, uri)
     }
 
     private fun getRingtoneUri(fileName: String): Uri? {
@@ -133,9 +132,9 @@ class CallkitSoundPlayerService : Service() {
         }
 
         try {
-            val resId = resources.getIdentifier(fileName, "raw", packageName)
+            val resId = context.resources.getIdentifier(fileName, "raw", context.packageName)
             if (resId != 0) {
-                return Uri.parse("android.resource://${packageName}/$resId")
+                return Uri.parse("android.resource://${context.packageName}/$resId")
             }
 
             // For any other unresolved filename, return the default ringtone
@@ -150,15 +149,15 @@ class CallkitSoundPlayerService : Service() {
         try {
             if (!useSystemDefault) {
                 // First try to use ringtone_default resource if it exists
-                val resId = resources.getIdentifier("ringtone_default", "raw", packageName)
+                val resId = context.resources.getIdentifier("ringtone_default", "raw", context.packageName)
                 if (resId != 0) {
-                    return Uri.parse("android.resource://${packageName}/$resId")
+                    return Uri.parse("android.resource://${context.packageName}/$resId")
                 }
             }
 
             // Fall back to system default ringtone
             return RingtoneManager.getActualDefaultRingtoneUri(
-                this@CallkitSoundPlayerService,
+                context,
                 RingtoneManager.TYPE_RINGTONE
             )
         } catch (e: Exception) {

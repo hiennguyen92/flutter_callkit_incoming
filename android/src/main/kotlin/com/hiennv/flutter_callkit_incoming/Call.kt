@@ -109,7 +109,7 @@ data class Data(val args: Map<String, Any?>) {
     var isAccepted: Boolean = false
 
     @JsonProperty("callingNotificationId")
-    var callingNotificationId: Int? = null
+    var callingNotificationId: String? = null
 
     @JsonProperty("isShowCallingNotification")
     var isShowCallingNotification: Boolean = true
@@ -185,7 +185,7 @@ data class Data(val args: Map<String, Any?>) {
             args["callingNotification"] as? Map<String, Any?>?
 
         if (callingNotification != null) {
-            callingNotificationId = callingNotification["id"] as? Int?
+            callingNotificationId = callingNotification["id"] as? String?
             callingNotificationSubtitle = callingNotification["subtitle"] as? String?
             //callingNotificationCount = missedNotification["count"] as? Int? ?: 1
             callingNotificationHangupText = callingNotification["callbackText"] as? String?
@@ -246,12 +246,11 @@ data class Data(val args: Map<String, Any?>) {
             missedNotificationCallbackText
         )
 
-        callingNotificationId?.let {
-            bundle.putInt(
-                CallkitConstants.EXTRA_CALLKIT_CALLING_ID,
-                it
-            )
-        }
+        bundle.putString(
+            CallkitConstants.EXTRA_CALLKIT_CALLING_ID,
+            callingNotificationId
+        )
+
         bundle.putBoolean(
             CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW,
             isShowCallingNotification
@@ -367,7 +366,7 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_CALLBACK_TEXT, "")
 
 
-            data.callingNotificationId = bundle.getInt(CallkitConstants.EXTRA_CALLKIT_CALLING_ID)
+            data.callingNotificationId = bundle.getString(CallkitConstants.EXTRA_CALLKIT_CALLING_ID)
             data.isShowCallingNotification =
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)
             data.callingNotificationSubtitle =
