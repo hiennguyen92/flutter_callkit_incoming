@@ -11,20 +11,14 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ServiceInfo
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.Icon
-import android.graphics.drawable.RippleDrawable
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
+import android.text.format.DateFormat
 import android.view.View
 import android.widget.RemoteViews
 import androidx.appcompat.app.AlertDialog
@@ -32,13 +26,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.IconCompat
 import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
-import com.squareup.picasso.OkHttp3Downloader
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
-import okhttp3.OkHttpClient
+import java.util.Date
 
 
 class CallkitNotificationManager(private val context: Context) {
@@ -120,7 +109,6 @@ class CallkitNotificationManager(private val context: Context) {
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         createNotificationChanel(data)
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
-        notificationBuilder.setAutoCancel(false)
         notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -194,23 +182,23 @@ class CallkitNotificationManager(private val context: Context) {
                         )
                     )
                 }
-                notificationBuilder.setLargeIcon(
-                    BitmapFactory.decodeResource(
-                        context.resources,
-                        R.drawable.ic_default_avatar
-                    )
-                )
-//                val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-//                if (avatarUrl != null && avatarUrl.isNotEmpty()) {
-//                    val headers =
-//                        data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
-//                    targetInComingAvatarDefault = createAvatarTargetDefault(notificationId)
-//                    val picasso = PicassoProvider.get(context, headers)
-//                    picasso
-//                        .load(avatarUrl)
-//                        .transform(CircleTransform())
-//                        .into(targetInComingAvatarCustom!!)
-//                }
+//                notificationBuilder.setLargeIcon(
+//                    BitmapFactory.decodeResource(
+//                        context.resources,
+//                        R.drawable.ic_default_avatar
+//                    )
+//                )
+                val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+                if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                    val headers =
+                        data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+                    targetInComingAvatarCustom = createAvatarTargetDefault(notificationId)
+                    val picasso = PicassoProvider.get(context, headers)
+                    picasso
+                        .load(avatarUrl)
+                        .transform(CircleTransform())
+                        .into(targetInComingAvatarCustom!!)
+                }
             } else {
                 notificationViews =
                     RemoteViews(context.packageName, R.layout.layout_custom_notification)
@@ -293,7 +281,7 @@ class CallkitNotificationManager(private val context: Context) {
         }
         notificationBuilder.setOngoing(true)
         val notification = notificationBuilder.build()
-        notification.flags = Notification.FLAG_INSISTENT
+
         return CallkitNotification(notificationId, notification)
     }
 
@@ -343,6 +331,14 @@ class CallkitNotificationManager(private val context: Context) {
         }
     }
 
+    private fun getSystemFormattedTime(context: Context): String {
+        val currentTimeMillis = System.currentTimeMillis()
+        val date = Date(currentTimeMillis)
+
+        val timeFormatter = DateFormat.getTimeFormat(context)
+        return timeFormatter.format(date)
+    }
+
     @SuppressLint("MissingPermission")
     fun showMissCallNotification(data: Bundle) {
         val missedNotificationId = data.getInt(
@@ -367,6 +363,7 @@ class CallkitNotificationManager(private val context: Context) {
                 notificationBuilder.setCategory(Notification.CATEGORY_MISSED_CALL)
             }
         }
+        notificationBuilder.setWhen(System.currentTimeMillis())
         val textMissedCall = data.getString(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_SUBTITLE, "")
         notificationBuilder.setSubText(if (TextUtils.isEmpty(textMissedCall)) context.getString(R.string.text_missed_call) else textMissedCall)
         notificationBuilder.setSmallIcon(smallIcon)
@@ -379,14 +376,28 @@ class CallkitNotificationManager(private val context: Context) {
         if (isCustomNotification) {
             notificationViews =
                 RemoteViews(context.packageName, R.layout.layout_custom_miss_notification)
+            notificationSmallViews =
+                RemoteViews(context.packageName, R.layout.layout_custom_miss_small_notification)
             notificationViews?.setTextViewText(
                 R.id.tvNameCaller,
                 data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
             )
+            notificationSmallViews?.setTextViewText(
+                R.id.tvNameCaller,
+                data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
+            )
+            notificationSmallViews?.setTextViewText(
+                R.id.tvTime,
+                getSystemFormattedTime(context)
+            )
             val isShowCallID =
-                data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID, false)
-            if (isShowCallID == true) {
+                data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID, false)
+            if (isShowCallID) {
                 notificationViews?.setTextViewText(
+                    R.id.tvNumber,
+                    data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
+                )
+                notificationSmallViews?.setTextViewText(
                     R.id.tvNumber,
                     data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
                 )
@@ -421,7 +432,7 @@ class CallkitNotificationManager(private val context: Context) {
                     .into(targetMissingAvatarCustom!!)
             }
             notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            notificationBuilder.setCustomContentView(notificationViews)
+            notificationBuilder.setCustomContentView(notificationSmallViews)
             notificationBuilder.setCustomBigContentView(notificationViews)
         } else {
             notificationBuilder.setContentTitle(
@@ -557,12 +568,17 @@ class CallkitNotificationManager(private val context: Context) {
                         )
                     )
                 }
-                notificationOngoingBuilder.setLargeIcon(
-                    BitmapFactory.decodeResource(
-                        context.resources,
-                        R.drawable.ic_default_avatar
-                    )
-                )
+                val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+                if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                    val headers =
+                        data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+                    targetOnGoingAvatarCustom = createOnGoingAvatarTargetDefault(onGoingNotificationId)
+                    val picasso = PicassoProvider.get(context, headers)
+                    picasso
+                        .load(avatarUrl)
+                        .transform(CircleTransform())
+                        .into(targetOnGoingAvatarCustom!!)
+                }
             } else {
                 notificationOngoingViews =
                     RemoteViews(context.packageName, R.layout.layout_custom_ongoing_notification)
@@ -868,6 +884,18 @@ class CallkitNotificationManager(private val context: Context) {
         return NotificationManagerCompat.from(context)
     }
 
+    @SuppressLint("MissingPermission")
+    fun showIncomingNotification(data: Bundle) {
+        val callkitNotification = getIncomingNotification(data)
+        getNotificationManager().notify(callkitNotification.id, callkitNotification.notification)
+    }
+
+    @SuppressLint("MissingPermission")
+    fun showOngoingCallNotification(data: Bundle, isConnected: Boolean?) {
+        val callkitNotification = getOnGoingCallNotification(data, isConnected)
+        getNotificationManager().notify(callkitNotification.id, callkitNotification.notification)
+    }
+
 
     fun requestNotificationPermission(activity: Activity?, map: Map<String, Any>) {
         this.dataNotificationPermission = map
@@ -899,6 +927,8 @@ class CallkitNotificationManager(private val context: Context) {
         }
         return true
     }
+
+
 
     fun onRequestPermissionsResult(activity: Activity?, requestCode: Int, grantResults: IntArray) {
         when (requestCode) {
@@ -983,6 +1013,11 @@ class CallkitNotificationManager(private val context: Context) {
                 .show()
         }
     }
+
+    fun destroy() {
+
+    }
+
 }
 
 data class CallkitNotification(val id: Int, val notification: Notification)

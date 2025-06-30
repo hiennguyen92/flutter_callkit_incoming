@@ -6,8 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
@@ -77,28 +75,23 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
     }
 
+    private val callkitNotificationManager: CallkitNotificationManager? = FlutterCallkitIncomingPlugin.getInstance().getCallkitNotificationManager()
+    private val callkitSoundPlayerManager: CallkitSoundPlayerManager? = FlutterCallkitIncomingPlugin.getInstance().getCallkitSoundPlayerManager()
+
+
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
-        val callkitNotificationManager = CallkitNotificationManager(context)
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA) ?: return
         when (action) {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
                 try {
-                    callkitNotificationManager.createNotificationChanel(data)
-                    CallkitNotificationService.startServiceWithAction(
-                        context,
-                        CallkitNotificationService.CALLKIT_NOTIFICATION_SERVICE_ACTION_INCOMING,
-                        data
-                    )
+                    callkitNotificationManager?.showIncomingNotification(data)
+                    if (callkitNotificationManager?.incomingChannelEnabled() == true) {
+                        callkitSoundPlayerManager?.play(data)
+                    }
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
-                    if (callkitNotificationManager.incomingChannelEnabled()) {
-                        val soundPlayerServiceIntent =
-                            Intent(context, CallkitSoundPlayerService::class.java)
-                        soundPlayerServiceIntent.putExtras(data)
-                        context.startService(soundPlayerServiceIntent)
-                    }
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -106,15 +99,14 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_START}" -> {
                 try {
-                    callkitNotificationManager.createNotificationChanel(data)
-                    sendEventFlutter(CallkitConstants.ACTION_CALL_START, data)
                     if (data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
                         CallkitNotificationService.startServiceWithAction(
                             context,
-                            CallkitNotificationService.CALLKIT_NOTIFICATION_SERVICE_ACTION_STARTED,
+                            CallkitConstants.ACTION_CALL_START,
                             data
                         )
                     }
+                    sendEventFlutter(CallkitConstants.ACTION_CALL_START, data)
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
@@ -123,17 +115,13 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT}" -> {
                 try {
-                    sendEventFlutter(CallkitConstants.ACTION_CALL_ACCEPT, data)
-                    context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data, true)
                     // show ongoing call when call is accepted
-                    if (data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
-                        CallkitNotificationService.startServiceWithAction(
-                            context,
-                            CallkitNotificationService.CALLKIT_NOTIFICATION_SERVICE_ACTION_STARTED,
-                            data
-                        )
-                    }
+                    CallkitNotificationService.startServiceWithAction(
+                        context,
+                        CallkitConstants.ACTION_CALL_ACCEPT,
+                        data
+                    )
+                    sendEventFlutter(CallkitConstants.ACTION_CALL_ACCEPT, data)
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
@@ -142,9 +130,13 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
+                    // clear notification and stop service
+                    CallkitNotificationService.startServiceWithAction(
+                        context,
+                        CallkitConstants.ACTION_CALL_DECLINE,
+                        data
+                    )
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
-                    context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data, false)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
@@ -153,10 +145,13 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
                 try {
+                    // clear notification and stop service
+                    CallkitNotificationService.startServiceWithAction(
+                        context,
+                        CallkitConstants.ACTION_CALL_ENDED,
+                        data
+                    )
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
-                    context.stopService(Intent(context, CallkitNotificationService::class.java))
-                    context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data, false)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
@@ -165,11 +160,13 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_TIMEOUT}" -> {
                 try {
+                    // stop sound and show miss notification
+                    CallkitNotificationService.startServiceWithAction(
+                        context,
+                        CallkitConstants.ACTION_CALL_TIMEOUT,
+                        data
+                    )
                     sendEventFlutter(CallkitConstants.ACTION_CALL_TIMEOUT, data)
-                    context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    if (data.getBoolean(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_SHOW, true)) {
-                        callkitNotificationManager.showMissCallNotification(data)
-                    }
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
@@ -178,7 +175,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_CALLBACK}" -> {
                 try {
-                    callkitNotificationManager.clearMissCallNotification(data)
+                    callkitNotificationManager?.clearMissCallNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_CALLBACK, data)
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                         val closeNotificationPanel = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
@@ -246,7 +243,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "duration" to data.getLong(CallkitConstants.EXTRA_CALLKIT_DURATION, 0L),
             "textAccept" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, ""),
             "textDecline" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, ""),
-            "extra" to data.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA)!!,
+            "extra" to data.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA),
             "missedCallNotification" to missedCallNotification,
             "callingNotification" to callingNotification,
             "android" to android
