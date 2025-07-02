@@ -40,8 +40,8 @@ class CallkitNotificationService : Service() {
 
     }
 
-    private val callkitNotificationManager: CallkitNotificationManager? = FlutterCallkitIncomingPlugin.getInstance().getCallkitNotificationManager()
-    private val callkitSoundPlayerManager: CallkitSoundPlayerManager? = FlutterCallkitIncomingPlugin.getInstance().getCallkitSoundPlayerManager()
+    private val callkitNotificationManager: CallkitNotificationManager? = FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
+    private val callkitSoundPlayerManager: CallkitSoundPlayerManager? = FlutterCallkitIncomingPlugin.getInstance()?.getCallkitSoundPlayerManager()
 
 
 
@@ -53,7 +53,7 @@ class CallkitNotificationService : Service() {
         if (intent?.action === CallkitConstants.ACTION_CALL_START) {
             intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
                 ?.let {
-                    FlutterCallkitIncomingPlugin.getInstance().getCallkitNotificationManager()?.createNotificationChanel(it)
+                    FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()?.createNotificationChanel(it)
                     showOngoingCallNotification(it, false)
                 }
         }

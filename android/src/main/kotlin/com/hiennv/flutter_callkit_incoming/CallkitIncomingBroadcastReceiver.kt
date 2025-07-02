@@ -75,8 +75,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
     }
 
-    private val callkitNotificationManager: CallkitNotificationManager? = FlutterCallkitIncomingPlugin.getInstance().getCallkitNotificationManager()
-    private val callkitSoundPlayerManager: CallkitSoundPlayerManager? = FlutterCallkitIncomingPlugin.getInstance().getCallkitSoundPlayerManager()
+    private val callkitNotificationManager: CallkitNotificationManager? = FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
+    private val callkitSoundPlayerManager: CallkitSoundPlayerManager? = FlutterCallkitIncomingPlugin.getInstance()?.getCallkitSoundPlayerManager()
 
 
     @SuppressLint("MissingPermission")

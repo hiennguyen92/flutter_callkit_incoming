@@ -85,8 +85,8 @@ class CallkitNotificationManager(private val context: Context) {
     @SuppressLint("MissingPermission")
     private fun createOnGoingAvatarTargetDefault(notificationId: Int): SafeTarget {
         return object : SafeTarget(notificationId, onLoaded = { bitmap ->
-            notificationOngoingBuilder.setLargeIcon(bitmap)
-            getNotificationManager().notify(notificationId, notificationOngoingBuilder.build())
+            //notificationOngoingBuilder.setLargeIcon(bitmap)
+            //getNotificationManager().notify(notificationId, notificationOngoingBuilder.build())
         }) {}
     }
 

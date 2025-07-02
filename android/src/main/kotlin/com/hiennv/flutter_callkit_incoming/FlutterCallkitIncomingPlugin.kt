@@ -27,11 +27,14 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         @SuppressLint("StaticFieldLeak")
         private lateinit var instance: FlutterCallkitIncomingPlugin
 
-        public fun getInstance(): FlutterCallkitIncomingPlugin {
-            return instance
+        fun getInstance(): FlutterCallkitIncomingPlugin? {
+            if(hasInstance()) {
+                return instance
+            }
+            return null
         }
 
-        public fun hasInstance(): Boolean {
+        fun hasInstance(): Boolean {
             return ::instance.isInitialized
         }
 
