@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.util.Log
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -43,11 +44,14 @@ open class SafeTarget(
     var isCancelled = false
 
     override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
+        Log.d("isCancelled", isCancelled.toString())
         if (!isCancelled) {
             onLoaded(bitmap)
         }
     }
 
     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+        Log.d("isCancelled", isCancelled.toString())
+    }
 }

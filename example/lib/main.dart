@@ -100,8 +100,13 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (calls is List) {
       if (calls.isNotEmpty) {
         print('DATA: $calls');
-        _currentUuid = calls[0]['id'];
-        return calls[0];
+        if(calls[0]['id'] != null && calls[0]['isAccepted'] == true) {
+          _currentUuid = calls[0]['id'];
+          return calls[0];
+        } else {
+          _currentUuid = "";
+          return null;
+        }
       } else {
         _currentUuid = "";
         return null;

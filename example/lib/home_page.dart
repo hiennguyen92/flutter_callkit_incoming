@@ -136,7 +136,7 @@ class HomePageState extends State<HomePage> {
         id: _currentUuid,
         nameCaller: 'Hien Nguyen',
         appName: 'Callkit',
-        avatar: 'https://i.pravatar.cc/100',
+        avatar: 'https://placehold.co/400',
         handle: '0123456789',
         type: 1,
         duration: 30000,

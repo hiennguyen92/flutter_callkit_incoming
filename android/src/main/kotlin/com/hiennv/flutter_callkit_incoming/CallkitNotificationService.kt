@@ -5,6 +5,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -40,9 +41,10 @@ class CallkitNotificationService : Service() {
 
     }
 
-    private val callkitNotificationManager: CallkitNotificationManager? = FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
-    private val callkitSoundPlayerManager: CallkitSoundPlayerManager? = FlutterCallkitIncomingPlugin.getInstance()?.getCallkitSoundPlayerManager()
-
+    private val callkitNotificationManager: CallkitNotificationManager? =
+        FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
+    private val callkitSoundPlayerManager: CallkitSoundPlayerManager? =
+        FlutterCallkitIncomingPlugin.getInstance()?.getCallkitSoundPlayerManager()
 
 
     override fun onCreate() {
@@ -53,7 +55,8 @@ class CallkitNotificationService : Service() {
         if (intent?.action === CallkitConstants.ACTION_CALL_START) {
             intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
                 ?.let {
-                    FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()?.createNotificationChanel(it)
+                    FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
+                        ?.createNotificationChanel(it)
                     showOngoingCallNotification(it, false)
                 }
         }
@@ -89,6 +92,7 @@ class CallkitNotificationService : Service() {
             intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
                 ?.let {
                     callkitSoundPlayerManager?.stop()
+                    callkitNotificationManager?.clearIncomingNotification(it, false)
                     if (it.getBoolean(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_SHOW, true)) {
                         callkitNotificationManager?.showMissCallNotification(it)
                     }
@@ -100,7 +104,6 @@ class CallkitNotificationService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun showOngoingCallNotification(bundle: Bundle, isConnected: Boolean? = false) {
-
 
         val callkitNotification =
             this.callkitNotificationManager?.getOnGoingCallNotification(bundle, isConnected)
@@ -124,10 +127,10 @@ class CallkitNotificationService : Service() {
         callkitSoundPlayerManager?.destroy()
     }
 
-
     override fun onBind(p0: Intent?): IBinder? {
-        return null;
+        return null
     }
+
 
 
 }
