@@ -39,7 +39,10 @@ import java.net.URL
 import java.util.Date
 
 
-class CallkitNotificationManager(private val context: Context, private val callkitSoundPlayerManager: CallkitSoundPlayerManager?) {
+class CallkitNotificationManager(
+    private val context: Context,
+    private val callkitSoundPlayerManager: CallkitSoundPlayerManager?
+) {
 
     companion object {
         const val PERMISSION_NOTIFICATION_REQUEST_CODE = 6969
@@ -86,13 +89,16 @@ class CallkitNotificationManager(private val context: Context, private val callk
     }
 
     @SuppressLint("MissingPermission")
-    private fun createInComingAvatarTargetCustom(notificationId: Int, isCallStyle: Boolean = false): SafeTarget {
+    private fun createInComingAvatarTargetCustom(
+        notificationId: Int,
+        isCallStyle: Boolean = false
+    ): SafeTarget {
         return object : SafeTarget(notificationId, onLoaded = { bitmap ->
             notificationViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
             notificationViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
             notificationSmallViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
             notificationSmallViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
-            if(isCallStyle) notificationBuilder?.setLargeIcon(bitmap)
+            if (isCallStyle) notificationBuilder?.setLargeIcon(bitmap)
             notificationBuilder?.let { getNotificationManager().notify(notificationId, it.build()) }
         }) {}
     }
@@ -149,13 +155,16 @@ class CallkitNotificationManager(private val context: Context, private val callk
     }
 
     @SuppressLint("MissingPermission")
-    private fun createOnGoingAvatarTargetCustom(notificationId: Int, isCallStyle: Boolean = false): SafeTarget {
+    private fun createOnGoingAvatarTargetCustom(
+        notificationId: Int,
+        isCallStyle: Boolean = false
+    ): SafeTarget {
         return object : SafeTarget(notificationId, onLoaded = { bitmap ->
             notificationOngoingViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
             notificationOngoingViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
             notificationOngoingSmallViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
             notificationOngoingSmallViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
-            if(isCallStyle) notificationOngoingBuilder?.setLargeIcon(bitmap)
+            if (isCallStyle) notificationOngoingBuilder?.setLargeIcon(bitmap)
             notificationOngoingBuilder?.let {
                 getNotificationManager().notify(
                     notificationId, it.build()
@@ -238,9 +247,16 @@ class CallkitNotificationManager(private val context: Context, private val callk
                         )
                     )
                 }
-                val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-                if (avatarUrl != null && avatarUrl.isNotEmpty()) {
-                    Log.d("avatarUrl", avatarUrl)
+                var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+                if (!avatarUrl.isNullOrEmpty()) {
+                    if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith(
+                            "https://",
+                            true
+                        )
+                    ) {
+                        avatarUrl =
+                            String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
+                    }
                     val headers =
                         data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
                     if (targetInComingAvatarCustom == null) targetInComingAvatarCustom =
@@ -285,8 +301,12 @@ class CallkitNotificationManager(private val context: Context, private val callk
                 )
             )
             var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-            if (avatarUrl != null && avatarUrl.isNotEmpty()) {
-                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith("https://", true)) {
+            if (!avatarUrl.isNullOrEmpty()) {
+                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith(
+                        "https://",
+                        true
+                    )
+                ) {
                     avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
                 }
                 val headers =
@@ -365,7 +385,7 @@ class CallkitNotificationManager(private val context: Context, private val callk
             if (TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept
         )
         var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-        if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+        if (!avatarUrl.isNullOrEmpty()) {
             if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith("https://", true)) {
                 avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
             }
@@ -389,8 +409,9 @@ class CallkitNotificationManager(private val context: Context, private val callk
     @SuppressLint("MissingPermission")
     fun showMissCallNotification(data: Bundle) {
 
-        val isMissedCallShow = data.getBoolean(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_SHOW, true)
-        if(!isMissedCallShow) return
+        val isMissedCallShow =
+            data.getBoolean(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_SHOW, true)
+        if (!isMissedCallShow) return
 
 
         val missingId = data.getString(
@@ -475,8 +496,12 @@ class CallkitNotificationManager(private val context: Context, private val callk
             )
 
             var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-            if (avatarUrl != null && avatarUrl.isNotEmpty()) {
-                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith("https://", true)) {
+            if (!avatarUrl.isNullOrEmpty()) {
+                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith(
+                        "https://",
+                        true
+                    )
+                ) {
                     avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
                 }
                 val headers =
@@ -506,8 +531,12 @@ class CallkitNotificationManager(private val context: Context, private val callk
                 )
             )
             var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-            if (avatarUrl != null && avatarUrl.isNotEmpty()) {
-                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith("https://", true)) {
+            if (!avatarUrl.isNullOrEmpty()) {
+                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith(
+                        "https://",
+                        true
+                    )
+                ) {
                     avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
                 }
                 val headers =
@@ -630,8 +659,16 @@ class CallkitNotificationManager(private val context: Context, private val callk
                         )
                     )
                 }
-                val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-                if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+                if (!avatarUrl.isNullOrEmpty()) {
+                    if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith(
+                            "https://",
+                            true
+                        )
+                    ) {
+                        avatarUrl =
+                            String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
+                    }
                     val headers =
                         data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
                     if (targetOnGoingAvatarCustom == null) targetOnGoingAvatarCustom =
@@ -687,8 +724,16 @@ class CallkitNotificationManager(private val context: Context, private val callk
                     if (TextUtils.isEmpty(textHangup)) context.getString(R.string.text_hang_up) else textHangup
                 )
 
-                val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-                if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+                if (!avatarUrl.isNullOrEmpty()) {
+                    if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith(
+                            "https://",
+                            true
+                        )
+                    ) {
+                        avatarUrl =
+                            String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
+                    }
                     val headers =
                         data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
@@ -718,8 +763,15 @@ class CallkitNotificationManager(private val context: Context, private val callk
                     CallkitConstants.EXTRA_CALLKIT_HANDLE, ""
                 )
             )
-            val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-            if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+            var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+            if (!avatarUrl.isNullOrEmpty()) {
+                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith(
+                        "https://",
+                        true
+                    )
+                ) {
+                    avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
+                }
                 val headers =
                     data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
@@ -818,7 +870,7 @@ class CallkitNotificationManager(private val context: Context, private val callk
         return areNotificationsEnabled() && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && channel != null && channel.importance > NotificationManagerCompat.IMPORTANCE_NONE) || Build.VERSION.SDK_INT < Build.VERSION_CODES.O
     }
 
-    public fun createNotificationChanel(data: Bundle) {
+    fun createNotificationChanel(data: Bundle) {
         val incomingCallChannelName = data.getString(
             CallkitConstants.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, "Incoming Call"
         )
@@ -1009,9 +1061,10 @@ class CallkitNotificationManager(private val context: Context, private val callk
                             )
                         ) {
                             //showDialogPermissionRationale()
-                            if (this.dataNotificationPermission["rationaleMessagePermission"] != null) {
+                            if (this.dataNotificationPermission["title"] != null && this.dataNotificationPermission["rationaleMessagePermission"] != null) {
                                 showDialogMessage(
                                     it,
+                                    this.dataNotificationPermission["title"] as String,
                                     this.dataNotificationPermission["rationaleMessagePermission"] as String
                                 ) { dialog, _ ->
                                     dialog?.dismiss()
@@ -1026,9 +1079,10 @@ class CallkitNotificationManager(private val context: Context, private val callk
                             }
                         } else {
                             //Open Setting
-                            if (this.dataNotificationPermission["postNotificationMessageRequired"] != null) {
+                            if (this.dataNotificationPermission["title"] != null && this.dataNotificationPermission["postNotificationMessageRequired"] != null) {
                                 showDialogMessage(
                                     it,
+                                    this.dataNotificationPermission["title"] as String,
                                     this.dataNotificationPermission["postNotificationMessageRequired"] as String
                                 ) { dialog, _ ->
                                     dialog?.dismiss()
@@ -1042,6 +1096,7 @@ class CallkitNotificationManager(private val context: Context, private val callk
                             } else {
                                 showDialogMessage(
                                     it,
+                                    it.resources.getString(R.string.text_title_post_notification),
                                     it.resources.getString(R.string.text_post_notification_message_required)
                                 ) { dialog, _ ->
                                     dialog?.dismiss()
@@ -1061,10 +1116,13 @@ class CallkitNotificationManager(private val context: Context, private val callk
     }
 
     private fun showDialogMessage(
-        activity: Activity?, message: String, okListener: DialogInterface.OnClickListener
+        activity: Activity?,
+        title: String,
+        message: String,
+        okListener: DialogInterface.OnClickListener
     ) {
         activity?.let {
-            AlertDialog.Builder(it, R.style.DialogTheme).setMessage(message)
+            AlertDialog.Builder(it, R.style.DialogTheme).setTitle(title).setMessage(message)
                 .setPositiveButton(android.R.string.ok, okListener)
                 .setNegativeButton(android.R.string.cancel, null).create().show()
         }

@@ -105,6 +105,7 @@ class HomePageState extends State<HomePage> {
 
   Future<void> requestNotificationPermission() async {
     await FlutterCallkitIncoming.requestNotificationPermission({
+      "title": "Notification Permission",
       "rationaleMessagePermission":
           "Notification permission is required, to show notification.",
       "postNotificationMessageRequired":

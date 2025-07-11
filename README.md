@@ -149,14 +149,18 @@ Our top sponsors are shown below!
   For Android 13+, please `requestNotificationPermission` or requestPermission of firebase_messaging before `showCallkitIncoming`
     ```dart
       await FlutterCallkitIncoming.requestNotificationPermission({
+        "title": "Notification permission",
         "rationaleMessagePermission": "Notification permission is required, to show notification.",
         "postNotificationMessageRequired": "Notification permission is required, Please allow notification permission from setting."
       });
     ```
 
   * request permission for full intent Notification/full screen locked screen Android 14+
-  For Android 14+, please `requestFullIntentPermission`
+  For Android 14+, please using `canUseFullScreenIntent` and `requestFullIntentPermission`
     ```dart
+      //for check
+      await FlutterCallkitIncoming.canUseFullScreenIntent();
+
       await FlutterCallkitIncoming.requestFullIntentPermission();
     ```
 

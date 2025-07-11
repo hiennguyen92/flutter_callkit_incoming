@@ -326,6 +326,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "canUseFullScreenIntent" -> {
                     result.success(callkitNotificationManager?.canUseFullScreenIntent() ?: true)
                 }
+
                 // EDIT - clear the incoming notification/ring (after accept/decline/timeout)
                 "hideCallkitIncoming" -> {
                     val data = Data(call.arguments() ?: HashMap())
