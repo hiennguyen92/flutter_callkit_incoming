@@ -284,8 +284,11 @@ class CallkitNotificationManager(private val context: Context, private val callk
                     CallkitConstants.EXTRA_CALLKIT_HANDLE, ""
                 )
             )
-            val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+            var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith("https://", true)) {
+                    avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
+                }
                 val headers =
                     data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
                 if (targetInComingAvatarDefault == null) targetInComingAvatarDefault =
@@ -361,8 +364,11 @@ class CallkitNotificationManager(private val context: Context, private val callk
             R.id.tvAccept,
             if (TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept
         )
-        val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+        var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+            if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith("https://", true)) {
+                avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
+            }
             val headers =
                 data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
@@ -468,8 +474,11 @@ class CallkitNotificationManager(private val context: Context, private val callk
                 if (TextUtils.isEmpty(textCallback)) context.getString(R.string.text_call_back) else textCallback
             )
 
-            val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+            var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith("https://", true)) {
+                    avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
+                }
                 val headers =
                     data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
@@ -496,8 +505,11 @@ class CallkitNotificationManager(private val context: Context, private val callk
                     CallkitConstants.EXTRA_CALLKIT_HANDLE, ""
                 )
             )
-            val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+            var avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith("https://", true)) {
+                    avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
+                }
                 val headers =
                     data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 
