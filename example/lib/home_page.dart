@@ -139,7 +139,7 @@ class HomePageState extends State<HomePage> {
         appName: 'Callkit',
         avatar: 'https://fastly.picsum.photos/id/773/200/300.jpg?hmac=nhH4e4UtqcS6I0hy7eCr9waIFzMYNaMkzety6PQnOHM',
         handle: '0123456789',
-        type: 1,
+        type: 0,
         duration: 30000,
         textAccept: 'Accept',
         textDecline: 'Decline',
@@ -298,10 +298,10 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
+  //check with https://events.hiennv.com
   Future<void> requestHttp(content) async {
     get(Uri.parse(
-        'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
+        'https://events.hiennv.com/api/logs?data=$content'));
   }
 
   void onEvent(CallEvent event) {
