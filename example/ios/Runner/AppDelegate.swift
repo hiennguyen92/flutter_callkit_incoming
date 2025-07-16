@@ -80,12 +80,10 @@ import flutter_callkit_incoming
         data.extra = ["user": "abc@123", "platform": "ios"]
         //data.iconName = ...
         //data.....
-        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
-        
-        //Make sure call completion()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true){
             completion()
         }
+        
     }
     
     
@@ -170,7 +168,7 @@ import flutter_callkit_incoming
     }
     
     func performRequest(parameters: [String: Any], completion: @escaping (Result<Any, Error>) -> Void) {
-        if let url = URL(string: "https://webhook.site/e32a591f-0d17-469d-a70d-33e9f9d60727") {
+        if let url = URL(string: "https://events.hiennv.com/api/logs") {
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")

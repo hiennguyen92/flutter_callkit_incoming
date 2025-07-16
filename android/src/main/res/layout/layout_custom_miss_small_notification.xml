@@ -29,8 +29,7 @@
                 android:id="@+id/tvTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
-                android:alpha="0.7"/>
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Time" />
 
 
         </LinearLayout>

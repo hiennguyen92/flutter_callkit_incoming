@@ -73,10 +73,15 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_UNHELD}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
             }
+
+        fun getIntentConnected(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = "${context.packageName}.${CallkitConstants.ACTION_CALL_CONNECTED}"
+                putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+            }
     }
 
-    private val callkitNotificationManager: CallkitNotificationManager? = FlutterCallkitIncomingPlugin.getInstance().getCallkitNotificationManager()
-    private val callkitSoundPlayerManager: CallkitSoundPlayerManager? = FlutterCallkitIncomingPlugin.getInstance().getCallkitSoundPlayerManager()
+    private val callkitNotificationManager: CallkitNotificationManager? = FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
 
 
     @SuppressLint("MissingPermission")
@@ -87,9 +92,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
                 try {
                     callkitNotificationManager?.showIncomingNotification(data)
-                    if (callkitNotificationManager?.incomingChannelEnabled() == true) {
-                        callkitSoundPlayerManager?.play(data)
-                    }
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
@@ -99,13 +101,12 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_START}" -> {
                 try {
-                    if (data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
-                        CallkitNotificationService.startServiceWithAction(
-                            context,
-                            CallkitConstants.ACTION_CALL_START,
-                            data
-                        )
-                    }
+                    // start service and show ongoing call when call is accepted
+                    CallkitNotificationService.startServiceWithAction(
+                        context,
+                        CallkitConstants.ACTION_CALL_START,
+                        data
+                    )
                     sendEventFlutter(CallkitConstants.ACTION_CALL_START, data)
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
@@ -115,7 +116,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT}" -> {
                 try {
-                    // show ongoing call when call is accepted
+                    // start service and show ongoing call when call is accepted
                     CallkitNotificationService.startServiceWithAction(
                         context,
                         CallkitConstants.ACTION_CALL_ACCEPT,
@@ -130,12 +131,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
-                    // clear notification and stop service
-                    CallkitNotificationService.startServiceWithAction(
-                        context,
-                        CallkitConstants.ACTION_CALL_DECLINE,
-                        data
-                    )
+                    // clear notification
+                    callkitNotificationManager?.clearIncomingNotification(data, false)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
@@ -146,11 +143,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
                 try {
                     // clear notification and stop service
-                    CallkitNotificationService.startServiceWithAction(
-                        context,
-                        CallkitConstants.ACTION_CALL_ENDED,
-                        data
-                    )
+                    callkitNotificationManager?.clearIncomingNotification(data, false)
+                    CallkitNotificationService.stopService(context)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
@@ -160,14 +154,21 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_TIMEOUT}" -> {
                 try {
-                    // stop sound and show miss notification
-                    CallkitNotificationService.startServiceWithAction(
-                        context,
-                        CallkitConstants.ACTION_CALL_TIMEOUT,
-                        data
-                    )
+                    // clear notification and show miss notification
+                    callkitNotificationManager?.clearIncomingNotification(data, false)
+                    callkitNotificationManager?.showMissCallNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_TIMEOUT, data)
                     removeCall(context, Data.fromBundle(data))
+                } catch (error: Exception) {
+                    Log.e(TAG, null, error)
+                }
+            }
+
+            "${context.packageName}.${CallkitConstants.ACTION_CALL_CONNECTED}" -> {
+                try {
+                    // update notification on going connected
+                    callkitNotificationManager?.showOngoingCallNotification(data, true)
+                    sendEventFlutter(CallkitConstants.ACTION_CALL_CONNECTED, data)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
