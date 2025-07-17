@@ -16,7 +16,7 @@
 
     <permission
         android:name="com.hiennv.flutter_callkit_incoming.PERMISSION_CALL"
-        android:protectionLevel="signature" />
+        android:protectionLevel="normal" />
 
     <application>
 
