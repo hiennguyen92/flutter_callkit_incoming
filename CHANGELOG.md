@@ -1,3 +1,9 @@
+## 2.5.4
+* Fix bug custom permission Android
+* Remove calling notification when task remove
+* Fixed calling notification show
+* Fixed some bugs.
+
 ## 2.5.3
 * Update Android 14+ compatibility(force CallStyle/`FOREGROUND_SERVICE_PHONE_CALL` for https://developer.android.com/about/versions/14/behavior-changes-all#non-dismissable-notifications)
 * Change structure Notification/Sound on Android

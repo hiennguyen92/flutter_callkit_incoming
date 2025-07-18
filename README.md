@@ -41,7 +41,7 @@ Our top sponsors are shown below!
     * Add pubspec.yaml:
       ```console
           dependencies:
-            flutter_callkit_incoming: any
+            flutter_callkit_incoming: ^latest
       ```
 2. Configure Project
     * Android
