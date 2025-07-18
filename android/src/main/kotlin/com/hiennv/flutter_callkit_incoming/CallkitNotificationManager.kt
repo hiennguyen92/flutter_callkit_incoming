@@ -593,6 +593,10 @@ class CallkitNotificationManager(
         data: Bundle, isConnected: Boolean? = false
     ): CallkitNotification? {
 
+        val isCallingNotificationShow =
+            data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)
+        if (!isCallingNotificationShow) return null
+
         val callingId = data.getString(
             CallkitConstants.EXTRA_CALLKIT_CALLING_ID,
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming")
@@ -1129,6 +1133,7 @@ class CallkitNotificationManager(
     }
 
     fun destroy() {
+
         callkitSoundPlayerManager?.destroy()
     }
 

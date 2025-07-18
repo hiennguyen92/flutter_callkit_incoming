@@ -8,6 +8,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import androidx.core.content.ContextCompat
 
 class CallkitNotificationService : Service() {
@@ -26,7 +27,13 @@ class CallkitNotificationService : Service() {
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && intent.action in ActionForeground) {
-                ContextCompat.startForegroundService(context, intent)
+                data?.let {
+                    if(it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
+                        ContextCompat.startForegroundService(context, intent)
+                    }else {
+                        context.startService(intent)
+                    }
+                }
             } else {
                 context.startService(intent)
             }
@@ -66,6 +73,8 @@ class CallkitNotificationService : Service() {
                     callkitNotificationManager?.clearIncomingNotification(it, true)
                     if (it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
                         showOngoingCallNotification(it)
+                    }else {
+                        stopSelf()
                     }
                 }
         }
@@ -98,6 +107,17 @@ class CallkitNotificationService : Service() {
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
+    }
+
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        }else {
+            stopForeground(true)
+        }
+        stopSelf()
     }
 
 
