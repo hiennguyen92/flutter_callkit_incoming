@@ -1,4 +1,4 @@
-## 2.5.3+1
+## 2.5.4
 * Fix bug custom permission Android
 * Remove calling notification when task remove
 * Fixed calling notification show
