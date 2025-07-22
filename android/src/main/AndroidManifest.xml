@@ -12,11 +12,11 @@
     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL"/>
 
-    <uses-permission android:name="com.hiennv.flutter_callkit_incoming.PERMISSION_CALL" />
+    <uses-permission android:name="${applicationId}.PERMISSION_CALL" />
 
     <permission
-        android:name="com.hiennv.flutter_callkit_incoming.PERMISSION_CALL"
-        android:protectionLevel="normal" />
+        android:name="${applicationId}.PERMISSION_CALL"
+        android:protectionLevel="signature" />
 
     <application>
 
@@ -31,7 +31,7 @@
             android:launchMode="singleInstance"
             android:allowTaskReparenting="false"
             android:theme="@style/CallkitIncomingTheme"
-            android:permission="com.hiennv.flutter_callkit_incoming.PERMISSION_CALL">
+            android:permission="${applicationId}.PERMISSION_CALL">
             <intent-filter>
                 <action android:name="${applicationId}.com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -59,7 +59,7 @@
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="phoneCall"
-            android:permission="com.hiennv.flutter_callkit_incoming.PERMISSION_CALL"
+            android:permission="${applicationId}.PERMISSION_CALL"
             android:name="com.hiennv.flutter_callkit_incoming.CallkitNotificationService">
         </service>
 

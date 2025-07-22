@@ -1,3 +1,6 @@
+## 2.5.5
+* Fix bug duplicate permission Android
+
 ## 2.5.4
 * Fix bug custom permission Android
 * Remove calling notification when task remove
