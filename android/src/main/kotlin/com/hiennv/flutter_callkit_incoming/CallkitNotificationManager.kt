@@ -850,6 +850,26 @@ class CallkitNotificationManager(
         }
     }
 
+    fun clearOngoingNotification(data: Bundle) {
+        val callingId = data.getString(
+            CallkitConstants.EXTRA_CALLKIT_CALLING_ID,
+            data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming")
+        )
+
+        val onGoingNotificationId = ("ongoing_$callingId").hashCode()
+
+        getNotificationManager().cancel(onGoingNotificationId)
+
+        targetMissingAvatarDefault?.let {
+            targetMissingAvatarDefault?.isCancelled = true
+            targetMissingAvatarDefault = null
+        }
+        targetMissingAvatarCustom?.let {
+            targetMissingAvatarCustom?.isCancelled = true
+            targetMissingAvatarCustom = null
+        }
+    }
+
     fun clearMissCallNotification(data: Bundle) {
         val missingId = data.getString(
             CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_ID,

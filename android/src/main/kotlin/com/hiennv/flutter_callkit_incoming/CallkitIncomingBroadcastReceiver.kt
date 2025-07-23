@@ -132,7 +132,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
                     // clear notification
-                    callkitNotificationManager?.clearIncomingNotification(data, false)
+                    callkitNotificationManager?.apply {
+                        clearIncomingNotification(data, false)  
+                        clearOngoingNotification(data)
+                    }
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
@@ -143,7 +146,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
                 try {
                     // clear notification and stop service
-                    callkitNotificationManager?.clearIncomingNotification(data, false)
+                    callkitNotificationManager?.apply {
+                        clearIncomingNotification(data, false)  
+                        clearOngoingNotification(data)
+                    }
                     CallkitNotificationService.stopService(context)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
                     removeCall(context, Data.fromBundle(data))
