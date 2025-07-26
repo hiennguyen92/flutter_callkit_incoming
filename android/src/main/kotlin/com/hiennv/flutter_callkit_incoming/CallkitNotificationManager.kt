@@ -180,6 +180,11 @@ class CallkitNotificationManager(
         val notificationId =
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         createNotificationChanel(data)
+
+        if (incomingChannelEnabled()) {
+            callkitSoundPlayerManager?.play(data)
+        }
+
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder?.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder?.setDefaults(NotificationCompat.DEFAULT_VIBRATE)
@@ -993,9 +998,6 @@ class CallkitNotificationManager(
     @SuppressLint("MissingPermission")
     fun showIncomingNotification(data: Bundle) {
 
-        if (incomingChannelEnabled()) {
-            callkitSoundPlayerManager?.play(data)
-        }
         val callkitNotification = getIncomingNotification(data)
         callkitNotification?.let {
             getNotificationManager().notify(
