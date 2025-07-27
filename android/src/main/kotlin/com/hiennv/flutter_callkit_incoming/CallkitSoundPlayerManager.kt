@@ -4,18 +4,21 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.*
 import android.text.TextUtils
+import androidx.annotation.RequiresApi
 
 class CallkitSoundPlayerManager(private val context: Context) {
 
     private var vibrator: Vibrator? = null
     private var audioManager: AudioManager? = null
 
-    private var mediaPlayer: MediaPlayer? = null
+    private var ringtone: Ringtone? = null
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun play(data: Bundle) {
         this.prepare()
         this.playSound(data)
@@ -23,26 +26,24 @@ class CallkitSoundPlayerManager(private val context: Context) {
     }
 
     fun stop() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        ringtone?.stop()
         vibrator?.cancel()
 
-        mediaPlayer = null
+        ringtone = null
         vibrator = null
     }
 
     fun destroy() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        ringtone?.stop()
+
         vibrator?.cancel()
 
-        mediaPlayer = null
+        ringtone = null
         vibrator = null
     }
 
     private fun prepare() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        ringtone?.stop()
         vibrator?.cancel()
     }
 
@@ -74,6 +75,7 @@ class CallkitSoundPlayerManager(private val context: Context) {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun playSound(data: Bundle?) {
         val sound = data?.getString(
             CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH,
@@ -85,41 +87,51 @@ class CallkitSoundPlayerManager(private val context: Context) {
             return
         }
         try {
-            mediaPlayer(uri)
+            ringtone = RingtoneManager.getRingtone(context, uri)
+            ringtone?.apply {
+                audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    isLooping = true
+                }
+                play()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun mediaPlayer(uri: Uri) {
-        mediaPlayer = MediaPlayer()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val attribution = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                .setLegacyStreamType(AudioManager.STREAM_RING)
-                .build()
-            mediaPlayer?.setAudioAttributes(attribution)
-        } else {
-            mediaPlayer?.setAudioStreamType(AudioManager.STREAM_RING)
-        }
-        setDataSource(uri)
-        mediaPlayer?.prepare()
-        mediaPlayer?.isLooping = true
-        mediaPlayer?.start()
-    }
+//    private fun mediaPlayer(uri: Uri) {
+//        mediaPlayer = MediaPlayer()
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            val attribution = AudioAttributes.Builder()
+//                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+//                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+//                .setLegacyStreamType(AudioManager.STREAM_RING)
+//                .build()
+//            mediaPlayer?.setAudioAttributes(attribution)
+//        } else {
+//            mediaPlayer?.setAudioStreamType(AudioManager.STREAM_RING)
+//        }
+//        setDataSource(uri)
+//        mediaPlayer?.prepare()
+//        mediaPlayer?.isLooping = true
+//        mediaPlayer?.start()
+//    }
 
-    private fun setDataSource(uri: Uri) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val assetFileDescriptor =
-                context.contentResolver.openAssetFileDescriptor(uri, "r")
-            if (assetFileDescriptor != null) {
-                mediaPlayer?.setDataSource(assetFileDescriptor)
-            }
-            return
-        }
-        mediaPlayer?.setDataSource(context, uri)
-    }
+//    private fun setDataSource(uri: Uri) {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            val assetFileDescriptor =
+//                context.contentResolver.openAssetFileDescriptor(uri, "r")
+//            if (assetFileDescriptor != null) {
+//                mediaPlayer?.setDataSource(assetFileDescriptor)
+//            }
+//            return
+//        }
+//        mediaPlayer?.setDataSource(context, uri)
+//    }
 
     private fun getRingtoneUri(fileName: String): Uri? {
         if (TextUtils.isEmpty(fileName)) {
@@ -165,5 +177,34 @@ class CallkitSoundPlayerManager(private val context: Context) {
             // for custom ringtones
             return null
         }
+    }
+
+    private fun getSafeSystemRingtoneUri(): Uri? {
+        val defaultUri = RingtoneManager.getActualDefaultRingtoneUri(
+            context,
+            RingtoneManager.TYPE_RINGTONE
+        )
+
+        val rm = RingtoneManager(context)
+        rm.setType(RingtoneManager.TYPE_RINGTONE)
+        val cursor = rm.cursor
+        if (defaultUri != null && cursor != null) {
+            while (cursor.moveToNext()) {
+                val uri = rm.getRingtoneUri(cursor.position)
+                if (uri == defaultUri) {
+                    cursor.close()
+                    return defaultUri
+                }
+            }
+        }
+
+        // Default isn't system-provided → fallback to first available
+        if (cursor != null && cursor.moveToFirst()) {
+            val fallback = rm.getRingtoneUri(cursor.position)
+            cursor.close()
+            return fallback
+        }
+
+        return null
     }
 }
