@@ -1,9 +1,12 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioAttributes
 import android.media.AudioManager
-import android.media.MediaPlayer
+import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.*
@@ -14,35 +17,57 @@ class CallkitSoundPlayerManager(private val context: Context) {
     private var vibrator: Vibrator? = null
     private var audioManager: AudioManager? = null
 
-    private var mediaPlayer: MediaPlayer? = null
+    private var ringtone: Ringtone? = null
+
+    private var isPlaying: Boolean = false
+
+
+    inner class ScreenOffCallkitIncomingBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (isPlaying){
+                stop()
+            }
+        }
+    }
+
+    private var screenOffCallkitIncomingBroadcastReceiver = ScreenOffCallkitIncomingBroadcastReceiver()
+
+
+    init {
+        val filter = IntentFilter(Intent.ACTION_SCREEN_OFF)
+        context.registerReceiver(screenOffCallkitIncomingBroadcastReceiver, filter)
+    }
+
 
     fun play(data: Bundle) {
         this.prepare()
         this.playSound(data)
         this.playVibrator()
+        this.isPlaying = true
     }
 
     fun stop() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        this.isPlaying = false
+        ringtone?.stop()
         vibrator?.cancel()
 
-        mediaPlayer = null
+        ringtone = null
         vibrator = null
     }
 
     fun destroy() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        this.isPlaying = false
+        context.unregisterReceiver(screenOffCallkitIncomingBroadcastReceiver)
+
+        ringtone?.stop()
         vibrator?.cancel()
 
-        mediaPlayer = null
+        ringtone = null
         vibrator = null
     }
 
     private fun prepare() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        ringtone?.stop()
         vibrator?.cancel()
     }
 
@@ -85,40 +110,24 @@ class CallkitSoundPlayerManager(private val context: Context) {
             return
         }
         try {
-            mediaPlayer(uri)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun mediaPlayer(uri: Uri) {
-        mediaPlayer = MediaPlayer()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val attribution = AudioAttributes.Builder()
+            ringtone = RingtoneManager.getRingtone(context, uri)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val attribution = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                 .setLegacyStreamType(AudioManager.STREAM_RING)
                 .build()
-            mediaPlayer?.setAudioAttributes(attribution)
-        } else {
-            mediaPlayer?.setAudioStreamType(AudioManager.STREAM_RING)
-        }
-        setDataSource(uri)
-        mediaPlayer?.prepare()
-        mediaPlayer?.isLooping = true
-        mediaPlayer?.start()
-    }
-
-    private fun setDataSource(uri: Uri) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val assetFileDescriptor =
-                context.contentResolver.openAssetFileDescriptor(uri, "r")
-            if (assetFileDescriptor != null) {
-                mediaPlayer?.setDataSource(assetFileDescriptor)
+                ringtone?.setAudioAttributes(attribution)
+            }else {
+                ringtone?.streamType = AudioManager.STREAM_RING
             }
-            return
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                ringtone?.isLooping = true
+            }
+            ringtone?.play()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        mediaPlayer?.setDataSource(context, uri)
     }
 
     private fun getRingtoneUri(fileName: String): Uri? {
@@ -163,7 +172,39 @@ class CallkitSoundPlayerManager(private val context: Context) {
         } catch (e: Exception) {
             // getActualDefaultRingtoneUri can throw an exception on some devices
             // for custom ringtones
-            return null
+            return getSafeSystemRingtoneUri()
         }
+    }
+
+    private fun getSafeSystemRingtoneUri(): Uri? {
+        try {
+            val defaultUri = RingtoneManager.getActualDefaultRingtoneUri(
+                context,
+                RingtoneManager.TYPE_RINGTONE
+            )
+
+            val rm = RingtoneManager(context)
+            rm.setType(RingtoneManager.TYPE_RINGTONE)
+            val cursor = rm.cursor
+            if (defaultUri != null && cursor != null) {
+                while (cursor.moveToNext()) {
+                    val uri = rm.getRingtoneUri(cursor.position)
+                    if (uri == defaultUri) {
+                        cursor.close()
+                        return defaultUri
+                    }
+                }
+            }
+
+            // Default isn't system-provided → fallback to first available
+            if (cursor != null && cursor.moveToFirst()) {
+                val fallback = rm.getRingtoneUri(cursor.position)
+                cursor.close()
+                return fallback
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
     }
 }
