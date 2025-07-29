@@ -198,11 +198,14 @@ class CallkitIncomingActivity : Activity() {
             ImageLoaderProvider.loadImage(this@CallkitIncomingActivity, logoUrl, headers, R.drawable.transparent, ivLogo)
         }
 
-        val avatarUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+        var avatarUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
         if (!avatarUrl.isNullOrEmpty()) {
             ivAvatar.visibility = View.VISIBLE
+            if (!avatarUrl.startsWith("http://", true) && !avatarUrl.startsWith("https://", true)) {
+                avatarUrl = String.format("file:///android_asset/flutter_assets/%s", avatarUrl)
+            }
             val headers =
-                data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+                data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
             ImageLoaderProvider.loadImage(this@CallkitIncomingActivity, avatarUrl, headers, R.drawable.ic_default_avatar, ivAvatar)
         }
 
