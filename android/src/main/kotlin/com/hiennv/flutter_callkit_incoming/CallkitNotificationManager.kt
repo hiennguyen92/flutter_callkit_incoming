@@ -11,10 +11,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Icon
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
@@ -22,7 +19,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import androidx.appcompat.app.AlertDialog
@@ -30,12 +26,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
-import coil.ImageLoader
-import coil.request.ImageRequest
-import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
-import kotlinx.coroutines.Dispatchers
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.Date
 
 
@@ -180,10 +170,6 @@ class CallkitNotificationManager(
         val notificationId =
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         createNotificationChanel(data)
-
-        if (incomingChannelEnabled()) {
-            callkitSoundPlayerManager?.play(data)
-        }
 
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder?.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
@@ -997,8 +983,10 @@ class CallkitNotificationManager(
 
     @SuppressLint("MissingPermission")
     fun showIncomingNotification(data: Bundle) {
-
         val callkitNotification = getIncomingNotification(data)
+        if (incomingChannelEnabled()) {
+            callkitSoundPlayerManager?.play(data)
+        }
         callkitNotification?.let {
             getNotificationManager().notify(
                 it.id, callkitNotification.notification

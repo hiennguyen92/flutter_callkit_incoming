@@ -351,6 +351,10 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         methodChannels.remove(binding.binaryMessenger)?.setMethodCallHandler(null)
         eventChannels.remove(binding.binaryMessenger)?.setStreamHandler(null)
+        instance.callkitSoundPlayerManager?.destroy()
+        instance.callkitNotificationManager?.destroy()
+        instance.callkitSoundPlayerManager = null
+        instance.callkitNotificationManager = null
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -369,7 +373,8 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     override fun onDetachedFromActivity() {
-
+        instance.context = null
+        instance.activity = null
     }
 
     class EventCallbackHandler : EventChannel.StreamHandler {

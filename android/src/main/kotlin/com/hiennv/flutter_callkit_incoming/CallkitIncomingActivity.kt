@@ -22,12 +22,10 @@ import android.widget.TextView
 import com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlin.math.abs
-import okhttp3.OkHttpClient
 import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.text.TextUtils
 import android.util.Log
-
 
 class CallkitIncomingActivity : Activity() {
 

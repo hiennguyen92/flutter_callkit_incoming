@@ -8,7 +8,6 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import androidx.core.content.ContextCompat
 
 class CallkitNotificationService : Service() {

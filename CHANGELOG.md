@@ -1,3 +1,9 @@
+## 2.5.6
+* Fix bug duplicate permission Android
+* Replaces MediaPlayer with Ringtone Android
+* Fix bug notification channel Android
+* Stop sound notification when screen off Android
+
 ## 2.5.5
 * Fix bug duplicate permission Android
 
