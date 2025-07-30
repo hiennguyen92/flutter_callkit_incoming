@@ -33,37 +33,38 @@ class CallkitSoundPlayerManager(private val context: Context) {
     private var screenOffCallkitIncomingBroadcastReceiver = ScreenOffCallkitIncomingBroadcastReceiver()
 
 
-    init {
+    fun play(data: Bundle) {
+        this.isPlaying = true
+        this.prepare()
+        this.playSound(data)
+        this.playVibrator()
+
         val filter = IntentFilter(Intent.ACTION_SCREEN_OFF)
         context.registerReceiver(screenOffCallkitIncomingBroadcastReceiver, filter)
     }
 
-
-    fun play(data: Bundle) {
-        this.prepare()
-        this.playSound(data)
-        this.playVibrator()
-        this.isPlaying = true
-    }
-
     fun stop() {
         this.isPlaying = false
+
         ringtone?.stop()
         vibrator?.cancel()
-
         ringtone = null
         vibrator = null
+        try {
+            context.unregisterReceiver(screenOffCallkitIncomingBroadcastReceiver)
+        }catch (_: Exception){}
     }
 
     fun destroy() {
         this.isPlaying = false
-        context.unregisterReceiver(screenOffCallkitIncomingBroadcastReceiver)
 
         ringtone?.stop()
         vibrator?.cancel()
-
         ringtone = null
         vibrator = null
+        try {
+            context.unregisterReceiver(screenOffCallkitIncomingBroadcastReceiver)
+        }catch (_: Exception){}
     }
 
     private fun prepare() {
