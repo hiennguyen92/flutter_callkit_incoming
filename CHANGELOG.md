@@ -1,3 +1,7 @@
+## 2.5.7
+* Fix build Android
+* Fix stop sound notification when screen off Android
+
 ## 2.5.6
 * Fix bug duplicate permission Android
 * Replaces MediaPlayer with Ringtone Android
