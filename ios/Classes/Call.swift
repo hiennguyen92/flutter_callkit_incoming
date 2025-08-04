@@ -156,6 +156,10 @@ public class Call: NSObject {
     @objc public var audioSessionPreferredSampleRate: Double
     @objc public var audioSessionPreferredIOBufferDuration: Double
     
+    //missedCallNotification
+    @objc public var isShowMissedCallNotification: Bool = true
+    @objc public var missedNotificationSubtitle: String
+    
     @objc public init(id: String, nameCaller: String, handle: String, type: Int) {
         self.uuid = id
         self.nameCaller = nameCaller
@@ -183,6 +187,9 @@ public class Call: NSObject {
         self.audioSessionActive = true
         self.audioSessionPreferredSampleRate = 44100.0
         self.audioSessionPreferredIOBufferDuration = 0.005
+        
+        self.isShowMissedCallNotification = true
+        self.missedNotificationSubtitle = "Missed Call"
     }
     
     @objc public convenience init(args: NSDictionary) {
@@ -241,9 +248,20 @@ public class Call: NSObject {
             self.audioSessionPreferredSampleRate = args["audioSessionPreferredSampleRate"] as? Double ?? 44100.0
             self.audioSessionPreferredIOBufferDuration = args["audioSessionPreferredIOBufferDuration"] as? Double ?? 0.005
         }
+        if let missedCallNotification = args["missedCallNotification"] as? [String: Any] {
+            self.isShowMissedCallNotification = missedCallNotification["isShowMissedCallNotification"] as? Bool ?? true
+            self.missedNotificationSubtitle = missedCallNotification["missedNotificationSubtitle"] as? String ?? "Missed Call"
+        }else {
+            self.isShowMissedCallNotification = true
+            self.missedNotificationSubtitle = "Missed Call"
+        }
     }
     
     open func toJSON() -> [String: Any] {
+        let missedCallNotification: [String : Any] = [
+            "showNotification": isShowMissedCallNotification,
+            "missedNotificationSubtitle": missedNotificationSubtitle
+        ]
         let ios: [String : Any] = [
             "iconName": iconName,
             "handleType": handleType,
@@ -274,7 +292,8 @@ public class Call: NSObject {
             "duration": duration,
             "isAccepted": isAccepted,
             "extra": extra,
-            "ios": ios
+            "ios": ios,
+            "missedCallNotification": missedCallNotification
         ]
         return map
     }
