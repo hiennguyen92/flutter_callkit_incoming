@@ -24,6 +24,7 @@ fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
     if(currentData != null) {
         currentData.isAccepted = isAccepted
     }else {
+        data.isAccepted = isAccepted
         arrayData.add(data)
     }
     putString(context, "ACTIVE_CALLS", Utils.getGsonInstance().writeValueAsString(arrayData))

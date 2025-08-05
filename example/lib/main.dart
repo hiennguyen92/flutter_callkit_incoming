@@ -46,7 +46,7 @@ Future<void> showCallkitIncoming(String uuid) async {
     ),
     ios: const IOSParams(
       iconName: 'CallKitLogo',
-      handleType: '',
+      handleType: 'generic',
       supportsVideo: true,
       maximumCallGroups: 2,
       maximumCallsPerCallGroup: 1,
