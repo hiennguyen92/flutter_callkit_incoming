@@ -4,6 +4,9 @@ version: 2.5.8
 homepage: https://github.com/hiennguyen92/flutter_callkit_incoming
 repository: https://github.com/hiennguyen92/flutter_callkit_incoming
 issue_tracker: https://github.com/hiennguyen92/flutter_callkit_incoming/issues
+screenshots:
+  - description: "lock screen"
+    path: images/image6.jpg
 
 false_secrets:
   - /example/**
@@ -72,3 +75,8 @@ flutter:
   #
   # For details regarding fonts in packages, see
   # https://flutter.dev/custom-fonts/#from-packages
+
+topics:
+  - callkit
+  - incoming
+  - flutter-callkit-incoming
