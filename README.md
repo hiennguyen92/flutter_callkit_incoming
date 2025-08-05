@@ -20,7 +20,8 @@ Our top sponsors are shown below!
 <span>
   <a href="https://getstream.io/video/sdk/flutter/tutorial/video-calling/?utm_source=Github&utm_medium=Github_Repo_Content_Ad&utm_content=Developer&utm_campaign=Github_Video&utm_term=flutter_callkit" target="_blank">Try the Flutter Video Tutorial 📹</a>
 </span>
-
+</br>
+</br>
 <a href="https://www.buymeacoffee.com/hiennguyen92" target="_blank">
   <img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174">
 </a>
@@ -69,7 +70,7 @@ dependencies:
     <application ...>
         <activity ...
             android:name=".MainActivity"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance"><!-- add this -->
         ...
     </application>
 </manifest>
@@ -163,7 +164,7 @@ await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
 > **Note:** For Firebase Message: `@pragma('vm:entry-point')`  
 > https://github.com/firebase/flutterfire/blob/master/docs/cloud-messaging/receive.md#apple-platforms-and-android
 
-#### Request Notification Permission (Android 13+)
+#### Request Notification Permission (Android 13+/iOS)
 
 For Android 13+, please `requestNotificationPermission` or requestPermission of firebase_messaging before `showCallkitIncoming`:
 
@@ -328,7 +329,7 @@ FlutterCallkitIncoming.onEvent.listen((CallEvent event) {
       // TODO: missed an incoming call
       break;
     case Event.actionCallCallback:
-      // TODO: only Android - click action `Call back` from missed call notification
+      // TODO: click action `Call back` from missed call notification
       break;
     case Event.actionCallToggleHold:
       // TODO: only iOS
@@ -414,6 +415,7 @@ FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(body: Map<String, Any
 ```
 
 #### Call API when Accept/Decline/End/Timeout
+#### Setup for Missed call notification(iOS)
 
 **AppDelegate.swift:**
 ```swift
@@ -435,8 +437,33 @@ FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(body: Map<String, Any
         // Use if using WebRTC
         // RTCAudioSession.sharedInstance().useManualAudio = true
         // RTCAudioSession.sharedInstance().isAudioEnabled = false
+
+        //Add for Missed call notification
+        if #available(iOS 10.0, *) {
+          UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
+        }
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+
+    // Add for Missed call notification(show notification when foreground)
+    override func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler:
+                                   @escaping (UNNotificationPresentationOptions) -> Void) {
+        
+        CallkitNotificationManager.shared.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler)
+    }
+    
+    // Add for Missed call notification(action when click callback in missed notification)
+    override func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                         didReceive response: UNNotificationResponse,
+                                         withCompletionHandler completionHandler: @escaping () -> Void) {
+        if response.actionIdentifier == CallkitNotificationManager.CALLBACK_ACTION {
+            let data = response.notification.request.content.userInfo as? [String: Any]
+            SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendCallbackEvent(data)
+        }
+        completionHandler()
     }
 
     // Func Call API for Accept
@@ -542,8 +569,8 @@ FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(body: Map<String, Any
 
 | Property | Description | Default |
 |----------|-------------|---------|
-| **`subtitle`** | Text `Missed Call` used in Android (show in missed call notification) | `Missed Call` |
-| **`callbackText`** | Text `Call back` used in Android (show in missed call notification action) | `Call back` |
+| **`subtitle`** | Text `Missed Call` used in Android/iOS (show in missed call notification) | `Missed Call` |
+| **`callbackText`** | Text `Call back` used in Android/iOS (show in missed call notification action) | `Call back` |
 | **`showNotification`** | Show missed call notification when timeout | `true` |
 | **`isShowCallback`** | Show callback action from missed call notification | `true` |
 
@@ -607,8 +634,8 @@ Please check [PUSHKIT.md](https://github.com/hiennguyen92/flutter_callkit_incomi
 
 - [ ] Run background
 - [ ] Simplify the setup process
-- [ ] Custom notification for iOS (Missing notification)
-- [ ] Keep notification when calling
+- [X] Custom notification for iOS (Missing notification)
+- [X] Keep notification when calling
 
 ## 🎯 Demo
 

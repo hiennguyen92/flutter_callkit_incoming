@@ -1,3 +1,8 @@
+## 2.5.8
+* Fix OnGoing notification Android
+* Add missed call notification for iOS(notification/callback action - need to setup more in AppDelegate.swift)
+* Add `requestNotificationPermission` for iOS
+
 ## 2.5.7
 * Fix build Android
 * Fix stop sound notification when screen off Android

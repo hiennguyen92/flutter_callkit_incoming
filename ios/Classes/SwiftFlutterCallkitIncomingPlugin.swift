@@ -15,6 +15,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     static let ACTION_CALL_DECLINE = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE"
     static let ACTION_CALL_ENDED = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED"
     static let ACTION_CALL_TIMEOUT = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT"
+    static let ACTION_CALL_CALLBACK = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK"
     static let ACTION_CALL_CUSTOM = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CUSTOM"
     static let ACTION_CALL_CONNECTED = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CONNECTED"
     
@@ -80,7 +81,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public init(messenger: FlutterBinaryMessenger) {
         callManager = CallManager()
-        NotificationDelegateProxy.shared.attach()
     }
     
     private func shareHandlers(with registrar: FlutterPluginRegistrar) {
@@ -94,7 +94,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         switch call.method {
         case "showCallkitIncoming":
             guard let args = call.arguments else {
-                result("OK")
+                result(true)
                 return
             }
             if let getArgs = args as? [String: Any] {
@@ -104,6 +104,14 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             result(true)
             break
         case "showMissCallNotification":
+            guard let args = call.arguments else {
+                result(true)
+                return
+            }
+            if let getArgs = args as? [String: Any] {
+                self.data = Data(args: getArgs)
+                self.showMissedCallNotification(data!)
+            }
             result(true)
             break
         case "startCall":
@@ -201,7 +209,13 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             result(true)
             break;
         case "requestNotificationPermission":
-            self.requestNotificationPermission()
+            guard let args = call.arguments else {
+                result(true)
+                return
+            }
+            if let getArgs = args as? [String: Any] {
+                self.requestNotificationPermission(getArgs)
+            }
             result(true)
             break
          case "requestFullIntentPermission": 
@@ -247,6 +261,10 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self.data = data
         }
         
+        if(data.isShowMissedCallNotification){
+            CallkitNotificationManager.shared.addNotificationCategory(data.missedNotificationCallbackText)
+        }
+        
         var handle: CXHandle?
         handle = CXHandle(type: self.getHandleType(data.handleType), value: data.getEncryptHandle())
         
@@ -281,6 +299,10 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.isFromPushKit = fromPushKit
         if(fromPushKit){
             self.data = data
+        }
+        
+        if(data.isShowMissedCallNotification){
+            CallkitNotificationManager.shared.addNotificationCategory(data.missedNotificationCallbackText)
         }
         
         var handle: CXHandle?
@@ -735,15 +757,13 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_HOLD, [ "id": id, "isOnHold": isOnHold ])
     }
     
+    @objc public func sendCallbackEvent(_ data: [String: Any]?) {
+        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_CALLBACK, data)
+    }
     
-    private func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error = error {
-                print("Notification permission error: \(error)")
-            } else {
-                print("Permission granted: \(granted)")
-            }
-        }
+    
+    private func requestNotificationPermission(_ map: [String: Any]) {
+        CallkitNotificationManager.shared.requestNotificationPermission(map)
     }
     
     
@@ -757,11 +777,12 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         content.body = "\(data.missedNotificationSubtitle)"
         content.sound = UNNotificationSound.default
         content.categoryIdentifier = "MISSED_CALL_CATEGORY"
+        content.userInfo = data.toJSON()
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
 
         let request = UNNotificationRequest(
-            identifier: UUID().uuidString,
+            identifier: data.uuid,
             content: content,
             trigger: trigger
         )

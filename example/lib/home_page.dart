@@ -174,7 +174,7 @@ class HomePageState extends State<HomePage> {
         ),
         ios: const IOSParams(
           iconName: 'CallKitLogo',
-          handleType: '',
+          handleType: 'generic',
           supportsVideo: true,
           maximumCallGroups: 2,
           maximumCallsPerCallGroup: 1,
@@ -206,7 +206,7 @@ class HomePageState extends State<HomePage> {
         handle: '0123456789',
         type: 1,
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
-        ios: const IOSParams(handleType: 'number'),
+        ios: const IOSParams(handleType: 'generic'),
         callingNotification: const NotificationParams(
           showNotification: true,
           isShowCallback: true,
