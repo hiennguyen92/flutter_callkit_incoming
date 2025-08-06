@@ -1,3 +1,6 @@
+## next
+* Add answer from wired headset/headphone and some bluetooth devices on Android
+
 ## 2.5.8
 * Fix OnGoing notification Android
 * Add missed call notification for iOS(notification/callback action - need to setup more in AppDelegate.swift)

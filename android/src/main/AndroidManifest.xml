@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.hiennv.flutter_callkit_incoming">
 
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
@@ -65,9 +66,10 @@
         </service>
 
         <service
-            android:name="com.hiennv.flutter_callkit_incoming.CallkitConnectionService"
-            android:permission="android.permission.BIND_CONNECTION_SERVICE"
-            android:exported="true">
+            android:name=".CallkitConnectionService"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
+            android:exported="true"
+            tools:targetApi="23">
             <intent-filter>
                 <action android:name="android.telecom.ConnectionService" />
             </intent-filter>
