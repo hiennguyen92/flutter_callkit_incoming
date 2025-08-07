@@ -131,6 +131,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
+                    Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_DECLINE")           
+                    // Notify native decline callbacks
+                    FlutterCallkitIncomingPlugin.notifyDeclineCallbacks(data)
                     // clear notification
                     callkitNotificationManager?.clearIncomingNotification(data, false)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)

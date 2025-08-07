@@ -330,6 +330,7 @@ class CallkitIncomingActivity : Activity() {
     }
 
     private fun onDeclineClick() {
+        Log.d("CallkitIncomingActivity", "[CALLKIT] 📱 onDeclineClick")
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
 
         val intent =

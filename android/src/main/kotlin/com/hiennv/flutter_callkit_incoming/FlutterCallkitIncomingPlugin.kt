@@ -41,6 +41,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         private val methodChannels = mutableMapOf<BinaryMessenger, MethodChannel>()
         private val eventChannels = mutableMapOf<BinaryMessenger, EventChannel>()
         private val eventHandlers = mutableListOf<WeakReference<EventCallbackHandler>>()
+        private val declineCallbacks = mutableListOf<WeakReference<CallkitDeclineCallback>>()
 
         fun sendEvent(event: String, body: Map<String, Any?>) {
             eventHandlers.reapCollection().forEach {
@@ -51,6 +52,32 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         public fun sendEventCustom(event: String, body: Map<String, Any>) {
             eventHandlers.reapCollection().forEach {
                 it.get()?.send(event, body)
+            }
+        }
+
+        /**
+         * Register a callback to receive call decline events natively.
+         * This allows other plugins/services to handle decline events
+         * even when Flutter engine is terminated.
+         */
+        fun registerDeclineCallback(callback: CallkitDeclineCallback) {
+            declineCallbacks.add(WeakReference(callback))
+        }
+
+        /**
+         * Unregister a decline callback.
+         */
+        fun unregisterDeclineCallback(callback: CallkitDeclineCallback) {
+            declineCallbacks.removeAll { it.get() == callback || it.get() == null }
+        }
+
+        /**
+         * Notify all registered decline callbacks.
+         * Called internally when a call is declined.
+         */
+        internal fun notifyDeclineCallbacks(callData: android.os.Bundle) {
+            declineCallbacks.reapCollection().forEach { callbackRef ->
+                callbackRef.get()?.onCallDeclined(callData)
             }
         }
 
