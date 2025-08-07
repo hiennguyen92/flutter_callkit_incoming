@@ -106,22 +106,30 @@ class CallkitSoundPlayerManager(private val context: Context) {
             ""
         )
         val uri = sound?.let { getRingtoneUri(it) }
-        if (uri == null) {
-            // Failed to get ringtone url, can't play sound
-            return
-        }
+        if (uri == null) return
+
         try {
             ringtone = RingtoneManager.getRingtone(context, uri)
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+            // Set audio attributes for Bluetooth
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 val attribution = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                .setLegacyStreamType(AudioManager.STREAM_RING)
-                .build()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setLegacyStreamType(AudioManager.STREAM_VOICE_CALL)
+                    .build()
                 ringtone?.setAudioAttributes(attribution)
-            }else {
-                ringtone?.streamType = AudioManager.STREAM_RING
+            } else {
+                ringtone?.streamType = AudioManager.STREAM_VOICE_CALL
             }
+
+            // Enable Bluetooth SCO for voice calls
+            audioManager.mode = AudioManager.MODE_IN_CALL
+            audioManager.isSpeakerphoneOn = false
+            audioManager.isBluetoothScoOn = true
+            audioManager.startBluetoothSco()
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 ringtone?.isLooping = true
             }

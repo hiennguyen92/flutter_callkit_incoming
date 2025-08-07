@@ -1,5 +1,6 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
@@ -8,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.graphics.Color
+import android.media.session.MediaSession
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -26,9 +28,10 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.text.TextUtils
 import android.util.Log
+import android.view.KeyEvent
+import androidx.annotation.RequiresApi
 
 class CallkitIncomingActivity : Activity() {
-
     companion object {
 
         private const val ACTION_ENDED_CALL_INCOMING =
@@ -77,10 +80,35 @@ class CallkitIncomingActivity : Activity() {
 
     private lateinit var ivDeclineCall: ImageView
     private lateinit var tvDecline: TextView
+    private lateinit var mediaSession: MediaSession
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mediaSession = MediaSession(this, "CallkitIncomingSession").apply {
+            Log.d("CallkitIncoming", "MediaSession callback set")
+            setCallback(object : MediaSession.Callback() {
+                override fun onMediaButtonEvent(mediaButtonIntent: Intent): Boolean {
+                    val event: KeyEvent? =
+                        mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
+                    Log.d("CallkitIncoming", "onMediaButtonEvent triggered. Event: $event")
+                    if (event?.action == KeyEvent.ACTION_UP &&
+                        (event.keyCode == KeyEvent.KEYCODE_HEADSETHOOK || event.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+                    ) {
+                        Log.d("CallkitIncoming", "Bluetooth headset button pressed. Calling onAcceptClick()")
+                        onAcceptClick()
+                        return true
+                    }
+                    return super.onMediaButtonEvent(mediaButtonIntent)
+                }
+            })
+            setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS or MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
+            isActive = true
+        }
+
+
         requestedOrientation = if (!Utils.isTablet(this@CallkitIncomingActivity)) {
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         } else {
@@ -112,6 +140,11 @@ class CallkitIncomingActivity : Activity() {
                 IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}")
             )
         }
+
+        val filter = IntentFilter(Intent.ACTION_MEDIA_BUTTON).apply {
+            priority = IntentFilter.SYSTEM_HIGH_PRIORITY
+        }
+
     }
 
     private fun wakeLockRequest(duration: Long) {
