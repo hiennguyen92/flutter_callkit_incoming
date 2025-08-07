@@ -1,9 +1,56 @@
+## 2.5.8
+* Fix OnGoing notification Android
+* Add missed call notification for iOS(notification/callback action - need to setup more in AppDelegate.swift)
+* Add `requestNotificationPermission` for iOS
+
+## 2.5.7
+* Fix build Android
+* Fix stop sound notification when screen off Android
+
+## 2.5.6
+* Fix bug duplicate permission Android
+* Replaces MediaPlayer with Ringtone Android
+* Fix bug notification channel Android
+* Stop sound notification when screen off Android
+
+## 2.5.5
+* Fix bug duplicate permission Android
+
+## 2.5.4
+* Fix bug custom permission Android
+* Remove calling notification when task remove
+* Fixed calling notification show
+* Fixed some bugs.
+
+## 2.5.3
+* Update Android 14+ compatibility(force CallStyle/`FOREGROUND_SERVICE_PHONE_CALL` for https://developer.android.com/about/versions/14/behavior-changes-all#non-dismissable-notifications)
+* Change structure Notification/Sound on Android
+* Update get avatar from assets(Android), thanks @Ricky-yu https://github.com/hiennguyen92/flutter_callkit_incoming/pull/674
+* Add `isAccepted` properties for iOS and only show facetime button if support video, thank @td2thinh https://github.com/hiennguyen92/flutter_callkit_incoming/pull/673
+* Fixed some bugs.
+
+## 2.5.3-alpha
+* Update Android 14+ compatibility(force CallStyle/`FOREGROUND_SERVICE_PHONE_CALL` for https://developer.android.com/about/versions/14/behavior-changes-all#non-dismissable-notifications)
+* Fixed some bugs.
+
+## 2.5.2
+* Add notification calling for Android `callingNotification`, thank @ebsangam https://github.com/hiennguyen92/flutter_callkit_incoming/pull/662
+* Add `logoUrl` properties (inside android prop) 
+* Fixed issue DMTF IOS, thank @minn-ee https://github.com/hiennguyen92/flutter_callkit_incoming/issues/577
+* Fixed issue duplicate missing notification Android
+* Fixed some bugs.
+
+## 2.5.1
+* Fix issue security Android, thanks @datpt11 https://github.com/hiennguyen92/flutter_callkit_incoming/issues/651
+
+## 2.5.0
+* update jvmToolchain(17) for Android
+
 ## 2.0.4+2
 * add func `requestFullIntentPermission` (Android 14+) thank @Spyspyspy https://github.com/hiennguyen92/flutter_callkit_incoming/pull/584
 * set Notification call style (Android) thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/553
 * Many other issues
     1. add prop `accepted` in activeCalls (iOS) thank @vasilich6107
-    2. 
 
 ## 2.0.4+1
 * Removed `Telecom Framework` (Android)

@@ -36,7 +36,8 @@ Future<void> showCallkitIncoming(String uuid) async {
     headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
     android: const AndroidParams(
       isCustomNotification: true,
-      isShowLogo: false,
+      isShowLogo: true,
+      logoUrl: 'assets/test.png',
       ringtonePath: 'system_ringtone_default',
       backgroundColor: '#0955fa',
       backgroundUrl: 'assets/test.png',
@@ -45,7 +46,7 @@ Future<void> showCallkitIncoming(String uuid) async {
     ),
     ios: const IOSParams(
       iconName: 'CallKitLogo',
-      handleType: '',
+      handleType: 'generic',
       supportsVideo: true,
       maximumCallGroups: 2,
       maximumCallsPerCallGroup: 1,
@@ -87,6 +88,8 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     _uuid = const Uuid();
     initFirebase();
     WidgetsBinding.instance.addObserver(this);
+    FlutterCallkitIncoming.requestFullIntentPermission();
+
     //Check call when open app from terminated
     checkAndNavigationCallingPage();
   }
@@ -97,8 +100,13 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (calls is List) {
       if (calls.isNotEmpty) {
         print('DATA: $calls');
-        _currentUuid = calls[0]['id'];
-        return calls[0];
+        if(calls[0]['id'] != null && calls[0]['isAccepted'] == true) {
+          _currentUuid = calls[0]['id'];
+          return calls[0];
+        } else {
+          _currentUuid = "";
+          return null;
+        }
       } else {
         _currentUuid = "";
         return null;
