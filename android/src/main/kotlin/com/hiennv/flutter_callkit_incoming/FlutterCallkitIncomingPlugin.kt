@@ -42,6 +42,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         private val eventChannels = mutableMapOf<BinaryMessenger, EventChannel>()
         private val eventHandlers = mutableListOf<WeakReference<EventCallbackHandler>>()
         private val declineCallbacks = mutableListOf<WeakReference<CallkitDeclineCallback>>()
+        private val acceptCallbacks = mutableListOf<WeakReference<CallkitAcceptCallback>>()
 
         fun sendEvent(event: String, body: Map<String, Any?>) {
             eventHandlers.reapCollection().forEach {
@@ -78,6 +79,32 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         internal fun notifyDeclineCallbacks(callData: android.os.Bundle) {
             declineCallbacks.reapCollection().forEach { callbackRef ->
                 callbackRef.get()?.onCallDeclined(callData)
+            }
+        }
+
+        /**
+         * Register a callback to receive call accept events natively.
+         * This allows other plugins/services to handle accept events
+         * even when Flutter engine is terminated.
+         */
+        fun registerAcceptCallback(callback: CallkitAcceptCallback) {
+            acceptCallbacks.add(WeakReference(callback))
+        }
+
+        /**
+         * Unregister an accept callback.
+         */
+        fun unregisterAcceptCallback(callback: CallkitAcceptCallback) {
+            acceptCallbacks.removeAll { it.get() == callback || it.get() == null }
+        }
+
+        /**
+         * Notify all registered accept callbacks.
+         * Called internally when a call is accepted.
+         */
+        internal fun notifyAcceptCallbacks(callData: android.os.Bundle) {
+            acceptCallbacks.reapCollection().forEach { callbackRef ->
+                callbackRef.get()?.onCallAccepted(callData)
             }
         }
 

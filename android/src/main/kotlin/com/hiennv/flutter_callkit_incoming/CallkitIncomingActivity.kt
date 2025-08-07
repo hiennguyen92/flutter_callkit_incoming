@@ -304,6 +304,7 @@ class CallkitIncomingActivity : Activity() {
 
 
     private fun onAcceptClick() {
+        Log.d("CallkitIncomingActivity", "[CALLKIT] 📱 onAcceptClick")
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
 
 

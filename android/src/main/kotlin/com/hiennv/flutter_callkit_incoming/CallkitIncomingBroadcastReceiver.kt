@@ -116,6 +116,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT}" -> {
                 try {
+                    Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_ACCEPT")
+                    FlutterCallkitIncomingPlugin.notifyAcceptCallbacks(data)
                     // start service and show ongoing call when call is accepted
                     CallkitNotificationService.startServiceWithAction(
                         context,
