@@ -23,15 +23,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
-import com.squareup.picasso.OkHttp3Downloader
-import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
-import okhttp3.OkHttpClient
 import kotlin.math.abs
-import android.view.ViewGroup.MarginLayoutParams
-import android.os.PowerManager
-import android.text.TextUtils
-import android.util.Log
 
 class CallkitIncomingActivity : Activity() {
 
