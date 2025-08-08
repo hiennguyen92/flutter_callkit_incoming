@@ -60,6 +60,13 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             }
         }
 
+        public fun sendEventCustom(event: String, body: Map<String, Any>) {
+            eventHandlers.reapCollection().forEach {
+                it.get()?.send(event, body)
+            }
+        }
+
+
         fun sharePluginWithRegister(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
             initSharedInstance(
                 flutterPluginBinding.applicationContext,
@@ -102,11 +109,30 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         return callkitNotificationManager
     }
 
+    fun getCallkitSoundPlayerManager(): CallkitSoundPlayerManager? {
+        return callkitSoundPlayerManager
+    }
+
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         sharePluginWithRegister(flutterPluginBinding)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             InAppCallManager(flutterPluginBinding.applicationContext).registerPhoneAccount()
         }
+    }
+
+    public fun showIncomingNotification(data: Data) {
+        data.from = "notification"
+        //send BroadcastReceiver
+        context?.sendBroadcast(
+            CallkitIncomingBroadcastReceiver.getIntentIncoming(
+                requireNotNull(context),
+                data.toBundle()
+            )
+        )
+    }
+
+    public fun showMissCallNotification(data: Data) {
+        callkitNotificationManager?.showMissCallNotification(data.toBundle())
     }
 
     public fun startCall(data: Data) {
@@ -138,6 +164,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             )
         }
         removeAllCalls(context)
+    }
+
+    public fun sendEventCustom(body: Map<String, Any>) {
+        eventHandlers.reapCollection().forEach {
+            it.get()?.send(CallkitConstants.ACTION_CALL_CUSTOM, body)
+        }
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
