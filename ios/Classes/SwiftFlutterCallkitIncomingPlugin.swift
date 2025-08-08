@@ -599,7 +599,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
 
         call.hasConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
-            self?.configurAudioSession()
+            self?.configureAudioSession()
         }
         self.data?.isAccepted = true
         self.answerCall = call
