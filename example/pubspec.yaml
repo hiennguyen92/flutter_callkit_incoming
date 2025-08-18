@@ -4,7 +4,7 @@ description: Demonstrates how to use the flutter_callkit_incoming plugin.
 publish_to: "none"
 
 environment:
-  sdk: ">=2.18.0 <4.0.0"
+  sdk: ">=3.4.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -13,10 +13,10 @@ dependencies:
   flutter_callkit_incoming:
     path: ../
 
-  firebase_core: ^2.12.0
-  firebase_messaging: ^14.6.0
-  http: ^0.13.4
-  uuid: ^3.0.7
+  firebase_core: ^3.15.2
+  firebase_messaging: ^15.2.0
+  http: ^1.5.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
