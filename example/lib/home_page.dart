@@ -264,6 +264,8 @@ class HomePageState extends State<HomePage> {
             // TOTO: have check correct current call
             NavigationService.instance.popUntil(AppRoute.homePage);
             break;
+          case Event.actionCallConnected:
+            break;
           case Event.actionCallTimeout:
             // TODO: missed an incoming call
             break;

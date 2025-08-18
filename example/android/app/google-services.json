@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:773665512065:android:5708a78385fe29101a8b80",
         "android_client_info": {
-          "package_name": "com.hiennv.testing"
+          "package_name": "com.example.flutter_callkit_incoming_example"
         }
       },
       "oauth_client": [
