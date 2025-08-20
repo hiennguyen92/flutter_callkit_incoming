@@ -68,6 +68,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 instance.callkitSoundPlayerManager = CallkitSoundPlayerManager(context)
                 instance.callkitNotificationManager = CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
                 instance.context = context
+            } else {
+                // Re-initialize managers if they were destroyed but instance still exists
+                if (instance.callkitNotificationManager == null) {
+                    instance.callkitSoundPlayerManager = CallkitSoundPlayerManager(context)
+                    instance.callkitNotificationManager = CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
+                }
             }
 
             val channel = MethodChannel(binaryMessenger, "flutter_callkit_incoming")
@@ -351,10 +357,15 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         methodChannels.remove(binding.binaryMessenger)?.setMethodCallHandler(null)
         eventChannels.remove(binding.binaryMessenger)?.setStreamHandler(null)
-        instance.callkitSoundPlayerManager?.destroy()
-        instance.callkitNotificationManager?.destroy()
-        instance.callkitSoundPlayerManager = null
-        instance.callkitNotificationManager = null
+
+        // Only destroy managers when all engine bindings are detached
+        // This prevents issues when foreground services detach but main app is still running
+        if (methodChannels.isEmpty() && eventChannels.isEmpty()) {
+            instance.callkitSoundPlayerManager?.destroy()
+            instance.callkitNotificationManager?.destroy()
+            instance.callkitSoundPlayerManager = null
+            instance.callkitNotificationManager = null
+        }
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
