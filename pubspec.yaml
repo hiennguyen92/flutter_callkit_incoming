@@ -1,9 +1,12 @@
 name: flutter_callkit_incoming
 description: Flutter Callkit Incoming to show callkit screen in your Flutter app.
-version: 2.5.8
+version: 3.0.0
 homepage: https://github.com/hiennguyen92/flutter_callkit_incoming
 repository: https://github.com/hiennguyen92/flutter_callkit_incoming
 issue_tracker: https://github.com/hiennguyen92/flutter_callkit_incoming/issues
+screenshots:
+  - description: "lock screen"
+    path: images/image6.jpg
 
 false_secrets:
   - /example/**
@@ -16,14 +19,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  json_annotation: ^4.8.0
+  json_annotation: ^4.9.0
 
 dev_dependencies:
-  build_runner: ^2.4.4
-  flutter_lints: ^2.0.1
+  build_runner: ^2.7.0
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  json_serializable: ^6.6.1
+  json_serializable: ^6.10.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -72,3 +75,8 @@ flutter:
   #
   # For details regarding fonts in packages, see
   # https://flutter.dev/custom-fonts/#from-packages
+
+topics:
+  - callkit
+  - incoming
+  - flutter-callkit-incoming
