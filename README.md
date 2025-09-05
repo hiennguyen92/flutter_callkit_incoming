@@ -543,6 +543,40 @@ FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(body: Map<String, Any
 
 > **Please check full example:** [Example](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/ios/Runner/AppDelegate.swift)
 
+**MainActivity.kt:**
+```kotlin
+class MainActivity: FlutterActivity(){
+
+    private var callkitEventCallback = object: CallkitEventCallback{
+        override fun onCallEvent(event: CallkitEventCallback.CallEvent, callData: Bundle) {
+            when (event) {
+                CallkitEventCallback.CallEvent.ACCEPT -> {
+                    // Do something with answer
+                }
+                CallkitEventCallback.CallEvent.DECLINE -> {
+                    // Do something with decline
+                }
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        FlutterCallkitIncomingPlugin.registerEventCallback(callkitEventCallback)
+    }
+
+    override fun onDestroy() {
+        FlutterCallkitIncomingPlugin.unregisterEventCallback(callkitEventCallback)
+        super.onDestroy()
+    }
+
+
+}
+```
+
+> **Please check full example:** [Example](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/android/app/src/main/kotlin/com/example/flutter_callkit_incoming_example/MainActivity.kt
+)
+
 ## 📋 Properties
 
 ### Main Properties
