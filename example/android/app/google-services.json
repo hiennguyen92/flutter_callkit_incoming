@@ -3,12 +3,12 @@
     "project_number": "773665512065",
     "firebase_url": "https://project-working-for-testing-default-rtdb.firebaseio.com",
     "project_id": "project-working-for-testing",
-    "storage_bucket": "project-working-for-testing.appspot.com"
+    "storage_bucket": "project-working-for-testing.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:773665512065:android:5708a78385fe29101a8b80",
+        "mobilesdk_app_id": "1:773665512065:android:eab94871a69e9baa1a8b80",
         "android_client_info": {
           "package_name": "com.example.flutter_callkit_incoming_example"
         }
@@ -30,6 +30,13 @@
             {
               "client_id": "773665512065-1shc4ufo4sfdt8v4lvmd0amhj1jqr3cl.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "773665512065-jm4t6cbmce962n5deevi0vbd3kh21kca.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hiennv.testing"
+              }
             }
           ]
         }
@@ -37,9 +44,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:773665512065:android:92f4f47a935afbf01a8b80",
+        "mobilesdk_app_id": "1:773665512065:android:2dcf6a0c607b57001a8b80",
         "android_client_info": {
-          "package_name": "com.scripturequest"
+          "package_name": "com.hiennv.app"
         }
       },
       "oauth_client": [
@@ -59,6 +66,49 @@
             {
               "client_id": "773665512065-1shc4ufo4sfdt8v4lvmd0amhj1jqr3cl.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "773665512065-jm4t6cbmce962n5deevi0vbd3kh21kca.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hiennv.testing"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:773665512065:android:5708a78385fe29101a8b80",
+        "android_client_info": {
+          "package_name": "com.hiennv.testing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "773665512065-1shc4ufo4sfdt8v4lvmd0amhj1jqr3cl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv5X-BDvO8km6lVG8gllj4bY6lJLDUguY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "773665512065-1shc4ufo4sfdt8v4lvmd0amhj1jqr3cl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "773665512065-jm4t6cbmce962n5deevi0vbd3kh21kca.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hiennv.testing"
+              }
             }
           ]
         }

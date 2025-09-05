@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.flutter_callkit_incoming_example"
-        minSdk 21
+        minSdk flutter.minSdkVersion
         targetSdk 35
         versionCode flutter.versionCode
         versionName flutter.versionName

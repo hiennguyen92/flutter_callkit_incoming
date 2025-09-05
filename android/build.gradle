@@ -1,49 +1,28 @@
-group 'com.example.flutter_callkit_incoming'
-version '1.0-SNAPSHOT'
-
-buildscript {
-    ext.kotlin_version = '1.8.0'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.3.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
 }
 
-rootProject.allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+group = "com.example.flutter_callkit_incoming"
+version = "1.0-SNAPSHOT"
 
 android {
-    compileSdk 35
+    namespace "com.hiennv.flutter_callkit_incoming"
+    compileSdk = 35
 
-    if (project.android.hasProperty("namespace")) {
-        namespace "com.hiennv.flutter_callkit_incoming"
-    }
-    
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
     defaultConfig {
-        minSdk 16
-        targetSdk 35
-
+        minSdk = 16
+        targetSdk = 35
         consumerProguardFiles 'consumer-rules.pro'
     }
 
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
@@ -51,9 +30,8 @@ android {
     }
 }
 
-
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
