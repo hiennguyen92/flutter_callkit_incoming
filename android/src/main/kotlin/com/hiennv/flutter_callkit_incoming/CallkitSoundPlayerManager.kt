@@ -91,7 +91,11 @@ class CallkitSoundPlayerManager(private val context: Context) {
                         VibrationEffect.createWaveform(
                             longArrayOf(0L, 1000L, 1000L),
                             0
-                        )
+                        ),
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
                     )
                 } else {
                     vibrator?.vibrate(longArrayOf(0L, 1000L, 1000L), 0)
