@@ -41,6 +41,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         private val methodChannels = mutableMapOf<BinaryMessenger, MethodChannel>()
         private val eventChannels = mutableMapOf<BinaryMessenger, EventChannel>()
         private val eventHandlers = mutableListOf<WeakReference<EventCallbackHandler>>()
+        private val eventCallbacks = mutableListOf<WeakReference<CallkitEventCallback>>()
 
         fun sendEvent(event: String, body: Map<String, Any?>) {
             eventHandlers.reapCollection().forEach {
@@ -51,6 +52,32 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         public fun sendEventCustom(event: String, body: Map<String, Any>) {
             eventHandlers.reapCollection().forEach {
                 it.get()?.send(event, body)
+            }
+        }
+
+        /**
+         * Register a callback to receive call events (accept/decline) natively.
+         * This allows other plugins/services to handle call events
+         * even when Flutter engine is terminated.
+         */
+        fun registerEventCallback(callback: CallkitEventCallback) {
+            eventCallbacks.add(WeakReference(callback))
+        }
+
+        /**
+         * Unregister an event callback.
+         */
+        fun unregisterEventCallback(callback: CallkitEventCallback) {
+            eventCallbacks.removeAll { it.get() == callback || it.get() == null }
+        }
+
+        /**
+         * Notify all registered event callbacks.
+         * Called internally when a call event occurs.
+         */
+        internal fun notifyEventCallbacks(event: CallkitEventCallback.CallEvent, callData: android.os.Bundle) {
+            eventCallbacks.reapCollection().forEach { callbackRef ->
+                callbackRef.get()?.onCallEvent(event, callData)
             }
         }
 
@@ -68,6 +95,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 instance.callkitSoundPlayerManager = CallkitSoundPlayerManager(context)
                 instance.callkitNotificationManager = CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
                 instance.context = context
+            } else {
+                // Re-initialize managers if they were destroyed but instance still exists
+                if (instance.callkitNotificationManager == null) {
+                    instance.callkitSoundPlayerManager = CallkitSoundPlayerManager(context)
+                    instance.callkitNotificationManager = CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
+                }
             }
 
             val channel = MethodChannel(binaryMessenger, "flutter_callkit_incoming")
@@ -351,10 +384,15 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         methodChannels.remove(binding.binaryMessenger)?.setMethodCallHandler(null)
         eventChannels.remove(binding.binaryMessenger)?.setStreamHandler(null)
-        instance.callkitSoundPlayerManager?.destroy()
-        instance.callkitNotificationManager?.destroy()
-        instance.callkitSoundPlayerManager = null
-        instance.callkitNotificationManager = null
+
+        // Only destroy managers when all engine bindings are detached
+        // This prevents issues when foreground services detach but main app is still running
+        if (methodChannels.isEmpty() && eventChannels.isEmpty()) {
+            instance.callkitSoundPlayerManager?.destroy()
+            instance.callkitNotificationManager?.destroy()
+            instance.callkitSoundPlayerManager = null
+            instance.callkitNotificationManager = null
+        }
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
