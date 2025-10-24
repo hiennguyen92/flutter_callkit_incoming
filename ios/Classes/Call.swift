@@ -138,7 +138,8 @@ public class Call: NSObject {
 
     @objc public var isAccepted: Bool
     @objc public var extra: NSDictionary
-    
+    @objc public var headers: NSDictionary
+
     //iOS
     @objc public var iconName: String
     @objc public var handleType: String
@@ -160,9 +161,14 @@ public class Call: NSObject {
     //missedCallNotification
     @objc public var isShowMissedCallNotification: Bool = true
     @objc public var missedNotificationSubtitle: String
-    
     @objc public var missedNotificationCallbackText: String
     @objc public var isShowCallback: Bool = true
+
+    //callingNotification
+    @objc public var isShowCallingNotification: Bool = true
+    @objc public var callingNotificationSubtitle: String
+    @objc public var callingNotificationHangupText: String
+    @objc public var isShowHangup: Bool = true
     
     
     @objc public init(id: String, nameCaller: String, handle: String, type: Int) {
@@ -177,6 +183,7 @@ public class Call: NSObject {
         self.isAccepted = false
 
         self.extra = [:]
+        self.headers = [:]
 
         self.iconName = "CallKitLogo"
         self.handleType = ""
@@ -199,6 +206,11 @@ public class Call: NSObject {
         self.missedNotificationSubtitle = "Missed Call"
         self.missedNotificationCallbackText = "Call back"
         self.isShowCallback = true
+
+        self.isShowCallingNotification = true
+        self.callingNotificationSubtitle = "Calling"
+        self.callingNotificationHangupText = "Hang up"
+        self.isShowHangup = true
     }
     
     @objc public convenience init(args: NSDictionary) {
@@ -220,8 +232,9 @@ public class Call: NSObject {
         self.duration = args["duration"] as? Int ?? 30000
         self.isAccepted = args["isAccepted"] as? Bool ?? false
         self.extra = args["extra"] as? NSDictionary ?? [:]
-        
-        
+        self.headers = args["headers"] as? NSDictionary ?? [:]
+
+
         if let ios = args["ios"] as? [String: Any] {
             self.iconName = ios["iconName"] as? String ?? "CallKitLogo"
             self.handleType = ios["handleType"] as? String ?? ""
@@ -268,6 +281,18 @@ public class Call: NSObject {
             self.missedNotificationCallbackText = "Call back"
             self.isShowCallback = true
         }
+
+        if let callingNotification = args["callingNotification"] as? [String: Any] {
+            self.isShowCallingNotification = callingNotification["showNotification"] as? Bool ?? true
+            self.callingNotificationSubtitle = callingNotification["subtitle"] as? String ?? "Calling"
+            self.callingNotificationHangupText = callingNotification["callbackText"] as? String ?? "Hang up"
+            self.isShowHangup = callingNotification["isShowCallback"] as? Bool ?? true
+        }else {
+            self.isShowCallingNotification = true
+            self.callingNotificationSubtitle = "Calling"
+            self.callingNotificationHangupText = "Hang up"
+            self.isShowHangup = true
+        }
     }
     
     open func toJSON() -> [String: Any] {
@@ -276,6 +301,12 @@ public class Call: NSObject {
             "subtitle": missedNotificationSubtitle,
             "callbackText": missedNotificationCallbackText,
             "isShowCallback": isShowCallback
+        ]
+        let callingNotification: [String : Any] = [
+            "showNotification": isShowCallingNotification,
+            "subtitle": callingNotificationSubtitle,
+            "callbackText": callingNotificationHangupText,
+            "isShowCallback": isShowHangup
         ]
         let ios: [String : Any] = [
             "iconName": iconName,
@@ -307,8 +338,10 @@ public class Call: NSObject {
             "duration": duration,
             "isAccepted": isAccepted,
             "extra": extra,
+            "headers": headers,
             "ios": ios,
-            "missedCallNotification": missedCallNotification
+            "missedCallNotification": missedCallNotification,
+            "callingNotification": callingNotification
         ]
         return map
     }
