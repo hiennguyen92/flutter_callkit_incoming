@@ -2,6 +2,13 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'android_params.g.dart';
 
+/// DMTF action type enum
+enum DTMFActionType {
+  singleTone,
+  softPause,
+  hardPause,
+}
+
 /// Object config for Android.
 @JsonSerializable(explicitToJson: true)
 class AndroidParams {
@@ -21,6 +28,7 @@ class AndroidParams {
     this.isShowFullLockedScreen,
     this.isImportant,
     this.isBot,
+    this.from,
   });
 
   /// Using custom notifications.
@@ -70,6 +78,8 @@ class AndroidParams {
   /// https://developer.android.com/reference/androidx/core/app/Person#isBot()
   final bool? isBot;
 
+  final String? from;
+
   factory AndroidParams.fromJson(Map<String, dynamic> json) =>
       _$AndroidParamsFromJson(json);
 
@@ -92,7 +102,8 @@ class AndroidParams {
         'missedCallNotificationChannelName: $missedCallNotificationChannelName, '
         'isShowFullLockedScreen: $isShowFullLockedScreen, '
         'isImportant: $isImportant, '
-        'isBot: $isBot'
+        'isBot: $isBot, '
+        'from: $from'
         '}';
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
@@ -153,15 +154,131 @@ class FlutterCallkitIncoming {
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {
-    Event? event;
-    Map<String, dynamic> body = {};
-
-    if (data is Map) {
-      event = Event.values.firstWhere((e) => e.name == data['event']);
-      body = Map<String, dynamic>.from(data['body']);
-      return CallEvent(body, event);
+    if (data is! Map) {
+      return null;
     }
-    return null;
+
+    final eventName = data['event'];
+    switch (eventName) {
+      case CallEventConstants.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+        return const CallEventActionDidUpdateDevicePushTokenVoip();
+      case CallEventConstants.ACTION_CALL_INCOMING:
+        final callkitParams = toCallkitParams(data);
+        if (callkitParams == null) {
+          throw const FormatException('[ACTION_CALL_INCOMING] body is null.');
+        }
+        return CallEventActionCallIncoming(callkitParams);
+      case CallEventConstants.ACTION_CALL_START:
+        final callkitParams = toCallkitParams(data);
+        if (callkitParams == null) {
+          throw const FormatException('[ACTION_CALL_START] id is null.');
+        }
+        return CallEventActionCallStart(callkitParams.id);
+      case CallEventConstants.ACTION_CALL_ACCEPT:
+        final callkitParams = toCallkitParams(data);
+        if (callkitParams == null) {
+          throw const FormatException('[ACTION_CALL_ACCEPT] id is null.');
+        }
+        return CallEventActionCallAccept(callkitParams.id);
+      case CallEventConstants.ACTION_CALL_DECLINE:
+        final callkitParams = toCallkitParams(data);
+        if (callkitParams == null) {
+          throw const FormatException('[ACTION_CALL_DECLINE] id is null.');
+        }
+        return CallEventActionCallDecline(callkitParams.id);
+      case CallEventConstants.ACTION_CALL_ENDED:
+        final callkitParams = toCallkitParams(data);
+        if (callkitParams == null) {
+          throw const FormatException('[ACTION_CALL_ENDED] id is null.');
+        }
+        return CallEventActionCallEnded(callkitParams.id);
+      case CallEventConstants.ACTION_CALL_TIMEOUT:
+        final callkitParams = toCallkitParams(data);
+        if (callkitParams == null) {
+          throw const FormatException('[ACTION_CALL_TIMEOUT] id is null.');
+        }
+        return CallEventActionCallTimeout(callkitParams.id);
+      case CallEventConstants.ACTION_CALL_CONNECTED:
+        final callkitParams = toCallkitParams(data);
+        if (callkitParams == null) {
+          throw const FormatException('[ACTION_CALL_CONNECTED] id is null.');
+        }
+        return CallEventActionCallConnected(callkitParams.id);
+      case CallEventConstants.ACTION_CALL_CALLBACK:
+        final callkitParams = toCallkitParams(data);
+        if (callkitParams == null) {
+          throw const FormatException('[ACTION_CALL_CALLBACK] id is null.');
+        }
+        return CallEventActionCallCallback(callkitParams.id);
+      case CallEventConstants.ACTION_CALL_TOGGLE_HOLD:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final id = body?['id'] as String?;
+        if (id == null) {
+          throw const FormatException('[ACTION_CALL_TOGGLE_HOLD] id is null.');
+        }
+        final isOnHold = body?['isOnHold'] as bool?;
+        if (isOnHold == null) {
+          throw const FormatException(
+              '[ACTION_CALL_TOGGLE_HOLD] isOnHold is null.');
+        }
+        return CallEventActionCallToggleHold(
+          id,
+          isOnHold,
+        );
+      case CallEventConstants.ACTION_CALL_TOGGLE_MUTE:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final id = body?['id'] as String?;
+        if (id == null) {
+          throw const FormatException('[ACTION_CALL_TOGGLE_MUTE] id is null.');
+        }
+        final isMuted = body?['isMuted'] as bool?;
+        if (isMuted == null) {
+          throw const FormatException(
+              '[ACTION_CALL_TOGGLE_MUTE] isMuted is null.');
+        }
+        return CallEventActionCallToggleMute(id, isMuted);
+      case CallEventConstants.ACTION_CALL_TOGGLE_DMTF:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final id = body?['id'] as String?;
+        if (id == null) {
+          throw const FormatException('[ACTION_CALL_TOGGLE_DMTF] id is null.');
+        }
+        final digits = body?['digits'] as String?;
+        if (digits == null) {
+          throw const FormatException(
+              '[ACTION_CALL_TOGGLE_DMTF] digits is null.');
+        }
+        final type = body != null ? toDTMFActionType(body) : null;
+        if (type == null) {
+          throw const FormatException(
+              '[ACTION_CALL_TOGGLE_DMTF] type is null.');
+        }
+        return CallEventActionCallToggleDmtf(id, digits, type);
+      case CallEventConstants.ACTION_CALL_TOGGLE_GROUP:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final id = body?['id'] as String?;
+        if (id == null) {
+          throw const FormatException('[ACTION_CALL_TOGGLE_GROUP] id is null.');
+        }
+        final callUUIDToGroupWith = body?['callUUIDToGroupWith'] as String?;
+        return CallEventActionCallToggleGroup(id, callUUIDToGroupWith);
+      case CallEventConstants.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+        final body = data['body'] as Map<Object?, Object?>?;
+        final isActive = body?['isActive'] as bool?;
+        if (isActive == null) {
+          throw const FormatException(
+              '[ACTION_CALL_TOGGLE_AUDIO_SESSION] id is null.');
+        }
+        return CallEventActionCallToggleAudioSession(isActive);
+      case CallEventConstants.ACTION_CALL_CUSTOM:
+        final body = data['body'] as Map<String, dynamic>?;
+        if (body == null) {
+          throw const FormatException('[ACTION_CALL_CUSTOM] body is null.');
+        }
+        return CallEventActionCallCustom(body);
+      default:
+        return null;
+    }
   }
 
   static dynamic _convertMap(dynamic data) {
@@ -172,6 +289,31 @@ class FlutterCallkitIncoming {
       return data.map((item) => _convertMap(item)).toList();
     } else {
       return data;
+    }
+  }
+
+  static CallKitParams? toCallkitParams(Map<dynamic, dynamic> data) {
+    final body = data['data'];
+    if (body == null) {
+      return null;
+    }
+    final jsonData = jsonDecode(jsonEncode(body)) as Map<String, dynamic>;
+    return CallKitParams.fromJson(jsonData);
+  }
+
+  static DTMFActionType? toDTMFActionType(Map data) {
+    final type = data['type'] as String?;
+    if (type == null) return null;
+
+    switch (type) {
+      case 'singleTone':
+        return DTMFActionType.singleTone;
+      case 'softPause':
+        return DTMFActionType.softPause;
+      case 'hardPause':
+        return DTMFActionType.hardPause;
+      default:
+        return null;
     }
   }
 }

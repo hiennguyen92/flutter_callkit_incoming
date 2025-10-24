@@ -134,6 +134,9 @@ data class Data(val args: Map<String, Any?>) {
     @JsonProperty("isBot")
     var isBot: Boolean = false
 
+    @JsonProperty("from")
+    var from: String = ""
+
     init {
         var android: Map<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         android = android ?: args
@@ -153,6 +156,7 @@ data class Data(val args: Map<String, Any?>) {
         isShowFullLockedScreen = android["isShowFullLockedScreen"] as? Boolean ?: true
         isImportant = android["isImportant"] as? Boolean ?: false
         isBot = android["isBot"] as? Boolean ?: false
+        from = android["from"] as? String ?: ""
 
 
         val missedNotification: Map<String, Any?>? =
@@ -317,6 +321,7 @@ data class Data(val args: Map<String, Any?>) {
             CallkitConstants.EXTRA_CALLKIT_IS_BOT,
             isBot,
         )
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_ACTION_FROM, from)
         return bundle
     }
 
@@ -422,6 +427,7 @@ data class Data(val args: Map<String, Any?>) {
                 CallkitConstants.EXTRA_CALLKIT_IS_SHOW_FULL_LOCKED_SCREEN,
                 true
             )
+            data.from = bundle.getString(CallkitConstants.EXTRA_CALLKIT_ACTION_FROM, "")
             return data
         }
     }

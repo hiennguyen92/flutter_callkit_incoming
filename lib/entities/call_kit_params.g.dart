@@ -8,7 +8,7 @@ part of 'call_kit_params.dart';
 
 CallKitParams _$CallKitParamsFromJson(Map<String, dynamic> json) =>
     CallKitParams(
-      id: json['id'] as String?,
+      id: json['id'] as String,
       nameCaller: json['nameCaller'] as String?,
       appName: json['appName'] as String?,
       avatar: json['avatar'] as String?,

@@ -132,7 +132,7 @@ class HomePageState extends State<HomePage> {
       _currentUuid = _uuid.v4();
 
       final params = CallKitParams(
-        id: _currentUuid,
+        id: _currentUuid!,
         nameCaller: 'Hien Nguyen',
         appName: 'Callkit',
         avatar:
@@ -202,7 +202,7 @@ class HomePageState extends State<HomePage> {
   Future<void> startOutGoingCall() async {
     _currentUuid = _uuid.v4();
     final params = CallKitParams(
-        id: _currentUuid,
+        id: _currentUuid!,
         nameCaller: 'Hien Nguyen',
         handle: '0123456789',
         type: 1,
@@ -237,62 +237,64 @@ class HomePageState extends State<HomePage> {
     print(devicePushTokenVoIP);
   }
 
-  Future<void> listenerEvent(void Function(CallEvent) callback) async {
+  Future<void> listenerEvent(void Function(CallEvent?) callback) async {
     try {
       FlutterCallkitIncoming.onEvent.listen((event) async {
         print('HOME: $event');
-        switch (event!.event) {
-          case Event.actionCallIncoming:
+        switch (event) {
+          case CallEventActionCallIncoming():
             // TODO: received an incoming call
             break;
-          case Event.actionCallStart:
+          case CallEventActionCallStart():
             // TODO: started an outgoing call
             // TODO: show screen calling in Flutter
             NavigationService.instance
-                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
+                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.id);
             break;
-          case Event.actionCallAccept:
+          case CallEventActionCallAccept():
             // TODO: accepted an incoming call
             // TODO: show screen calling in Flutter
             NavigationService.instance
-                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
+                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.id);
             break;
-          case Event.actionCallDecline:
+          case CallEventActionCallDecline():
             // TODO: declined an incoming call
             await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
             break;
-          case Event.actionCallEnded:
+          case CallEventActionCallEnded():
             // TODO: ended an incoming/outgoing call
             // TOTO: have check correct current call
             NavigationService.instance.popUntil(AppRoute.homePage);
             break;
-          case Event.actionCallConnected:
+          case CallEventActionCallConnected():
             break;
-          case Event.actionCallTimeout:
+          case CallEventActionCallTimeout():
             // TODO: missed an incoming call
             break;
-          case Event.actionCallCallback:
+          case CallEventActionCallCallback():
             // TODO: only Android - click action `Call back` from missed call notification
             break;
-          case Event.actionCallToggleHold:
+          case CallEventActionCallToggleHold():
             // TODO: only iOS
             break;
-          case Event.actionCallToggleMute:
+          case CallEventActionCallToggleMute():
             // TODO: only iOS
             break;
-          case Event.actionCallToggleDmtf:
+          case CallEventActionCallToggleDmtf():
             // TODO: only iOS
             break;
-          case Event.actionCallToggleGroup:
+          case CallEventActionCallToggleGroup():
             // TODO: only iOS
             break;
-          case Event.actionCallToggleAudioSession:
+          case CallEventActionCallToggleAudioSession():
             // TODO: only iOS
             break;
-          case Event.actionDidUpdateDevicePushTokenVoip:
+          case CallEventActionDidUpdateDevicePushTokenVoip():
             // TODO: only iOS
             break;
-          case Event.actionCallCustom:
+          case CallEventActionCallCustom():
+            break;
+          case null:
             break;
         }
         callback(event);
@@ -307,7 +309,7 @@ class HomePageState extends State<HomePage> {
     get(Uri.parse('https://events.hiennv.com/api/logs?data=$content'));
   }
 
-  void onEvent(CallEvent event) {
+  void onEvent(CallEvent? event) {
     if (!mounted) return;
     setState(() {
       textEvents += '-----------------------\n${event.toString()}\n';

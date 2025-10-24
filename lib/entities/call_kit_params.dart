@@ -10,7 +10,7 @@ part 'call_kit_params.g.dart';
 @JsonSerializable(explicitToJson: true)
 class CallKitParams {
   const CallKitParams({
-    this.id,
+    required this.id,
     this.nameCaller,
     this.appName,
     this.avatar,
@@ -29,7 +29,7 @@ class CallKitParams {
     this.ios,
   });
 
-  final String? id;
+  final String id;
   final String? nameCaller;
   final String? appName;
   final String? avatar;
@@ -37,7 +37,7 @@ class CallKitParams {
   final int? type;
   final int? normalHandle; // androidにない iosのみ
   final int? duration;
-  final bool? isAccepted;
+  final bool isAccepted;
 
   final String? textAccept; // Androidのみ
   final String? textDecline;

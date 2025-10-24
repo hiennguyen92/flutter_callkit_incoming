@@ -96,13 +96,13 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     checkAndNavigationCallingPage();
   }
 
-  Future<dynamic> getCurrentCall() async {
+  Future<CallKitParams?> getCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await FlutterCallkitIncoming.activeCalls();
 
     if (calls.isNotEmpty) {
       print('DATA: $calls');
-      if (calls[0].id != null && calls[0].isAccepted == true) {
+      if (calls[0].isAccepted) {
         _currentUuid = calls[0].id;
         return calls[0];
       } else {
@@ -119,7 +119,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     var currentCall = await getCurrentCall();
     if (currentCall != null) {
       NavigationService.instance
-          .pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
+          .pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall.id);
     }
   }
 

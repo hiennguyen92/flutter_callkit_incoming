@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_callkit_incoming_example/navigation_service.dart';
 import 'package:http/http.dart';
@@ -16,7 +15,7 @@ class CallingPage extends StatefulWidget {
 }
 
 class CallingPageState extends State<CallingPage> {
-  late CallKitParams? calling;
+  late String? callingId;
 
   Timer? _timer;
   int _start = 0;
@@ -47,7 +46,7 @@ class CallingPageState extends State<CallingPage> {
 
   @override
   Widget build(BuildContext context) {
-    calling = ModalRoute.of(context)!.settings.arguments as CallKitParams;
+    callingId = ModalRoute.of(context)!.settings.arguments as String?;
 
     var timeDisplay = intToTimeLeft(_start);
 
@@ -68,8 +67,8 @@ class CallingPageState extends State<CallingPage> {
                       MaterialStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () async {
-                  if (calling != null) {
-                    await makeFakeConnectedCall(calling!.id!);
+                  if (callingId != null) {
+                    await makeFakeConnectedCall(callingId!);
                     startTimer();
                   }
                 },
@@ -81,9 +80,9 @@ class CallingPageState extends State<CallingPage> {
                       MaterialStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () async {
-                  if (calling != null) {
-                    await makeEndCall(calling!.id!);
-                    calling = null;
+                  if (callingId != null) {
+                    await makeEndCall(callingId!);
+                    callingId = null;
                   }
                   NavigationService.instance.goBack();
                   await requestHttp('END_CALL');
@@ -97,16 +96,16 @@ class CallingPageState extends State<CallingPage> {
     );
   }
 
-  Future<void> makeFakeConnectedCall(id) async {
+  Future<void> makeFakeConnectedCall(String id) async {
     await FlutterCallkitIncoming.setCallConnected(id);
   }
 
-  Future<void> makeEndCall(id) async {
+  Future<void> makeEndCall(String id) async {
     await FlutterCallkitIncoming.endCall(id);
   }
 
   //check with https://webhook.site/#!/2748bc41-8599-4093-b8ad-93fd328f1cd2
-  Future<void> requestHttp(content) async {
+  Future<void> requestHttp(String content) async {
     get(Uri.parse(
         'https://webhook.site/2748bc41-8599-4093-b8ad-93fd328f1cd2?data=$content'));
   }
@@ -115,6 +114,6 @@ class CallingPageState extends State<CallingPage> {
   void dispose() {
     super.dispose();
     _timer?.cancel();
-    if (calling != null) FlutterCallkitIncoming.endCall(calling!.id!);
+    if (callingId != null) FlutterCallkitIncoming.endCall(callingId!);
   }
 }
