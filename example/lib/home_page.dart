@@ -305,7 +305,7 @@ class HomePageState extends State<HomePage> {
   }
 
   //check with https://events.hiennv.com
-  Future<void> requestHttp(content) async {
+  Future<void> requestHttp(String content) async {
     get(Uri.parse('https://events.hiennv.com/api/logs?data=$content'));
   }
 
