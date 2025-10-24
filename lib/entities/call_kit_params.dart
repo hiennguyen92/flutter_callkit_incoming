@@ -16,7 +16,6 @@ class CallKitParams {
     this.avatar,
     this.handle,
     this.type,
-    this.normalHandle,
     this.duration,
     this.isAccepted = false,
     this.textAccept,
@@ -35,7 +34,6 @@ class CallKitParams {
   final String? avatar;
   final String? handle;
   final int? type;
-  final int? normalHandle; // androidにない iosのみ
   final int? duration;
   final bool isAccepted;
 
@@ -65,7 +63,6 @@ class CallKitParams {
         'avatar: $avatar, '
         'handle: $handle, '
         'type: $type, '
-        'normalHandle: $normalHandle, '
         'duration: $duration, '
         'isAccepted: $isAccepted, '
         'textAccept: $textAccept, '

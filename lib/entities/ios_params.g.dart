@@ -9,6 +9,7 @@ part of 'ios_params.dart';
 IOSParams _$IOSParamsFromJson(Map<String, dynamic> json) => IOSParams(
       iconName: json['iconName'] as String?,
       handleType: json['handleType'] as String?,
+      normalHandle: (json['normalHandle'] as num?)?.toInt(),
       supportsVideo: json['supportsVideo'] as bool?,
       maximumCallGroups: (json['maximumCallGroups'] as num?)?.toInt(),
       maximumCallsPerCallGroup:
@@ -31,6 +32,7 @@ IOSParams _$IOSParamsFromJson(Map<String, dynamic> json) => IOSParams(
 Map<String, dynamic> _$IOSParamsToJson(IOSParams instance) => <String, dynamic>{
       'iconName': instance.iconName,
       'handleType': instance.handleType,
+      'normalHandle': instance.normalHandle,
       'supportsVideo': instance.supportsVideo,
       'maximumCallGroups': instance.maximumCallGroups,
       'maximumCallsPerCallGroup': instance.maximumCallsPerCallGroup,

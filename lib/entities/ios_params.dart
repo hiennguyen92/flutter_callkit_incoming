@@ -10,6 +10,10 @@ class IOSParams {
 
   /// Type handle call `generic`, `number`, `email`
   final String? handleType;
+
+  /// If normalHandle > 0, handle will not be encrypted
+  final int? normalHandle;
+
   final bool? supportsVideo;
   final int? maximumCallGroups;
   final int? maximumCallsPerCallGroup;
@@ -30,6 +34,7 @@ class IOSParams {
   const IOSParams({
     this.iconName,
     this.handleType,
+    this.normalHandle,
     this.supportsVideo,
     this.maximumCallGroups,
     this.maximumCallsPerCallGroup,
@@ -56,6 +61,7 @@ class IOSParams {
     return 'IOSParams{'
         'iconName: $iconName, '
         'handleType: $handleType, '
+        'normalHandle: $normalHandle, '
         'supportsVideo: $supportsVideo, '
         'maximumCallGroups: $maximumCallGroups, '
         'maximumCallsPerCallGroup: $maximumCallsPerCallGroup, '

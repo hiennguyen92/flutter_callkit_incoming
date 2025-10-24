@@ -228,7 +228,6 @@ public class Call: NSObject {
         self.handle = args["handle"] as? String ?? ""
         self.avatar = args["avatar"] as? String ?? ""
         self.type = args["type"] as? Int ?? 0
-        self.normalHandle = args["normalHandle"] as? Int ?? 0
         self.duration = args["duration"] as? Int ?? 30000
         self.isAccepted = args["isAccepted"] as? Bool ?? false
         self.extra = args["extra"] as? NSDictionary ?? [:]
@@ -238,6 +237,7 @@ public class Call: NSObject {
         if let ios = args["ios"] as? [String: Any] {
             self.iconName = ios["iconName"] as? String ?? "CallKitLogo"
             self.handleType = ios["handleType"] as? String ?? ""
+            self.normalHandle = ios["normalHandle"] as? Int ?? 0
             self.supportsVideo = ios["supportsVideo"] as? Bool ?? true
             self.maximumCallGroups = ios["maximumCallGroups"] as? Int ?? 2
             self.maximumCallsPerCallGroup = ios["maximumCallsPerCallGroup"] as? Int ?? 1
@@ -255,6 +255,7 @@ public class Call: NSObject {
         }else {
             self.iconName = args["iconName"] as? String ?? "CallKitLogo"
             self.handleType = args["handleType"] as? String ?? ""
+            self.normalHandle = args["normalHandle"] as? Int ?? 0
             self.supportsVideo = args["supportsVideo"] as? Bool ?? true
             self.maximumCallGroups = args["maximumCallGroups"] as? Int ?? 2
             self.maximumCallsPerCallGroup =  args["maximumCallsPerCallGroup"] as? Int ?? 1
@@ -311,6 +312,7 @@ public class Call: NSObject {
         let ios: [String : Any] = [
             "iconName": iconName,
             "handleType": handleType,
+            "normalHandle": normalHandle,
             "supportsVideo": supportsVideo,
             "maximumCallGroups": maximumCallGroups,
             "maximumCallsPerCallGroup": maximumCallsPerCallGroup,
@@ -334,7 +336,6 @@ public class Call: NSObject {
             "handle": handle,
             "avatar": avatar,
             "type": type,
-            "normalHandle": normalHandle,
             "duration": duration,
             "isAccepted": isAccepted,
             "extra": extra,
