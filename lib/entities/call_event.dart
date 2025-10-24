@@ -3,35 +3,35 @@ import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
 
 /// Event name constants for external reference
 abstract class CallEventConstants {
-  static const String ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP =
+  static const String actionDidUpdateDevicePushTokenVoip =
       'com.hiennv.flutter_callkit_incoming.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP';
-  static const String ACTION_CALL_INCOMING =
+  static const String actionCallIncoming =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_INCOMING';
-  static const String ACTION_CALL_START =
+  static const String actionCallStart =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_START';
-  static const String ACTION_CALL_ACCEPT =
+  static const String actionCallAccept =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT';
-  static const String ACTION_CALL_DECLINE =
+  static const String actionCallDecline =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE';
-  static const String ACTION_CALL_ENDED =
+  static const String actionCallEnded =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_ENDED';
-  static const String ACTION_CALL_TIMEOUT =
+  static const String actionCallTimeout =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT';
-  static const String ACTION_CALL_CONNECTED =
+  static const String actionCallConnected =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CONNECTED';
-  static const String ACTION_CALL_CALLBACK =
+  static const String actionCallCallback =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK';
-  static const String ACTION_CALL_TOGGLE_HOLD =
+  static const String actionCallToggleHold =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_HOLD';
-  static const String ACTION_CALL_TOGGLE_MUTE =
+  static const String actionCallToggleMute =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_MUTE';
-  static const String ACTION_CALL_TOGGLE_DMTF =
+  static const String actionCallToggleDmtf =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_DMTF';
-  static const String ACTION_CALL_TOGGLE_GROUP =
+  static const String actionCallToggleGroup =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP';
-  static const String ACTION_CALL_TOGGLE_AUDIO_SESSION =
+  static const String actionCallToggleAudioSession =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION';
-  static const String ACTION_CALL_CUSTOM =
+  static const String actionCallCustom =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CUSTOM';
 }
 
@@ -47,7 +47,7 @@ class CallEventActionDidUpdateDevicePushTokenVoip extends CallEvent {
 
   @override
   String get eventName =>
-      CallEventConstants.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP;
+      CallEventConstants.actionDidUpdateDevicePushTokenVoip;
 
   @override
   String toString() => 'CallEventActionDidUpdateDevicePushTokenVoip()';
@@ -57,7 +57,7 @@ class CallEventActionCallIncoming extends CallEvent {
   const CallEventActionCallIncoming(this.callKitParams);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_INCOMING;
+  String get eventName => CallEventConstants.actionCallIncoming;
 
   final CallKitParams callKitParams;
 
@@ -70,7 +70,7 @@ class CallEventActionCallStart extends CallEvent {
   const CallEventActionCallStart(this.id);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_START;
+  String get eventName => CallEventConstants.actionCallStart;
 
   final String id;
 
@@ -82,7 +82,7 @@ class CallEventActionCallAccept extends CallEvent {
   const CallEventActionCallAccept(this.id);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_ACCEPT;
+  String get eventName => CallEventConstants.actionCallAccept;
 
   final String id;
 
@@ -94,7 +94,7 @@ class CallEventActionCallDecline extends CallEvent {
   const CallEventActionCallDecline(this.id);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_DECLINE;
+  String get eventName => CallEventConstants.actionCallDecline;
 
   final String id;
 
@@ -106,7 +106,7 @@ class CallEventActionCallEnded extends CallEvent {
   const CallEventActionCallEnded(this.id);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_ENDED;
+  String get eventName => CallEventConstants.actionCallEnded;
 
   final String id;
 
@@ -118,7 +118,7 @@ class CallEventActionCallTimeout extends CallEvent {
   const CallEventActionCallTimeout(this.id);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_TIMEOUT;
+  String get eventName => CallEventConstants.actionCallTimeout;
 
   final String id;
 
@@ -130,7 +130,7 @@ class CallEventActionCallConnected extends CallEvent {
   const CallEventActionCallConnected(this.id);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_CONNECTED;
+  String get eventName => CallEventConstants.actionCallConnected;
 
   final String id;
 
@@ -142,7 +142,7 @@ class CallEventActionCallCallback extends CallEvent {
   const CallEventActionCallCallback(this.id);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_CALLBACK;
+  String get eventName => CallEventConstants.actionCallCallback;
 
   final String id;
 
@@ -154,7 +154,7 @@ class CallEventActionCallToggleHold extends CallEvent {
   const CallEventActionCallToggleHold(this.id, this.isOnHold);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_TOGGLE_HOLD;
+  String get eventName => CallEventConstants.actionCallToggleHold;
 
   final String id;
   final bool isOnHold;
@@ -168,7 +168,7 @@ class CallEventActionCallToggleMute extends CallEvent {
   const CallEventActionCallToggleMute(this.id, this.isMuted);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_TOGGLE_MUTE;
+  String get eventName => CallEventConstants.actionCallToggleMute;
 
   final String id;
   final bool isMuted;
@@ -182,7 +182,7 @@ class CallEventActionCallToggleDmtf extends CallEvent {
   const CallEventActionCallToggleDmtf(this.id, this.digits, this.type);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_TOGGLE_DMTF;
+  String get eventName => CallEventConstants.actionCallToggleDmtf;
 
   final String id;
   final String digits;
@@ -197,7 +197,7 @@ class CallEventActionCallToggleGroup extends CallEvent {
   const CallEventActionCallToggleGroup(this.id, this.callUUIDToGroupWith);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_TOGGLE_GROUP;
+  String get eventName => CallEventConstants.actionCallToggleGroup;
 
   final String id;
   final String? callUUIDToGroupWith;
@@ -211,7 +211,7 @@ class CallEventActionCallToggleAudioSession extends CallEvent {
   const CallEventActionCallToggleAudioSession(this.isActive);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_TOGGLE_AUDIO_SESSION;
+  String get eventName => CallEventConstants.actionCallToggleAudioSession;
 
   final bool isActive;
 
@@ -224,7 +224,7 @@ class CallEventActionCallCustom extends CallEvent {
   const CallEventActionCallCustom(this.body);
 
   @override
-  String get eventName => CallEventConstants.ACTION_CALL_CUSTOM;
+  String get eventName => CallEventConstants.actionCallCustom;
 
   final Map<String, dynamic> body;
 

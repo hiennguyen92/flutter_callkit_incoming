@@ -160,57 +160,57 @@ class FlutterCallkitIncoming {
 
     final eventName = data['event'];
     switch (eventName) {
-      case CallEventConstants.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+      case CallEventConstants.actionDidUpdateDevicePushTokenVoip:
         return const CallEventActionDidUpdateDevicePushTokenVoip();
-      case CallEventConstants.ACTION_CALL_INCOMING:
+      case CallEventConstants.actionCallIncoming:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_INCOMING] body is null.');
         }
         return CallEventActionCallIncoming(callkitParams);
-      case CallEventConstants.ACTION_CALL_START:
+      case CallEventConstants.actionCallStart:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_START] id is null.');
         }
         return CallEventActionCallStart(callkitParams.id);
-      case CallEventConstants.ACTION_CALL_ACCEPT:
+      case CallEventConstants.actionCallAccept:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_ACCEPT] id is null.');
         }
         return CallEventActionCallAccept(callkitParams.id);
-      case CallEventConstants.ACTION_CALL_DECLINE:
+      case CallEventConstants.actionCallDecline:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_DECLINE] id is null.');
         }
         return CallEventActionCallDecline(callkitParams.id);
-      case CallEventConstants.ACTION_CALL_ENDED:
+      case CallEventConstants.actionCallEnded:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_ENDED] id is null.');
         }
         return CallEventActionCallEnded(callkitParams.id);
-      case CallEventConstants.ACTION_CALL_TIMEOUT:
+      case CallEventConstants.actionCallTimeout:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_TIMEOUT] id is null.');
         }
         return CallEventActionCallTimeout(callkitParams.id);
-      case CallEventConstants.ACTION_CALL_CONNECTED:
+      case CallEventConstants.actionCallConnected:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_CONNECTED] id is null.');
         }
         return CallEventActionCallConnected(callkitParams.id);
-      case CallEventConstants.ACTION_CALL_CALLBACK:
+      case CallEventConstants.actionCallCallback:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_CALLBACK] id is null.');
         }
         return CallEventActionCallCallback(callkitParams.id);
-      case CallEventConstants.ACTION_CALL_TOGGLE_HOLD:
+      case CallEventConstants.actionCallToggleHold:
         final body = data['body'] as Map<Object?, Object?>?;
         final id = body?['id'] as String?;
         if (id == null) {
@@ -225,7 +225,7 @@ class FlutterCallkitIncoming {
           id,
           isOnHold,
         );
-      case CallEventConstants.ACTION_CALL_TOGGLE_MUTE:
+      case CallEventConstants.actionCallToggleMute:
         final body = data['body'] as Map<Object?, Object?>?;
         final id = body?['id'] as String?;
         if (id == null) {
@@ -237,7 +237,7 @@ class FlutterCallkitIncoming {
               '[ACTION_CALL_TOGGLE_MUTE] isMuted is null.');
         }
         return CallEventActionCallToggleMute(id, isMuted);
-      case CallEventConstants.ACTION_CALL_TOGGLE_DMTF:
+      case CallEventConstants.actionCallToggleDmtf:
         final body = data['body'] as Map<Object?, Object?>?;
         final id = body?['id'] as String?;
         if (id == null) {
@@ -254,7 +254,7 @@ class FlutterCallkitIncoming {
               '[ACTION_CALL_TOGGLE_DMTF] type is null.');
         }
         return CallEventActionCallToggleDmtf(id, digits, type);
-      case CallEventConstants.ACTION_CALL_TOGGLE_GROUP:
+      case CallEventConstants.actionCallToggleGroup:
         final body = data['body'] as Map<Object?, Object?>?;
         final id = body?['id'] as String?;
         if (id == null) {
@@ -262,7 +262,7 @@ class FlutterCallkitIncoming {
         }
         final callUUIDToGroupWith = body?['callUUIDToGroupWith'] as String?;
         return CallEventActionCallToggleGroup(id, callUUIDToGroupWith);
-      case CallEventConstants.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+      case CallEventConstants.actionCallToggleAudioSession:
         final body = data['body'] as Map<Object?, Object?>?;
         final isActive = body?['isActive'] as bool?;
         if (isActive == null) {
@@ -270,7 +270,7 @@ class FlutterCallkitIncoming {
               '[ACTION_CALL_TOGGLE_AUDIO_SESSION] id is null.');
         }
         return CallEventActionCallToggleAudioSession(isActive);
-      case CallEventConstants.ACTION_CALL_CUSTOM:
+      case CallEventConstants.actionCallCustom:
         final body = data['body'] as Map<String, dynamic>?;
         if (body == null) {
           throw const FormatException('[ACTION_CALL_CUSTOM] body is null.');
