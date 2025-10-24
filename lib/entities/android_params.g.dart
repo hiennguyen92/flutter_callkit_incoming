@@ -26,6 +26,8 @@ AndroidParams _$AndroidParamsFromJson(Map<String, dynamic> json) =>
       isImportant: json['isImportant'] as bool?,
       isBot: json['isBot'] as bool?,
       from: json['from'] as String?,
+      textAccept: json['textAccept'] as String?,
+      textDecline: json['textDecline'] as String?,
     );
 
 Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
@@ -48,4 +50,6 @@ Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
       'isImportant': instance.isImportant,
       'isBot': instance.isBot,
       'from': instance.from,
+      'textAccept': instance.textAccept,
+      'textDecline': instance.textDecline,
     };

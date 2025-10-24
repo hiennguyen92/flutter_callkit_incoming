@@ -29,6 +29,8 @@ class AndroidParams {
     this.isImportant,
     this.isBot,
     this.from,
+    this.textAccept,
+    this.textDecline,
   });
 
   /// Using custom notifications.
@@ -80,6 +82,12 @@ class AndroidParams {
 
   final String? from;
 
+  /// Text for accept button
+  final String? textAccept;
+
+  /// Text for decline button
+  final String? textDecline;
+
   factory AndroidParams.fromJson(Map<String, dynamic> json) =>
       _$AndroidParamsFromJson(json);
 
@@ -103,7 +111,9 @@ class AndroidParams {
         'isShowFullLockedScreen: $isShowFullLockedScreen, '
         'isImportant: $isImportant, '
         'isBot: $isBot, '
-        'from: $from'
+        'from: $from, '
+        'textAccept: $textAccept, '
+        'textDecline: $textDecline'
         '}';
   }
 }

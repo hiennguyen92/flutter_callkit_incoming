@@ -18,8 +18,6 @@ class CallKitParams {
     this.type,
     this.duration,
     this.isAccepted = false,
-    this.textAccept,
-    this.textDecline,
     this.missedCallNotification,
     this.callingNotification,
     this.extra,
@@ -36,9 +34,6 @@ class CallKitParams {
   final int? type;
   final int? duration;
   final bool isAccepted;
-
-  final String? textAccept; // Androidのみ
-  final String? textDecline;
 
   final NotificationParams? missedCallNotification;
   final NotificationParams? callingNotification;
@@ -65,8 +60,6 @@ class CallKitParams {
         'type: $type, '
         'duration: $duration, '
         'isAccepted: $isAccepted, '
-        'textAccept: $textAccept, '
-        'textDecline: $textDecline, '
         'missedCallNotification: $missedCallNotification, '
         'callingNotification: $callingNotification, '
         'extra: $extra, '

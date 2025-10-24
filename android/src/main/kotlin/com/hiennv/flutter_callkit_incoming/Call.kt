@@ -35,10 +35,10 @@ data class Data(val args: Map<String, Any?>) {
     var isAccepted: Boolean = false
 
     @JsonProperty("textAccept")
-    var textAccept: String = (args["textAccept"] as? String) ?: ""
+    var textAccept: String = ""
 
     @JsonProperty("textDecline")
-    var textDecline: String = (args["textDecline"] as? String) ?: ""
+    var textDecline: String = ""
 
     // NotificationParams: missedCallNotification params
 
@@ -157,6 +157,8 @@ data class Data(val args: Map<String, Any?>) {
         isImportant = android["isImportant"] as? Boolean ?: false
         isBot = android["isBot"] as? Boolean ?: false
         from = android["from"] as? String ?: ""
+        textAccept = android["textAccept"] as? String ?: ""
+        textDecline = android["textDecline"] as? String ?: ""
 
 
         val missedNotification: Map<String, Any?>? =
