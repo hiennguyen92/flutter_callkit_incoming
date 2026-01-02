@@ -8,6 +8,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.graphics.Color
+import android.graphics.drawable.Drawable
+import androidx.core.graphics.drawable.DrawableCompat
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -222,6 +224,20 @@ class CallkitIncomingActivity : Activity() {
         val textDecline = data?.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
         tvDecline.text =
             if (TextUtils.isEmpty(textDecline)) getString(R.string.text_decline) else textDecline
+
+        val acceptCallColor =
+            data?.getString(CallkitConstants.EXTRA_CALLKIT_ACCEPT_COLOR, "#4CAF50")
+        try {
+            ivAcceptCall.setBackground(AppUtils.createCircleDrawable(Color.parseColor(acceptCallColor)))
+        } catch (error: Exception) {
+        }
+
+        val declineCallColor =
+            data?.getString(CallkitConstants.EXTRA_CALLKIT_DECLINE_COLOR, "#F44336")
+        try {
+            ivDeclineCall.setBackground(AppUtils.createCircleDrawable(Color.parseColor(declineCallColor)))
+        } catch (error: Exception) {
+        }
 
         try {
             tvAccept.setTextColor(Color.parseColor(textColor))

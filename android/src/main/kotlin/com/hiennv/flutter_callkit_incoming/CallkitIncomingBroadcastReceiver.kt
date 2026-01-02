@@ -253,6 +253,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "duration" to data.getLong(CallkitConstants.EXTRA_CALLKIT_DURATION, 0L),
             "textAccept" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, ""),
             "textDecline" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, ""),
+            "acceptColor" to data.getString(CallkitConstants.EXTRA_CALLKIT_ACCEPT_COLOR, ""),
+            "declineColor" to data.getString(CallkitConstants.EXTRA_CALLKIT_DECLINE_COLOR, ""),
             "extra" to data.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA),
             "missedCallNotification" to missedCallNotification,
             "callingNotification" to callingNotification,
