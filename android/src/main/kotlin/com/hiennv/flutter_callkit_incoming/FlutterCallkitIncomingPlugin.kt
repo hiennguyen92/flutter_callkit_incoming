@@ -6,8 +6,10 @@ import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.annotation.NonNull
 import com.hiennv.flutter_callkit_incoming.Utils.Companion.reapCollection
+import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -18,6 +20,7 @@ import java.lang.ref.WeakReference
 
 
 /** FlutterCallkitIncomingPlugin */
+@SuppressLint("LongLogTag")
 class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     PluginRegistry.RequestPermissionsResultListener {
     companion object {
@@ -27,8 +30,18 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         @SuppressLint("StaticFieldLeak")
         private lateinit var instance: FlutterCallkitIncomingPlugin
 
+        @Volatile
+        var detachedFromEngine: Boolean = false
+
         fun getInstance(): FlutterCallkitIncomingPlugin? {
             if (hasInstance()) {
+              // if (detachedFromEngine) {
+              //      Log.w(
+              //          "FlutterCallkitIncomingPlugin",
+              //          "Plugin instance is detached from engine. Probably app was closed while FGS was running. Creating a new Flutter engine."
+              //      )
+              //      FlutterEngine(instance.context!!)
+              //  }
                 return instance
             }
             return null
@@ -46,6 +59,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         fun sendEvent(event: String, body: Map<String, Any?>) {
             eventHandlers.reapCollection().forEach {
                 it.get()?.send(event, body)
+            }
+
+            // Send to background dart callback if app is closed
+            if (CallkitHeadlessDart.started) {
+                CallkitHeadlessDart.send(event, body)
             }
         }
 
@@ -139,6 +157,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             InAppCallManager(flutterPluginBinding.applicationContext).registerPhoneAccount()
         }
+        detachedFromEngine = false
     }
 
     public fun showIncomingNotification(data: Data) {
@@ -393,6 +412,9 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             instance.callkitSoundPlayerManager = null
             instance.callkitNotificationManager = null
         }
+
+        detachedFromEngine = true
+        CallkitHeadlessDart.start(instance.context!!)
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -411,7 +433,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     override fun onDetachedFromActivity() {
-        instance.context = null
+        // Application context must remains available: case when app is in fgs and activity is destroyed; nulling context breaks notification
         instance.activity = null
     }
 
