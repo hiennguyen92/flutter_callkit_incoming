@@ -1,8 +1,13 @@
 import 'dart:async';
 
+import 'dart:ui';
+
 import 'package:flutter/services.dart';
 
 import 'entities/entities.dart';
+
+import 'package:flutter/material.dart';
+
 
 /// Instance to use library functions.
 /// * showCallkitIncoming(dynamic)
@@ -11,11 +16,56 @@ import 'entities/entities.dart';
 /// * endAllCalls()
 /// * callConnected(dynamic)
 
+typedef BackgroundMessageHandler = Future<void> Function(CallEvent callEvent);
+
+@pragma('vm:entry-point')
+void _flutterCallkitIncomingCallbackDispatcher() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  const MethodChannel backgroundChannel =
+  MethodChannel('flutter_callkit_incoming_background');
+
+  const MethodChannel channel =
+  MethodChannel('flutter_callkit_incoming');
+
+  backgroundChannel.setMethodCallHandler((MethodCall call) async {
+    final int rawHandle =
+      await channel.invokeMethod<int>('getBackgroundHandler') ?? 0;
+
+    final callback = PluginUtilities.getCallbackFromHandle(
+      CallbackHandle.fromRawHandle(rawHandle),
+    ) as Future<void> Function(CallEvent callEvent);
+
+    final Event event = Event.values.firstWhere((e) => e.name == call.method);
+    await callback(CallEvent(call.arguments, event));
+  });
+}
+
 class FlutterCallkitIncoming {
+
   static const MethodChannel _channel =
       MethodChannel('flutter_callkit_incoming');
   static const EventChannel _eventChannel =
       EventChannel('flutter_callkit_incoming_events');
+
+
+  /// Set a message handler function which is called when the app is in the
+  /// background or terminated.
+  ///
+  /// This provided handler must be a top-level function and cannot be
+  /// anonymous otherwise an [ArgumentError] will be thrown.
+  static Future<void> onBackgroundMessage(BackgroundMessageHandler handler) async {
+    final CallbackHandle pluginHandle = PluginUtilities.getCallbackHandle(
+      _flutterCallkitIncomingCallbackDispatcher,
+    )!;
+    final CallbackHandle userHandle = PluginUtilities.getCallbackHandle(handler)!;
+    await _channel.invokeMapMethod('registerBackgroundHandler',
+        {
+          'pluginHandle': pluginHandle.toRawHandle(),
+          'userHandle': userHandle.toRawHandle()
+        });
+  }
+
 
   /// Listen to event callback from [FlutterCallkitIncoming].
   ///

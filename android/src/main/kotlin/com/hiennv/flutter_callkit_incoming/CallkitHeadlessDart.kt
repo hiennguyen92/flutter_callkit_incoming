@@ -1,18 +1,16 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
-import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.silenceEvents
+import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.embedding.engine.loader.FlutterLoader
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.view.FlutterCallbackInformation
 
 object CallkitHeadlessDart {
     private const val TAG = "CallkitHeadlessDart"
-    private const val ENGINE_ID = "callkit_bg_engine"
     private const val CHANNEL = "flutter_callkit_incoming_background"
 
     @Volatile
@@ -23,32 +21,35 @@ object CallkitHeadlessDart {
     @Volatile
     var started = false
 
-    fun start(context: Context) {
+    fun start(context: Context, pluginCallbackHandle: Long) {
         if (started) {
             Log.d(TAG, "Engine already running")
             return
         }
+
         val appCtx = context.applicationContext
 
-        val loader = FlutterLoader()
+        val loader: FlutterLoader = FlutterInjector.instance().flutterLoader()
         loader.startInitialization(appCtx)
         loader.ensureInitializationComplete(appCtx, null)
 
-        val engine = FlutterEngine(appCtx)
-        val entrypoint = DartExecutor.DartEntrypoint(
-            loader.findAppBundlePath(),
-            "callkitBackgroundCallback" // entrypoint Dart
-        )
-        engine.dartExecutor.executeDartEntrypoint(entrypoint)
+        engine = FlutterEngine(appCtx)
 
-        CallkitHeadlessDart.engine = engine
-        FlutterEngineCache.getInstance().put(ENGINE_ID, engine)
-        channel = MethodChannel(engine.dartExecutor.binaryMessenger, CHANNEL)
+        val callbackInfo =
+            FlutterCallbackInformation.lookupCallbackInformation(pluginCallbackHandle)
+
+        val args = DartExecutor.DartCallback(
+            appCtx.assets,
+            loader.findAppBundlePath(),
+            callbackInfo
+        )
+
+        engine!!.dartExecutor.executeDartCallback(args)
+        channel = MethodChannel(engine!!.dartExecutor.binaryMessenger, CHANNEL)
         started = true
 
-        Log.d(TAG, "Engine started")
+        Log.d(TAG, "Background FlutterEngine started")
     }
-
 
     fun send(event: String, body: Map<String, Any?>) {
         if (!started) {

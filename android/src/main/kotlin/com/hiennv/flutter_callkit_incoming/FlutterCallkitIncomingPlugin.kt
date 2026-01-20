@@ -9,7 +9,6 @@ import android.os.Looper
 import android.util.Log
 import androidx.annotation.NonNull
 import com.hiennv.flutter_callkit_incoming.Utils.Companion.reapCollection
-import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -35,13 +34,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
         fun getInstance(): FlutterCallkitIncomingPlugin? {
             if (hasInstance()) {
-              // if (detachedFromEngine) {
-              //      Log.w(
-              //          "FlutterCallkitIncomingPlugin",
-              //          "Plugin instance is detached from engine. Probably app was closed while FGS was running. Creating a new Flutter engine."
-              //      )
-              //      FlutterEngine(instance.context!!)
-              //  }
                 return instance
             }
             return null
@@ -64,6 +56,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             // Send to background dart callback if app is closed
             if (CallkitHeadlessDart.started) {
                 CallkitHeadlessDart.send(event, body)
+            } else {
+                Log.d("FlutterCallkitIncomingPlugin", "Send normale event: $event")
+                eventHandlers.reapCollection().forEach {
+                    it.get()?.send(event, body)
+                }
             }
         }
 
@@ -215,6 +212,17 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         try {
             when (call.method) {
+                "registerBackgroundHandler" -> {
+                    val args = call.arguments as Map<*, *>
+                    val pluginHandle = (args["pluginHandle"] as Number).toLong()
+                    val userHandle = (args["userHandle"] as Number).toLong()
+                    addBackgroundCallback(context, pluginHandle, userHandle)
+                    result.success(null)
+                }
+                "getBackgroundHandler" -> {
+                    val handle = getUserCallback(context)
+                    result.success(handle)
+                }
                 "showCallkitIncoming" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
@@ -413,8 +421,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             instance.callkitNotificationManager = null
         }
 
-        detachedFromEngine = true
-        CallkitHeadlessDart.start(instance.context!!)
+        // If callback was registered, start headless dart engine that calls this
+        val pluginCallbackHandle: Long? = getPluginCallbackHandle(instance.context)
+        if (pluginCallbackHandle != 0L) {
+            CallkitHeadlessDart.start(instance.context!!, pluginCallbackHandle!!)
+        }
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
