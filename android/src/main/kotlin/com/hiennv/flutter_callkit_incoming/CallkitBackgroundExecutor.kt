@@ -9,21 +9,21 @@ import io.flutter.embedding.engine.loader.FlutterLoader
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.view.FlutterCallbackInformation
 
-object CallkitHeadlessDart {
-    private const val TAG = "CallkitHeadlessDart"
+object CallkitBackgroundExecutor {
+    private const val TAG = "CallkitBGExecutor"
     private const val CHANNEL = "flutter_callkit_incoming_background"
 
     @Volatile
-    private var engine: FlutterEngine? = null
+    private var backgroundFlutterEngine: FlutterEngine? = null
 
-    private var channel: MethodChannel? = null
+    private var backgroundChannel: MethodChannel? = null
 
-    @Volatile
-    var started = false
+    val registered: Boolean
+        get() = backgroundFlutterEngine != null
 
     fun start(context: Context, pluginCallbackHandle: Long) {
-        if (started) {
-            Log.d(TAG, "Engine already running")
+        if (backgroundFlutterEngine!= null) {
+            Log.d(TAG, "Background engine already running")
             return
         }
 
@@ -33,7 +33,7 @@ object CallkitHeadlessDart {
         loader.startInitialization(appCtx)
         loader.ensureInitializationComplete(appCtx, null)
 
-        engine = FlutterEngine(appCtx)
+        backgroundFlutterEngine = FlutterEngine(appCtx)
 
         val callbackInfo =
             FlutterCallbackInformation.lookupCallbackInformation(pluginCallbackHandle)
@@ -44,18 +44,17 @@ object CallkitHeadlessDart {
             callbackInfo
         )
 
-        engine!!.dartExecutor.executeDartCallback(args)
-        channel = MethodChannel(engine!!.dartExecutor.binaryMessenger, CHANNEL)
-        started = true
+        backgroundFlutterEngine!!.dartExecutor.executeDartCallback(args)
+        backgroundChannel = MethodChannel(backgroundFlutterEngine!!.dartExecutor.binaryMessenger, CHANNEL)
 
-        Log.d(TAG, "Background FlutterEngine started")
+        Log.d(TAG, "Background engine started")
     }
 
     fun send(event: String, body: Map<String, Any?>) {
-        if (!started) {
-            Log.e(TAG, "Engine not started, cannot send event: $event")
+        if (backgroundFlutterEngine == null) {
+            Log.e(TAG, "Background engin not started, cannot send event: $event")
             return
         }
-        channel!!.invokeMethod(event, body)
+        backgroundChannel!!.invokeMethod(event, body)
     }
 }
