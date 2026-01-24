@@ -15,37 +15,6 @@ class Utils {
 
         private var mapper: ObjectMapper? = null
 
-        fun isApplicationForeground(context: Context): Boolean {
-            val keyguardManager =
-                context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager?
-
-            if (keyguardManager != null && keyguardManager.isKeyguardLocked) {
-                return false
-            }
-
-            val activityManager =
-                context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
-            if (activityManager == null) {
-                return false
-            }
-
-            val appProcesses = activityManager.runningAppProcesses
-            if (appProcesses == null) {
-                return false
-            }
-
-            val packageName = context.packageName
-            for (appProcess in appProcesses) {
-                if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
-                    && appProcess.processName == packageName
-                ) {
-                    return true
-                }
-            }
-
-            return false
-        }
-
         fun getGsonInstance(): ObjectMapper {
             if (mapper == null) {
                 mapper = ObjectMapper()
