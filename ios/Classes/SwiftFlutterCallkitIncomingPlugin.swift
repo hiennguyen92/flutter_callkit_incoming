@@ -255,7 +255,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         return nil
     }
     
-    @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
+    @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool, onError: ((Error?) -> Void)? = nil) {
         self.isFromPushKit = fromPushKit
         if(fromPushKit){
             self.data = data
@@ -291,6 +291,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 self.callManager.addCall(call)
                 self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_INCOMING, data.toJSON())
                 self.endCallNotExist(data)
+            } else {
+                onError?(error)
             }
         }
     }
