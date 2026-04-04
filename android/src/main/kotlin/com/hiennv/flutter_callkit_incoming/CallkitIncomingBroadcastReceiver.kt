@@ -38,6 +38,12 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
             }
 
+        fun getIntentAcceptVideo(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT_VIDEO}"
+                putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+            }
+
         fun getIntentDecline(context: Context, data: Bundle?) =
             Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}"
@@ -134,6 +140,26 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 }
             }
 
+            "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT_VIDEO}" -> {
+                try {
+                    FlutterCallkitIncomingPlugin.notifyEventCallbacks(CallkitEventCallback.CallEvent.ACCEPT, data)
+                    // Start the ongoing-call notification service (same as regular accept)
+                    CallkitNotificationService.startServiceWithAction(
+                        context,
+                        CallkitConstants.ACTION_CALL_ACCEPT,
+                        data
+                    )
+                    // Build the standard event body then append acceptVideo = true
+                    val forwardData = buildEventBody(data).toMutableMap()
+                    forwardData["acceptVideo"] = true
+                    // Send as ACTION_CALL_CUSTOM so Dart's actionCallCustom handler receives it
+                    FlutterCallkitIncomingPlugin.sendEvent(CallkitConstants.ACTION_CALL_CUSTOM, forwardData)
+                    addCall(context, Data.fromBundle(data), true)
+                } catch (error: Exception) {
+                    Log.e(TAG, null, error)
+                }
+            }
+
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
                     // Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_DECLINE")           
@@ -198,9 +224,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun sendEventFlutter(event: String, data: Bundle) {
-        if (silenceEvents) return
-
+    private fun buildEventBody(data: Bundle): Map<String, Any?> {
         val android = mapOf(
             "isCustomNotification" to data.getBoolean(
                 CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
@@ -244,7 +268,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "callbackText" to data.getString(CallkitConstants.EXTRA_CALLKIT_CALLING_HANG_UP_TEXT),
             "isShowCallback" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_HANG_UP_SHOW),
         )
-        val forwardData = mapOf(
+        return mapOf(
             "id" to data.getString(CallkitConstants.EXTRA_CALLKIT_ID, ""),
             "nameCaller" to data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, ""),
             "avatar" to data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, ""),
@@ -258,6 +282,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "callingNotification" to callingNotification,
             "android" to android
         )
-        FlutterCallkitIncomingPlugin.sendEvent(event, forwardData)
+    }
+
+    private fun sendEventFlutter(event: String, data: Bundle) {
+        if (silenceEvents) return
+        FlutterCallkitIncomingPlugin.sendEvent(event, buildEventBody(data))
     }
 }

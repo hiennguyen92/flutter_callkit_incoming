@@ -131,6 +131,49 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/llVideoSpacer"
+            android:layout_width="@dimen/base_margin"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <!-- Video accept button: only shown for video calls (type > 0) -->
+        <LinearLayout
+            android:id="@+id/llAcceptVideo"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/base_margin_x3_5"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_button_accept"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/base_margin_half"
+                android:layout_marginRight="@dimen/base_margin_half"
+                android:src="@drawable/ic_video"
+                android:tint="@android:color/white"
+                app:tint="@android:color/white"
+                tools:ignore="UseAppTint" />
+
+            <TextView
+                android:id="@+id/tvAcceptVideo"
+                style="@style/Widget.Compat.NotificationActionText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/base_margin_half"
+                android:layout_marginRight="@dimen/base_margin_half"
+                android:gravity="center"
+                android:text="@string/text_accept_video"
+                android:textAllCaps="false"
+                android:textColor="@color/action_text" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

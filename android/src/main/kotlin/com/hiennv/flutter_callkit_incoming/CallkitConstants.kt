@@ -20,6 +20,8 @@ object CallkitConstants {
         "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK"
     const val ACTION_CALL_CUSTOM =
         "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CUSTOM"
+    const val ACTION_CALL_ACCEPT_VIDEO =
+        "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT_VIDEO"
     const val ACTION_CALL_AUDIO_STATE_CHANGE =
         "com.hiennv.flutter_callkit_incoming.ACTION_CALL_AUDIO_STATE_CHANGE"
     const val ACTION_CALL_HELD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_HELD"

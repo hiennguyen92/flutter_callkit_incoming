@@ -78,6 +78,10 @@ class CallkitIncomingActivity : Activity() {
     private lateinit var ivDeclineCall: ImageView
     private lateinit var tvDecline: TextView
 
+    private lateinit var llAcceptVideoCall: LinearLayout
+    private lateinit var ivAcceptVideoCall: ImageView
+    private lateinit var tvAcceptVideo: TextView
+
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -209,7 +213,7 @@ class CallkitIncomingActivity : Activity() {
 
         val callType = data?.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, 0) ?: 0
         if (callType > 0) {
-            ivAcceptCall.setImageResource(R.drawable.ic_video)
+            llAcceptVideoCall.visibility = View.VISIBLE
         }
         val duration = data?.getLong(CallkitConstants.EXTRA_CALLKIT_DURATION, 0L) ?: 0L
         wakeLockRequest(duration)
@@ -226,6 +230,7 @@ class CallkitIncomingActivity : Activity() {
         try {
             tvAccept.setTextColor(Color.parseColor(textColor))
             tvDecline.setTextColor(Color.parseColor(textColor))
+            tvAcceptVideo.setTextColor(Color.parseColor(textColor))
         } catch (error: Exception) {
         }
 
@@ -287,6 +292,9 @@ class CallkitIncomingActivity : Activity() {
         tvAccept = findViewById(R.id.tvAccept)
         ivDeclineCall = findViewById(R.id.ivDeclineCall)
         tvDecline = findViewById(R.id.tvDecline)
+        llAcceptVideoCall = findViewById(R.id.llAcceptVideoCall)
+        ivAcceptVideoCall = findViewById(R.id.ivAcceptVideoCall)
+        tvAcceptVideo = findViewById(R.id.tvAcceptVideo)
         animateAcceptCall()
 
         ivAcceptCall.setOnClickListener {
@@ -294,6 +302,9 @@ class CallkitIncomingActivity : Activity() {
         }
         ivDeclineCall.setOnClickListener {
             onDeclineClick()
+        }
+        ivAcceptVideoCall.setOnClickListener {
+            onAcceptVideoClick()
         }
     }
 
@@ -308,17 +319,27 @@ class CallkitIncomingActivity : Activity() {
         // Log.d("CallkitIncomingActivity", "[CALLKIT] 📱 onAcceptClick")
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
 
-
-        CallkitNotificationService.startServiceWithAction(
-            this@CallkitIncomingActivity,
-            CallkitConstants.ACTION_CALL_ACCEPT,
-            data
-        )
-
-
+        // TransparentActivity broadcasts ACTION_CALL_ACCEPT to CallkitIncomingBroadcastReceiver,
+        // which already starts CallkitNotificationService (clearIncomingNotification +
+        // showOngoingCallNotification). Starting the service directly here as well causes a
+        // duplicate accept handling — two clearIncomingNotification + showOngoingCallNotification
+        // cycles — which produces a brief notification flicker on Android.
         val acceptIntent =
             TransparentActivity.getIntent(this, CallkitConstants.ACTION_CALL_ACCEPT, data)
         startActivity(acceptIntent)
+
+        dismissKeyguard()
+        finish()
+    }
+
+    private fun onAcceptVideoClick() {
+        val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
+
+        // Same reasoning as onAcceptClick: the BroadcastReceiver path via TransparentActivity
+        // handles starting CallkitNotificationService. No need to start it directly here.
+        val acceptVideoIntent =
+            TransparentActivity.getIntent(this, CallkitConstants.ACTION_CALL_ACCEPT_VIDEO, data)
+        startActivity(acceptVideoIntent)
 
         dismissKeyguard()
         finish()
