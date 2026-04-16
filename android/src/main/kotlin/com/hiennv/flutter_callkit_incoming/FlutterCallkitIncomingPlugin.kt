@@ -65,8 +65,19 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         fun initSharedInstance(context: Context, binaryMessenger: BinaryMessenger) {
             if (!::instance.isInitialized) {
                 instance = FlutterCallkitIncomingPlugin()
+            }
+            // Restore instance fields that may have been nulled during a previous
+            // detach. The static `instance` survives across FlutterEngine teardown
+            // when the host process is kept alive (e.g. foreground services),
+            // so `onAttachedToEngine` must refresh these fields every time;
+            // otherwise background-isolate calls end up as silent no-ops.
+            if (instance.callkitSoundPlayerManager == null) {
                 instance.callkitSoundPlayerManager = CallkitSoundPlayerManager(context)
+            }
+            if (instance.callkitNotificationManager == null) {
                 instance.callkitNotificationManager = CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
+            }
+            if (instance.context == null) {
                 instance.context = context
             }
 
