@@ -362,10 +362,16 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         methodChannels.remove(binding.binaryMessenger)?.setMethodCallHandler(null)
         eventChannels.remove(binding.binaryMessenger)?.setStreamHandler(null)
-        instance.callkitSoundPlayerManager?.destroy()
-        instance.callkitNotificationManager?.destroy()
-        instance.callkitSoundPlayerManager = null
-        instance.callkitNotificationManager = null
+        // Only destroy and null the shared managers when the LAST engine detaches.
+        // When multiple engines are attached (e.g. main UI engine + FCM background
+        // isolate engine), tearing down the main engine must not pull the managers
+        // out from under the background isolate that still needs them.
+        if (methodChannels.isEmpty()) {
+            instance.callkitSoundPlayerManager?.destroy()
+            instance.callkitNotificationManager?.destroy()
+            instance.callkitSoundPlayerManager = null
+            instance.callkitNotificationManager = null
+        }
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -384,7 +390,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     override fun onDetachedFromActivity() {
-        instance.context = null
+        // Keep instance.context alive. It is the applicationContext, shared by
+        // every engine attachment and safe to hold for the lifetime of the JVM.
+        // Nulling it here would break background-isolate method channel calls
+        // (showCallkitIncoming relies on `context?.sendBroadcast(...)`) whenever
+        // the activity is destroyed while a cached background engine keeps the
+        // static `instance` alive.
         instance.activity = null
     }
 
