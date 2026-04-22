@@ -1,12 +1,16 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.telecom.TelecomManager
 import android.util.Log
+import androidx.core.content.ContextCompat
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
@@ -86,6 +90,73 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         return FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
     }
 
+    /**
+     * Inject an incoming call into the Android Telecom framework.
+     *
+     * Self-managed Telecom PhoneAccount was already registered in
+     * [FlutterCallkitIncomingPlugin.onAttachedToEngine] via
+     * [InAppCallManager.registerPhoneAccount]. This call makes the registration
+     * actually do something — [CallkitConnectionService.onCreateIncomingConnection]
+     * fires synchronously and returns a ringing [CallkitConnection] that the OS
+     * treats as a first-party call.
+     *
+     * Why it matters: strict OEMs (Samsung Knox / Xiaomi MIUI) ignore
+     * `setShowWhenLocked` on ordinary Activities. A call hosted in Telecom is
+     * treated as an actual phone call — the Accept button bypasses keyguard,
+     * the Activity we launch from `Connection.onAnswer()` gets full-screen
+     * priority, ringtone routing works through the system dialer.
+     */
+    @SuppressLint("MissingPermission")
+    private fun registerTelecomIncomingCall(context: Context, data: Bundle) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val parsed = try { Data.fromBundle(data) } catch (e: Exception) { null } ?: return
+        if (parsed.id.isEmpty()) return
+        // Already registered — avoid double-entry. The OS would also reject a
+        // duplicate call id but logging the skip is quieter than a stack trace.
+        if (CallkitConnection.find(parsed.id) != null) {
+            Log.d(TAG, "Telecom call already registered id=${parsed.id} — skip")
+            return
+        }
+        // MANAGE_OWN_CALLS is declared in the plugin manifest and auto-granted
+        // (normal protection level), but guard anyway for apps that strip it.
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.MANAGE_OWN_CALLS)
+            != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "MANAGE_OWN_CALLS not granted — Telecom incoming skipped")
+            return
+        }
+        val telecom = context.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return
+        val manager = InAppCallManager(context.applicationContext)
+        val handle = manager.getPhoneAccountHandle()
+        val extras = Bundle().apply {
+            putBundle(CallkitConnection.EXTRA_CALL_BUNDLE, data)
+            putInt(
+                TelecomManager.EXTRA_INCOMING_VIDEO_STATE,
+                android.telecom.VideoProfile.STATE_AUDIO_ONLY,
+            )
+        }
+        try {
+            telecom.addNewIncomingCall(handle, extras)
+            Log.d(TAG, "Telecom addNewIncomingCall id=${parsed.id}")
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Telecom addNewIncomingCall rejected: ${e.message}")
+        } catch (e: Exception) {
+            Log.w(TAG, "Telecom addNewIncomingCall error: ${e.message}")
+        }
+    }
+
+    /** Drive an existing Telecom [CallkitConnection] by call id + action. */
+    private fun driveTelecomConnection(data: Bundle, action: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        val parsed = try { Data.fromBundle(data) } catch (e: Exception) { null } ?: return
+        val conn = CallkitConnection.find(parsed.id) ?: return
+        when (action) {
+            CallkitConstants.ACTION_CALL_ACCEPT -> conn.markAccepted()
+            CallkitConstants.ACTION_CALL_DECLINE -> conn.markDeclined()
+            CallkitConstants.ACTION_CALL_ENDED -> conn.markEnded()
+            CallkitConstants.ACTION_CALL_TIMEOUT -> conn.markMissed()
+        }
+    }
+
 
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
@@ -94,6 +165,11 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         when (action) {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
                 try {
+                    // Self-managed Telecom entry — grants OS-level call privileges
+                    // (keyguard bypass on Samsung Knox / Xiaomi MIUI, system audio
+                    // focus, ringtone). Silent no-op on API < 26 or when MANAGE_OWN_CALLS
+                    // isn't granted; the existing notification path remains as fallback.
+                    registerTelecomIncomingCall(context, data)
                     getCallkitNotificationManager()?.showIncomingNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
@@ -120,6 +196,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT}" -> {
                 try {
                     // Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_ACCEPT")
+                    // Transition the Telecom Connection to ACTIVE first — the OS
+                    // uses this to dismiss keyguard on self-managed PhoneAccounts.
+                    driveTelecomConnection(data, CallkitConstants.ACTION_CALL_ACCEPT)
                     FlutterCallkitIncomingPlugin.notifyEventCallbacks(CallkitEventCallback.CallEvent.ACCEPT, data)
                     // start service and show ongoing call when call is accepted
                     CallkitNotificationService.startServiceWithAction(
@@ -136,8 +215,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
-                    // Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_DECLINE")           
+                    // Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_DECLINE")
                     // Notify native decline callbacks
+                    driveTelecomConnection(data, CallkitConstants.ACTION_CALL_DECLINE)
                     FlutterCallkitIncomingPlugin.notifyEventCallbacks(CallkitEventCallback.CallEvent.DECLINE, data)
                     // clear notification
                     getCallkitNotificationManager()?.clearIncomingNotification(data, false)
@@ -151,6 +231,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
                 try {
                     // clear notification and stop service
+                    driveTelecomConnection(data, CallkitConstants.ACTION_CALL_ENDED)
                     getCallkitNotificationManager()?.clearIncomingNotification(data, false)
                     CallkitNotificationService.stopService(context)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
@@ -163,6 +244,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_TIMEOUT}" -> {
                 try {
                     // clear notification and show miss notification
+                    driveTelecomConnection(data, CallkitConstants.ACTION_CALL_TIMEOUT)
                     val notificationManager = getCallkitNotificationManager()
                     notificationManager?.clearIncomingNotification(data, false)
                     notificationManager?.showMissCallNotification(data)
