@@ -24,6 +24,11 @@ enum Event {
   actionCallToggleGroup,
   actionCallToggleAudioSession,
   actionCallCustom,
+  // PATHB-V4: SnowChat Phase 8.2 Path B v4 (2026-05-02) — fires immediately after
+  // native plugin's reportNewIncomingCall succeeds. Used by SnowChat CallService
+  // to stop audioplayers ringtone (foreground socket-only path) when CallKit
+  // takes over. See app/lib/core/call/call_service.dart _onCallKitShown.
+  actionPathbV4CallkitShown,
 }
 
 /// Using extension for backward compatibility Dart SDK 2.17.0 and lower
@@ -60,6 +65,11 @@ extension EventX on Event {
         return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION';
       case Event.actionCallCustom:
         return 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CUSTOM';
+      case Event.actionPathbV4CallkitShown:
+        // PATHB-V4: SnowChat-specific — no plugin namespace prefix so other apps
+        // using this fork don't accidentally match generic events. Native side
+        // emits this exact string via SwiftFlutterCallkitIncomingPlugin.sendEvent.
+        return 'PATHB_V4_CALLKIT_SHOWN';
     }
   }
 }

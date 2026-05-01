@@ -41,7 +41,70 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private var silenceEvents: Bool = false
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
 
-    
+    // PATHB-V2: Phase 8.2 §25.5 Path B v3 (2026-05-01) — native dedup for PushKit cold-launch.
+    // The Dart-side _recentlyReported map is empty when reportNewIncomingCall fires
+    // before the Flutter engine boots. This Set is populated by every successful
+    // reportNewIncomingCall and cleared on end/answer/decline/timeout/reset. Dart
+    // queries via VoipNativeBridge.isCallActive(uuid) before its own
+    // showCallkitIncoming to decide whether to skip.
+    //
+    // v4 §3.7.1: also notifies Dart via MethodChannel("onCallKitShown") so
+    // audioplayers ringtone (foreground socket-only path) can be stopped when
+    // CallKit takes over. See call_service.dart _onCallKitShown.
+    //
+    // Thread safety: all reads/writes go through `activeCallKitUUIDsLock` (NSLock).
+    // CXProvider callbacks fire on its delegate queue; Dart MethodChannel calls
+    // arrive on the platform thread; PushKit handler runs on its own queue.
+    //
+    // Force-kill recovery: a fresh process starts with an empty Set. This is OK
+    // because CallKit window lifetime is process-bound — when iOS kills the app the
+    // CXProvider is also torn down, so there's no stale CallKit to reconcile.
+    //
+    // App Group / shared container: NOT needed. SnowChat has no Notification
+    // Service Extension; this Set lives only in the main app process.
+    private var activeCallKitUUIDs = Set<String>()
+    private let activeCallKitUUIDsLock = NSLock()
+
+    @objc public func isCallKitUUIDActive(_ uuid: String) -> Bool {
+        activeCallKitUUIDsLock.lock()
+        defer { activeCallKitUUIDsLock.unlock() }
+        return activeCallKitUUIDs.contains(uuid.lowercased())
+    }
+
+    private func addActiveCallKitUUID(_ uuid: String) {
+        activeCallKitUUIDsLock.lock()
+        activeCallKitUUIDs.insert(uuid.lowercased())
+        let totalCount = activeCallKitUUIDs.count
+        activeCallKitUUIDsLock.unlock()
+        NSLog("[SwiftFlutterCallkit] PATHB-V2 dedup add uuid=\(uuid.prefix(8)) total=\(totalCount)")
+
+        // PATHB-V4 §3.7.1: notify Dart side so audioplayers ringtone (if started
+        // via foreground socket-only path before CallKit raised) can be stopped.
+        // Reuses the plugin's existing EventChannel broadcast (streamHandlers /
+        // sendEvent pattern) — same channel that delivers ACTION_CALL_INCOMING
+        // etc. Dart side listens via FlutterCallkitIncoming.onEvent and dispatches
+        // event.event == "PATHB_V4_CALLKIT_SHOWN" → CallKitManager.onCallKitShown.
+        // Dispatched on main thread because EventChannel sink expects main-thread.
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.sendEvent("PATHB_V4_CALLKIT_SHOWN", ["callId": uuid.lowercased()])
+        }
+    }
+
+    private func removeActiveCallKitUUID(_ uuid: String) {
+        activeCallKitUUIDsLock.lock()
+        defer { activeCallKitUUIDsLock.unlock() }
+        activeCallKitUUIDs.remove(uuid.lowercased())
+        NSLog("[SwiftFlutterCallkit] PATHB-V2 dedup remove uuid=\(uuid.prefix(8)) total=\(activeCallKitUUIDs.count)")
+    }
+
+    @objc public func clearAllActiveCallKitUUIDs() {
+        activeCallKitUUIDsLock.lock()
+        defer { activeCallKitUUIDsLock.unlock() }
+        activeCallKitUUIDs.removeAll()
+        NSLog("[SwiftFlutterCallkit] PATHB-V2 dedup clear all")
+    }
+
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
         if silenceEvents {
             print(event, " silenced")
@@ -293,6 +356,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 let call = Call(uuid: uuid, data: data)
                 call.handle = data.handle
                 self.callManager.addCall(call)
+                // PATHB-V2: populate dedup Set immediately on successful report so a
+                // racing Dart-side showCallkitIncoming can detect we already raised one.
+                self.addActiveCallKitUUID(uuid.uuidString)
                 self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_INCOMING, data.toJSON())
                 self.endCallNotExist(data)
             }
@@ -338,6 +404,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 let call = Call(uuid: uuid, data: data)
                 call.handle = data.handle
                 self.callManager.addCall(call)
+                // PATHB-V2: populate dedup Set immediately on successful report.
+                // Mirror of the no-completion variant above.
+                self.addActiveCallKitUUID(uuid.uuidString)
                 self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_INCOMING, data.toJSON())
                 self.endCallNotExist(data)
             }
@@ -401,6 +470,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         let call = Call(uuid: uuid, data: data)
         self.callManager.endCall(call: call)
+        // PATHB-V2 cleanup site #1: Dart-initiated endCall
+        self.removeActiveCallKitUUID(uuidSourceString)
     }
 
     @objc public func connectedCall(_ data: Data) {
@@ -431,6 +502,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     @objc public func endAllCalls() {
         self.isFromPushKit = false
         self.callManager.endCallAlls()
+        // PATHB-V2 cleanup site #7: Dart logout / app-level reset
+        self.clearAllActiveCallKitUUIDs()
     }
     
     public func saveEndCall(_ uuid: String, _ reason: Int) {
@@ -459,6 +532,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         default:
             break
         }
+        // PATHB-V2 cleanup site #5: every reason case results in CXProvider call ended
+        self.removeActiveCallKitUUID(uuid)
     }
     
     
@@ -485,6 +560,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             NSLog("[CallkitIncoming] callEndTimeout: invalid UUID '\(data.uuid)' — ignored")
             return
         }
+        // PATHB-V2 cleanup site #4 (defensive): even if call already pruned, ensure
+        // dedup Set doesn't hold stale entry. removeActiveCallKitUUID is idempotent.
+        self.removeActiveCallKitUUID(data.uuid)
         guard let call = self.callManager.callWithUUID(uuid: uuid) else {
             return
         }
@@ -614,6 +692,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             call.endCall()
         }
         self.callManager.removeAllCalls()
+        // PATHB-V2 cleanup site #6: CallKit subsystem reset (system-initiated)
+        self.clearAllActiveCallKitUUIDs()
     }
     
     public func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
@@ -649,6 +729,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.data?.isAccepted = true
         self.answerCall = call
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
+        // PATHB-V2 cleanup site #2: user accepted CallKit (call now active, dedup obsolete)
+        self.removeActiveCallKitUUID(call.uuid.uuidString)
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.onAccept(call, action)
         }else {
@@ -676,11 +758,15 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             } else {
                 sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, self.data?.toJSON())
             }
+            // PATHB-V2 cleanup site #3a: action.fail() guard branch — Set may hold stale UUID
+            self.removeActiveCallKitUUID(action.callUUID.uuidString)
             action.fail()
             return
         }
         call.endCall()
         self.callManager.removeCall(call)
+        // PATHB-V2 cleanup site #3b: covers both decline + ended branches below
+        self.removeActiveCallKitUUID(call.uuid.uuidString)
         if (self.answerCall == nil && self.outgoingCall == nil) {
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
