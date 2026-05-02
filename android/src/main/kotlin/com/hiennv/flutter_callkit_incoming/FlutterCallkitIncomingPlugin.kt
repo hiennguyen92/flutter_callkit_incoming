@@ -135,6 +135,38 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        // [SnowChat M5 fix — call engine opt-out]
+        // SnowChat 의 Phase 2 lock-bypass fix 가 dual Flutter engine 사용
+        // (main + call_engine). call_engine 의 binaryMessenger 에 attach 되면
+        // eventHandlers static list 에 handler 추가 → EVENT_CALLKIT_ACCEPT 등이
+        // call_engine 에도 fire 되어 main_engine 과 duplicate. 이건 race
+        // condition + accept 처리 두 번 등 issue 야기.
+        //
+        // SnowChatApplication 가 call_engine 의 binaryMessenger 를 marker
+        // registry 에 등록 — 본 plugin 가 그 등록 여부 보고 self-skip.
+        //
+        // backward compatible: SnowChatApplication 가 없는 다른 fork user 는
+        // ClassNotFoundException 처리 후 정상 attach (try/catch).
+        try {
+            val appClass = Class.forName("com.snowchat.snowchat.SnowChatApplication")
+            val isCallEngineMethod = appClass.getMethod(
+                "isCallEngineMessenger",
+                io.flutter.plugin.common.BinaryMessenger::class.java
+            )
+            val isCallEngine = isCallEngineMethod.invoke(null, flutterPluginBinding.binaryMessenger) as? Boolean ?: false
+            if (isCallEngine) {
+                android.util.Log.i("FlutterCallkitIncomingPlugin",
+                    "Skipping attach to call_engine (SnowChat M5 opt-out)")
+                return
+            }
+        } catch (e: ClassNotFoundException) {
+            // 다른 app 의 fork — SnowChatApplication 가 없음. 정상 attach 진행.
+        } catch (e: Throwable) {
+            // Reflection 실패 시 보수적으로 정상 attach (기존 동작).
+            android.util.Log.w("FlutterCallkitIncomingPlugin",
+                "M5 marker probe failed (${e.javaClass.simpleName}) — proceeding with attach")
+        }
+
         sharePluginWithRegister(flutterPluginBinding)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             InAppCallManager(flutterPluginBinding.applicationContext).registerPhoneAccount()
