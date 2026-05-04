@@ -1,7 +1,11 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.telecom.Connection
 import android.telecom.DisconnectCause
 import android.util.Log
@@ -122,10 +126,77 @@ class CallkitConnection(
         setActive()
     }
 
-    /** Mark the call as declined/ended — user declined via app notification. */
-    fun markDeclined() {
+    /**
+     * Mark the call as declined/ended — user declined via app notification.
+     *
+     * [SnowChat fork 2026-05-05 H-fix] Cold-launch DECLINE recovery is fired
+     * from inside the self-managed [Connection] context (and *before*
+     * [setDisconnected] runs) so the call is still in the RINGING state when
+     * [Context.startActivity] is invoked. The hope: Android 14+ BAL grants a
+     * PHONE_CALL exemption for active self-managed Telecom calls. Previous
+     * placement inside the BroadcastReceiver hit BAL_BLOCK with
+     * `callingUidProcState: BOUND_FOREGROUND_SERVICE; callingUidHasVisibleActivity: false`
+     * (Galaxy logcat 2026-05-05 03:49:04.039).
+     *
+     * If this position still BAL_BLOCK's, the next escalation is to promote
+     * `CallkitConnectionService` to a `foregroundServiceType="phoneCall"`
+     * FGS for the lifetime of the connection.
+     */
+    fun markDeclined(context: Context) {
         Log.d(TAG, "markDeclined id=$callId")
-        finishWithCause(DisconnectCause.REJECTED)
+        triggerDeclineRecovery(context)
+        // [H' fix 2026-05-05 v2] Delay finishWithCause so the self-managed
+        // call stays RINGING long enough for:
+        //   1. MainActivity to bootstrap the main FlutterEngine (~100ms).
+        //   2. SealedSender service to cold-init (secure_storage open +
+        //      JWT load + server verify-key fetch — ~1~2s, network-bound).
+        //   3. callSignalingProvider → callServiceProvider → callProvider
+        //      to rebuild from _IdleCallNotifier into the real CallNotifier
+        //      whose ctor finally fires _consumePendingVoipDecline.
+        // The 1500ms first attempt was insufficient (logcat showed Activity
+        // booted + Dart plugins ran, but real CallNotifier ctor never reached
+        // before delay expired and Activity was killed).
+        // Trade-off: Telecom phone state stays RINGING for ~3s after decline.
+        // The notification is already dismissed by the BroadcastReceiver
+        // path, so the user sees no UI artifact — only the system-level
+        // call state lingers briefly while Dart finishes wiring.
+        Handler(Looper.getMainLooper()).postDelayed({
+            Log.d(TAG, "[H' fix] delayed finishWithCause id=$callId")
+            finishWithCause(DisconnectCause.REJECTED)
+        }, 3000L)
+    }
+
+    /**
+     * Persist declined nonce and start MainActivity. Idempotent — safe even
+     * if the BroadcastReceiver fallback also fires (single-task launch flag,
+     * one-shot consumePending).
+     */
+    private fun triggerDeclineRecovery(context: Context) {
+        try {
+            val prefs = context.getSharedPreferences(
+                "snowchat_voip_decline",
+                Context.MODE_PRIVATE,
+            )
+            prefs.edit()
+                .putString("pending_nonce", callId)
+                .putLong("pending_at", System.currentTimeMillis())
+                .apply()
+            Log.d(TAG, "[DIAG-DECLINE-CS] prefs written nonce=$callId")
+            val launchIntent = AppUtils.getAppIntent(context, null, null)
+            launchIntent?.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_NO_USER_ACTION or
+                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT,
+            )
+            if (launchIntent != null) {
+                context.startActivity(launchIntent)
+                Log.d(TAG, "[DIAG-DECLINE-CS] startActivity dispatched (CS ctx, RINGING)")
+            } else {
+                Log.w(TAG, "[DIAG-DECLINE-CS] launchIntent null — recovery skipped")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "[DIAG-DECLINE-CS] recovery failed: ${e.message}")
+        }
     }
 
     /** Mark the call as terminated — call ended (either side hung up). */

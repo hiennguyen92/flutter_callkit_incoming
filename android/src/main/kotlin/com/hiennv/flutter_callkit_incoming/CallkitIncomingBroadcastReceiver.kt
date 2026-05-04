@@ -145,13 +145,16 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
     }
 
     /** Drive an existing Telecom [CallkitConnection] by call id + action. */
-    private fun driveTelecomConnection(data: Bundle, action: String) {
+    private fun driveTelecomConnection(context: Context, data: Bundle, action: String) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
         val parsed = try { Data.fromBundle(data) } catch (e: Exception) { null } ?: return
         val conn = CallkitConnection.find(parsed.id) ?: return
         when (action) {
             CallkitConstants.ACTION_CALL_ACCEPT -> conn.markAccepted()
-            CallkitConstants.ACTION_CALL_DECLINE -> conn.markDeclined()
+            // [SnowChat fork 2026-05-05 H-fix] Pass context so markDeclined can
+            // launch MainActivity from within the self-managed Connection while
+            // the call is still RINGING (PHONE_CALL BAL exemption attempt).
+            CallkitConstants.ACTION_CALL_DECLINE -> conn.markDeclined(context)
             CallkitConstants.ACTION_CALL_ENDED -> conn.markEnded()
             CallkitConstants.ACTION_CALL_TIMEOUT -> conn.markMissed()
         }
@@ -198,7 +201,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     // Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_ACCEPT")
                     // Transition the Telecom Connection to ACTIVE first — the OS
                     // uses this to dismiss keyguard on self-managed PhoneAccounts.
-                    driveTelecomConnection(data, CallkitConstants.ACTION_CALL_ACCEPT)
+                    driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_ACCEPT)
                     FlutterCallkitIncomingPlugin.notifyEventCallbacks(CallkitEventCallback.CallEvent.ACCEPT, data)
                     // start service and show ongoing call when call is accepted
                     CallkitNotificationService.startServiceWithAction(
@@ -215,14 +218,34 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
-                    // Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_DECLINE")
+                    val parsedForLog = Data.fromBundle(data)
+                    Log.d(TAG, "[DIAG-DECLINE] enter id=${parsedForLog.id}")
                     // Notify native decline callbacks
-                    driveTelecomConnection(data, CallkitConstants.ACTION_CALL_DECLINE)
+                    driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_DECLINE)
                     FlutterCallkitIncomingPlugin.notifyEventCallbacks(CallkitEventCallback.CallEvent.DECLINE, data)
                     // clear notification
                     getCallkitNotificationManager()?.clearIncomingNotification(data, false)
+                    Log.d(TAG, "[DIAG-DECLINE] sendEventFlutter id=${parsedForLog.id}")
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
                     removeCall(context, Data.fromBundle(data))
+
+                    // [SnowChat fork 2026-05-05 H-fix verification window]
+                    //
+                    // The cold-launch DECLINE recovery (prefs.write + startActivity)
+                    // has been MOVED to CallkitConnection.markDeclined(context) so it
+                    // fires from inside the self-managed Connection while the call
+                    // is still RINGING. The original implementation (BroadcastReceiver
+                    // context, post-disconnect) hit Android 14+ BAL_BLOCK
+                    // (`callingUidProcState: BOUND_FOREGROUND_SERVICE;
+                    //   callingUidHasVisibleActivity: false`) on Galaxy — see
+                    // logcat trace 2026-05-05 03:49:04.039.
+                    //
+                    // Disabled here intentionally: keeping a second startActivity in
+                    // the receiver path would also hit BAL_BLOCK and pollute the
+                    // logcat with a duplicate failure line, making it harder to read
+                    // the H-fix verification result. If H-fix proves insufficient,
+                    // revert this commit + escalate to PHONE_CALL FGS promotion.
+                    Log.d(TAG, "[DIAG-DECLINE] receiver-path recovery DISABLED — see CS path")
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -231,7 +254,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
                 try {
                     // clear notification and stop service
-                    driveTelecomConnection(data, CallkitConstants.ACTION_CALL_ENDED)
+                    driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_ENDED)
                     getCallkitNotificationManager()?.clearIncomingNotification(data, false)
                     CallkitNotificationService.stopService(context)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
@@ -244,7 +267,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_TIMEOUT}" -> {
                 try {
                     // clear notification and show miss notification
-                    driveTelecomConnection(data, CallkitConstants.ACTION_CALL_TIMEOUT)
+                    driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_TIMEOUT)
                     val notificationManager = getCallkitNotificationManager()
                     notificationManager?.clearIncomingNotification(data, false)
                     notificationManager?.showMissCallNotification(data)
