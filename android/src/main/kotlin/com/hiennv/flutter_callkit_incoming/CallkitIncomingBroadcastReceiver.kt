@@ -163,6 +163,13 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
+        // [DIAG-RECV 2026-05-05] Galaxy swipe-up dismiss → no banner regression.
+        // BG isolate logs prove showCallkitIncoming returned, but no Telecom log
+        // ever follows. Confirm here whether the broadcast even reaches us.
+        Log.d(
+            TAG,
+            "[DIAG-RECV] onReceive entry action=${intent.action} hasData=${intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA) != null} pid=${android.os.Process.myPid()}"
+        )
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA) ?: return
         when (action) {
