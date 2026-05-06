@@ -1,7 +1,6 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.app.Activity
-import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -91,10 +90,15 @@ class CallkitIncomingActivity : Activity() {
             setTurnScreenOn(true)
             setShowWhenLocked(true)
         } else {
+            // SnowChat fork (2026-05-06): FLAG_DISMISS_KEYGUARD removed from
+            // the legacy SDK<O_MR1 branch. The Signal pattern hosts the call
+            // Activity over the keyguard without unlocking; PIN remains in
+            // place for the rest of the app. dismissKeyguard / FLAG_DISMISS
+            // forces the user to enter PIN before audio can flow, which
+            // contradicts that goal.
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
             window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
-            window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
         transparentStatusAndNavigation()
         setContentView(R.layout.activity_callkit_incoming)
@@ -320,15 +324,16 @@ class CallkitIncomingActivity : Activity() {
             TransparentActivity.getIntent(this, CallkitConstants.ACTION_CALL_ACCEPT, data)
         startActivity(acceptIntent)
 
-        dismissKeyguard()
+        // SnowChat fork (2026-05-06): dismissKeyguard() removed. Upstream
+        // forced the OS to ask for PIN before MainActivity could come up,
+        // which contradicts the Signal/WhatsApp model where the call UI
+        // sits on top of the keyguard and audio flows immediately. Our
+        // MainActivity carries showWhenLocked=true in the manifest, so it
+        // will appear over the keyguard; audio works without unlock. The
+        // user is still required to enter their PIN before they can
+        // navigate to chat / wallet routes (enforced on the Dart side via
+        // a /call route guard while keyguard is locked).
         finish()
-    }
-
-    private fun dismissKeyguard() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            keyguardManager.requestDismissKeyguard(this, null)
-        }
     }
 
     private fun onDeclineClick() {
