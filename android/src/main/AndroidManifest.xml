@@ -37,9 +37,22 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <!--
+             SnowChat fork (2026-05-09): showWhenLocked + turnScreenOn added so
+             this transparent relay Activity bridges the lockscreen-bypass between
+             CallkitIncomingActivity (which already has these flags) and the host
+             MainActivity. Without them, on cold-start where Dart isolate boot
+             takes ~1-2s, the keyguard sees no lock-bypass Activity in the gap
+             and re-engages — surfacing as a system PIN challenge mid-accept and
+             a re-published incoming-call notification (Galaxy field report
+             2026-05-09 first call after +268 install). Warm-start was unaffected
+             because MainActivity came up fast enough.
+        -->
         <activity
             android:exported="false"
             android:theme="@style/TranslucentTheme"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
             android:name="com.hiennv.flutter_callkit_incoming.TransparentActivity"/>
 
         <receiver
