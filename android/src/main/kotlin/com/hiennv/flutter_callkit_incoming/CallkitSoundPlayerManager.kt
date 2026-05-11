@@ -81,22 +81,29 @@ class CallkitSoundPlayerManager(private val context: Context) {
             context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        when (audioManager?.ringerMode) {
-            AudioManager.RINGER_MODE_SILENT -> {
-            }
+        if (audioManager?.ringerMode == AudioManager.RINGER_MODE_SILENT) return
 
-            else -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator?.vibrate(
-                        VibrationEffect.createWaveform(
-                            longArrayOf(0L, 1000L, 1000L),
-                            0
-                        )
-                    )
-                } else {
-                    vibrator?.vibrate(longArrayOf(0L, 1000L, 1000L), 0)
-                }
+        val pattern = longArrayOf(0L, 1000L, 1000L)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val audioAttrs = AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setLegacyStreamType(AudioManager.STREAM_RING)
+                .build()
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator?.vibrate(
+                    VibrationEffect.createWaveform(pattern, 0),
+                    audioAttrs
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator?.vibrate(pattern, 0, audioAttrs)
             }
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator?.vibrate(pattern, 0)
         }
     }
 

@@ -39,7 +39,8 @@ class CallkitNotificationManager(
 
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
-        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
+        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id_v2"
+        private const val LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
         const val NOTIFICATION_CHANNEL_ID_ONGOING = "callkit_ongoing_channel_id"
         const val NOTIFICATION_CHANNEL_ID_MISSED = "callkit_missed_channel_id"
 
