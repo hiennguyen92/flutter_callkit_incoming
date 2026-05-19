@@ -429,10 +429,17 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     func endCallNotExist(_ data: Data) {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(data.duration)) {
             let call = self.callManager.callWithUUID(uuid: UUID(uuidString: data.uuid)!)
+            NSLog("[ENDCALLNOTEXIST] uuid=%@ callFound=%d isOnHold=%d answerCall=%@ outgoingCall=%@",
+                  data.uuid,
+                  call != nil ? 1 : 0,
+                  call?.isOnHold == true ? 1 : 0,
+                  self.answerCall?.uuid.uuidString ?? "nil",
+                  self.outgoingCall?.uuid.uuidString ?? "nil")
             // Skip timeout for calls that are on hold — another call was answered and this
             // one was placed on hold by CallKit. Clearing answerCall when that other call
             // ends would otherwise trigger this timer and kill the held call's UI.
             if (call != nil && !(call!.isOnHold) && self.answerCall == nil && self.outgoingCall == nil) {
+                NSLog("[ENDCALLNOTEXIST] → firing callEndTimeout for %@", data.uuid)
                 self.callEndTimeout(data)
             }
         }
@@ -669,9 +676,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
+            NSLog("[HOLD][native] CXSetHeldCallAction uuid=%@ isOnHold=%d — call NOT in callManager", action.callUUID.uuidString, action.isOnHold ? 1 : 0)
             action.fail()
             return
         }
+        NSLog("[HOLD][native] CXSetHeldCallAction uuid=%@ isOnHold=%d", action.callUUID.uuidString, action.isOnHold ? 1 : 0)
         call.isOnHold = action.isOnHold
         call.isMuted = action.isOnHold
         self.callManager.setHold(call: call, onHold: action.isOnHold)

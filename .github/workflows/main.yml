@@ -11,7 +11,7 @@ on:
       - 1.*
 
 env:
-  FLUTTER_VERSION: "3.10.x"
+  FLUTTER_VERSION: "3.32.x"
   WORKING_DIRECTORY: ./example
 
 
