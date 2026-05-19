@@ -35,7 +35,10 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     private var outgoingCall : Call?
     private var answerCall : Call?
-    
+    // UUIDs of calls that were on hold when another call was answered.
+    // These must never be timed out by endCallNotExist even after being unheld.
+    private var suppressTimeoutCallUUIDs: Set<UUID> = []
+
     private var data: Data?
     private var isFromPushKit: Bool = false
     private var silenceEvents: Bool = false
@@ -428,17 +431,17 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     func endCallNotExist(_ data: Data) {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(data.duration)) {
-            let call = self.callManager.callWithUUID(uuid: UUID(uuidString: data.uuid)!)
-            NSLog("[ENDCALLNOTEXIST] uuid=%@ callFound=%d isOnHold=%d answerCall=%@ outgoingCall=%@",
+            guard let uuid = UUID(uuidString: data.uuid) else { return }
+            let call = self.callManager.callWithUUID(uuid: uuid)
+            let suppressed = self.suppressTimeoutCallUUIDs.contains(uuid)
+            NSLog("[ENDCALLNOTEXIST] uuid=%@ callFound=%d isOnHold=%d suppressed=%d answerCall=%@ outgoingCall=%@",
                   data.uuid,
                   call != nil ? 1 : 0,
                   call?.isOnHold == true ? 1 : 0,
+                  suppressed ? 1 : 0,
                   self.answerCall?.uuid.uuidString ?? "nil",
                   self.outgoingCall?.uuid.uuidString ?? "nil")
-            // Skip timeout for calls that are on hold — another call was answered and this
-            // one was placed on hold by CallKit. Clearing answerCall when that other call
-            // ends would otherwise trigger this timer and kill the held call's UI.
-            if (call != nil && !(call!.isOnHold) && self.answerCall == nil && self.outgoingCall == nil) {
+            if (call != nil && !suppressed && self.answerCall == nil && self.outgoingCall == nil) {
                 NSLog("[ENDCALLNOTEXIST] → firing callEndTimeout for %@", data.uuid)
                 self.callEndTimeout(data)
             }
@@ -612,6 +615,13 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         self.data?.isAccepted = true
         self.answerCall = call
+        // Suppress the endCallNotExist timeout for every other active call.
+        // iOS will unhold them when this call ends, resetting isOnHold to false,
+        // so an isOnHold check alone is not sufficient.
+        for otherCall in self.callManager.calls where otherCall.uuid != call.uuid {
+            self.suppressTimeoutCallUUIDs.insert(otherCall.uuid)
+        }
+        NSLog("[SUPPRESS] marked %d call(s) as timeout-suppressed", self.suppressTimeoutCallUUIDs.count)
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.onAccept(call, action)
