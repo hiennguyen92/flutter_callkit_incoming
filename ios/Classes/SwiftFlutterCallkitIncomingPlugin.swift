@@ -134,12 +134,12 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 return
             }
             if(self.isFromPushKit){
-                NSLog("[ENDCALL][native] Dart endCall isFromPushKit=true → using selfData=%@", self.data?.uuid ?? "nil")
+                print("[ENDCALL][native] Dart endCall isFromPushKit=true → using selfData=\(self.data?.uuid ?? "nil")")
                 self.endCall(self.data!)
             }else{
                 if let getArgs = args as? [String: Any] {
                     let dartId = getArgs["id"] as? String ?? "nil"
-                    NSLog("[ENDCALL][native] Dart endCall isFromPushKit=false id=%@", dartId)
+                    print("[ENDCALL][native] Dart endCall isFromPushKit=false id=\(dartId)")
                     self.data = Data(args: getArgs)
                     self.endCall(self.data!)
                 }
@@ -434,15 +434,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             guard let uuid = UUID(uuidString: data.uuid) else { return }
             let call = self.callManager.callWithUUID(uuid: uuid)
             let suppressed = self.suppressTimeoutCallUUIDs.contains(uuid)
-            NSLog("[ENDCALLNOTEXIST] uuid=%@ callFound=%d isOnHold=%d suppressed=%d answerCall=%@ outgoingCall=%@",
-                  data.uuid,
-                  call != nil ? 1 : 0,
-                  call?.isOnHold == true ? 1 : 0,
-                  suppressed ? 1 : 0,
-                  self.answerCall?.uuid.uuidString ?? "nil",
-                  self.outgoingCall?.uuid.uuidString ?? "nil")
+            print("[ENDCALLNOTEXIST] uuid=\(data.uuid) callFound=\(call != nil ? 1 : 0) isOnHold=\(call?.isOnHold == true ? 1 : 0) suppressed=\(suppressed ? 1 : 0) answerCall=\(self.answerCall?.uuid.uuidString ?? "nil") outgoingCall=\(self.outgoingCall?.uuid.uuidString ?? "nil")")
             if (call != nil && !suppressed && self.answerCall == nil && self.outgoingCall == nil) {
-                NSLog("[ENDCALLNOTEXIST] → firing callEndTimeout for %@", data.uuid)
+                print("[ENDCALLNOTEXIST] → firing callEndTimeout for \(data.uuid)")
                 self.callEndTimeout(data)
             }
         }
@@ -621,7 +615,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         for otherCall in self.callManager.calls where otherCall.uuid != call.uuid {
             self.suppressTimeoutCallUUIDs.insert(otherCall.uuid)
         }
-        NSLog("[SUPPRESS] marked %d call(s) as timeout-suppressed", self.suppressTimeoutCallUUIDs.count)
+        print("[SUPPRESS] marked \(self.suppressTimeoutCallUUIDs.count) call(s) as timeout-suppressed")
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.onAccept(call, action)
@@ -644,14 +638,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
-        NSLog("[ENDCALL][native] CXEndCallAction uuid=%@ isFromPushKit=%d selfData=%@ answerCall=%@ outgoingCall=%@",
-              action.callUUID.uuidString,
-              self.isFromPushKit ? 1 : 0,
-              self.data?.uuid ?? "nil",
-              self.answerCall?.uuid.uuidString ?? "nil",
-              self.outgoingCall?.uuid.uuidString ?? "nil")
+        print("[ENDCALL][native] CXEndCallAction uuid=\(action.callUUID.uuidString) isFromPushKit=\(self.isFromPushKit ? 1 : 0) selfData=\(self.data?.uuid ?? "nil") answerCall=\(self.answerCall?.uuid.uuidString ?? "nil") outgoingCall=\(self.outgoingCall?.uuid.uuidString ?? "nil")")
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
-            NSLog("[ENDCALL][native] call NOT in callManager — guard failed, sendingEvent selfData=%@", self.data?.uuid ?? "nil")
+            print("[ENDCALL][native] call NOT in callManager — guard failed, selfData=\(self.data?.uuid ?? "nil")")
             if(self.answerCall == nil && self.outgoingCall == nil){
                 sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TIMEOUT, self.data?.toJSON())
             } else {
@@ -660,19 +649,19 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             action.fail()
             return
         }
-        NSLog("[ENDCALL][native] call FOUND in callManager uuid=%@", call.uuid.uuidString)
+        print("[ENDCALL][native] call FOUND in callManager uuid=\(call.uuid.uuidString)")
         call.endCall()
         self.callManager.removeCall(call)
         if (self.answerCall == nil && self.outgoingCall == nil) {
-            NSLog("[ENDCALL][native] → DECLINE event selfData=%@", self.data?.uuid ?? "nil")
-            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
+            print("[ENDCALL][native] → DECLINE event call.uuid=\(call.uuid.uuidString)")
+            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
                 appDelegate.onDecline(call, action)
             } else {
                 action.fulfill()
             }
         }else {
-            NSLog("[ENDCALL][native] → ENDED event call.data.uuid=%@", call.data.uuid)
+            print("[ENDCALL][native] → ENDED event call.data.uuid=\(call.data.uuid)")
             self.answerCall = nil
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
@@ -686,11 +675,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
-            NSLog("[HOLD][native] CXSetHeldCallAction uuid=%@ isOnHold=%d — call NOT in callManager", action.callUUID.uuidString, action.isOnHold ? 1 : 0)
+            print("[HOLD][native] CXSetHeldCallAction uuid=\(action.callUUID.uuidString) isOnHold=\(action.isOnHold ? 1 : 0) — call NOT in callManager")
             action.fail()
             return
         }
-        NSLog("[HOLD][native] CXSetHeldCallAction uuid=%@ isOnHold=%d", action.callUUID.uuidString, action.isOnHold ? 1 : 0)
+        print("[HOLD][native] CXSetHeldCallAction uuid=\(action.callUUID.uuidString) isOnHold=\(action.isOnHold ? 1 : 0)")
         call.isOnHold = action.isOnHold
         call.isMuted = action.isOnHold
         self.callManager.setHold(call: call, onHold: action.isOnHold)
