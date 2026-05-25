@@ -40,7 +40,7 @@ class CallkitNotificationManager(
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
         const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
-        const val NOTIFICATION_CHANNEL_ID_ONGOING = "callkit_ongoing_channel_id"
+        const val NOTIFICATION_CHANNEL_ID_ONGOING = "callkit_ongoing_channel_id_v2"
         const val NOTIFICATION_CHANNEL_ID_MISSED = "callkit_missed_channel_id"
 
     }
@@ -625,9 +625,7 @@ class CallkitNotificationManager(
         )
         notificationOngoingBuilder?.setChannelId(NOTIFICATION_CHANNEL_ID_ONGOING)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                notificationOngoingBuilder?.setCategory(Notification.CATEGORY_CALL)
-            }
+            notificationOngoingBuilder?.setCategory(Notification.CATEGORY_CALL)
         }
         val textCalling = data.getString(CallkitConstants.EXTRA_CALLKIT_CALLING_SUBTITLE, "")
         notificationOngoingBuilder?.setSubText(
@@ -653,7 +651,7 @@ class CallkitNotificationManager(
         val isCustomNotification =
             data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
         if (isCustomNotification) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 
                 val caller = data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
                 val person = Person.Builder().setName(caller).setImportant(
@@ -952,8 +950,11 @@ class CallkitNotificationManager(
                 val channelOngoingCall = NotificationChannel(
                     NOTIFICATION_CHANNEL_ID_ONGOING,
                     ongoingCallChannelName,
-                    NotificationManager.IMPORTANCE_LOW // disables notification popup for ongoing call
-                )
+                    NotificationManager.IMPORTANCE_DEFAULT // ranked alongside system call notifications; silenced via setSound(null)
+                ).apply {
+                    setSound(null, null)
+                    enableVibration(false)
+                }
                 createNotificationChannel(channelOngoingCall)
             }
         }
