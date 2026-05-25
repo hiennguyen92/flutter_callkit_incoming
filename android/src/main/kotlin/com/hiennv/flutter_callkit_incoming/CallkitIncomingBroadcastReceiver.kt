@@ -201,8 +201,15 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_CONNECTED}" -> {
                 try {
-                    // update notification on going connected
-                    getCallkitNotificationManager()?.showOngoingCallNotification(data, true)
+                    // Route through CallkitNotificationService so the ongoing notification is
+                    // re-emitted via startForeground(). Calling NotificationManager.notify()
+                    // directly here would break the foreground-service (phoneCall) binding and
+                    // demote the notification to a regular one (user can silence the channel).
+                    CallkitNotificationService.startServiceWithAction(
+                        context,
+                        CallkitConstants.ACTION_CALL_CONNECTED,
+                        data
+                    )
                     sendEventFlutter(CallkitConstants.ACTION_CALL_CONNECTED, data)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)

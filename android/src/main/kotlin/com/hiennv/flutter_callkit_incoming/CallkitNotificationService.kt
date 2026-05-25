@@ -16,7 +16,8 @@ class CallkitNotificationService : Service() {
 
         private val ActionForeground = listOf(
             CallkitConstants.ACTION_CALL_START,
-            CallkitConstants.ACTION_CALL_ACCEPT
+            CallkitConstants.ACTION_CALL_ACCEPT,
+            CallkitConstants.ACTION_CALL_CONNECTED
         )
 
 
@@ -78,14 +79,26 @@ class CallkitNotificationService : Service() {
                     }
                 }
         }
+        if (intent?.action === CallkitConstants.ACTION_CALL_CONNECTED) {
+            // Re-emit the ongoing notification via startForeground so the FGS
+            // (FOREGROUND_SERVICE_TYPE_PHONE_CALL) binding is preserved. Going through
+            // NotificationManager.notify() here would demote the notification to a
+            // regular user notification and re-enable user channel settings.
+            intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
+                ?.let {
+                    if (it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
+                        showOngoingCallNotification(it, isConnected = true)
+                    }
+                }
+        }
         return START_STICKY
     }
 
     @SuppressLint("MissingPermission")
-    private fun showOngoingCallNotification(bundle: Bundle) {
+    private fun showOngoingCallNotification(bundle: Bundle, isConnected: Boolean = false) {
 
         val callkitNotification =
-            getCallkitNotificationManager()?.getOnGoingCallNotification(bundle, false)
+            getCallkitNotificationManager()?.getOnGoingCallNotification(bundle, isConnected)
         if (callkitNotification != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 startForeground(
