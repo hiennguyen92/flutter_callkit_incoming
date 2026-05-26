@@ -115,17 +115,19 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
                 tools:ignore="UseCompoundDrawables">
 
                 <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
-                    android:layout_width="@dimen/size_button_x2_5"
-                    android:layout_height="@dimen/size_button_x2_5"
+                    android:layout_width="@dimen/size_button_x2"
+                    android:layout_height="@dimen/size_button_x2"
                     app:ripple_amount="4"
                     app:ripple_radius="@dimen/base_margin_x1_5"
-                    app:ripple_scale="4.5">
+                    app:ripple_scale="4.0">
 
                     <ImageView
                         android:id="@+id/ivDeclineCall"
@@ -152,26 +154,22 @@
 
             </LinearLayout>
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <!-- Video accept button: only shown for video calls (type > 0) -->
             <LinearLayout
                 android:id="@+id/llAcceptVideoCall"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:visibility="gone"
                 tools:ignore="UseCompoundDrawables">
 
                 <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
-                    android:layout_width="@dimen/size_button_x2_5"
-                    android:layout_height="@dimen/size_button_x2_5"
+                    android:layout_width="@dimen/size_button_x2"
+                    android:layout_height="@dimen/size_button_x2"
                     app:ripple_amount="4"
                     app:ripple_radius="@dimen/base_margin_x1_5"
-                    app:ripple_scale="4.5">
+                    app:ripple_scale="4.0">
 
                     <ImageView
                         android:id="@+id/ivAcceptVideoCall"
@@ -198,26 +196,20 @@
 
             </LinearLayout>
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
                 tools:ignore="UseCompoundDrawables">
 
-
                 <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
-                    android:layout_width="@dimen/size_button_x2_5"
-                    android:layout_height="@dimen/size_button_x2_5"
+                    android:layout_width="@dimen/size_button_x2"
+                    android:layout_height="@dimen/size_button_x2"
                     app:ripple_amount="4"
                     app:ripple_radius="@dimen/base_margin_x1_5"
-                    app:ripple_scale="4.5">
-
+                    app:ripple_scale="4.0">
 
                     <ImageView
                         android:id="@+id/ivAcceptCall"
@@ -239,7 +231,6 @@
                         android:text="@string/text_accept"
                         android:textColor="@color/action_text"
                         android:textSize="@dimen/size_text_action" />
-
 
                 </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
 
