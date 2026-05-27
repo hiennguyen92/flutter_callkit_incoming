@@ -660,11 +660,16 @@ class CallkitNotificationManager(
                 val callStyle = NotificationCompat.CallStyle.forOngoingCall(
                     person, getHangupPendingIntent(onGoingNotificationId, data)
                 )
-                callStyle.setVerificationText(
-                    if (TextUtils.isEmpty(textCalling)) context.getString(
-                        R.string.text_calling
-                    ) else textCalling
-                )
+                if (isConnected != true) {
+                    // "Connecting…" text shown only during the pre-media-up phase.
+                    // Once the call is connected we drop it so the chronometer is
+                    // the only timing indicator.
+                    callStyle.setVerificationText(
+                        if (TextUtils.isEmpty(textCalling)) context.getString(
+                            R.string.text_calling
+                        ) else textCalling
+                    )
+                }
                 notificationOngoingBuilder?.setStyle(callStyle)
 
 
@@ -824,10 +829,17 @@ class CallkitNotificationManager(
             Notification.PRIORITY_HIGH
         }
         if (isConnected == true) {
+            // Media is up: show the chronometer starting from now.
             notificationOngoingBuilder?.setWhen(System.currentTimeMillis())
             notificationOngoingBuilder?.setUsesChronometer(true)
+            notificationOngoingBuilder?.setShowWhen(true)
         } else {
+            // Pre-media-up ("Connecting…" phase): hide the `when` timer entirely
+            // so CallStyle.forOngoingCall doesn't render a stopwatch that would
+            // visually compete with the verification text and then snap back to
+            // 0 once we promote the call to connected.
             notificationOngoingBuilder?.setUsesChronometer(false)
+            notificationOngoingBuilder?.setShowWhen(false)
         }
         notificationOngoingBuilder?.setSound(null)
         notificationOngoingBuilder?.setContentIntent(
