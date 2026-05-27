@@ -196,14 +196,24 @@ class FlutterCallkitIncoming {
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {
-    Event? event;
+    if (data is! Map) return null;
+    // Phase 8.2 v2.3 (SnowChat fork) — Plugin emits SnowChat-specific events
+    // (e.g. AUDIO_SESSION_ACTIVATED, AUDIO_SESSION_ACTIVATED_REPLAY,
+    // AUDIO_SESSION_DEACTIVATED, PROVIDER_DID_RESET) that aren't in the
+    // upstream `Event` enum. Without orElse the firstWhere throws and the
+    // whole event subscription dies (Bad state: No element). Fall back to
+    // actionCallCustom so the listener stays alive; downstream consumers
+    // (CallKitManager._mapAction) ignore unknown events.
+    final eventName = data['event'];
+    final event = Event.values.firstWhere(
+      (e) => e.name == eventName,
+      orElse: () => Event.actionCallCustom,
+    );
     Map<String, dynamic> body = {};
-
-    if (data is Map) {
-      event = Event.values.firstWhere((e) => e.name == data['event']);
-      body = Map<String, dynamic>.from(data['body']);
-      return CallEvent(body, event);
+    final rawBody = data['body'];
+    if (rawBody is Map) {
+      body = Map<String, dynamic>.from(rawBody);
     }
-    return null;
+    return CallEvent(body, event);
   }
 }

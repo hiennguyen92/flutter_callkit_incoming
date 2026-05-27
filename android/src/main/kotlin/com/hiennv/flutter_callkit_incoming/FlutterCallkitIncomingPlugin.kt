@@ -231,6 +231,13 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "showCallkitIncoming" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
+                    // [DIAG-SEND 2026-05-05] Galaxy swipe-up no-banner regression.
+                    // Pair with [DIAG-RECV] in CallkitIncomingBroadcastReceiver to
+                    // confirm broadcast dispatch survives BG isolate teardown.
+                    Log.d(
+                        "FltCallkitPlugin",
+                        "[DIAG-SEND] showCallkitIncoming → sendBroadcast id=${data.id} ctx=${context != null} pid=${android.os.Process.myPid()}"
+                    )
                     //send BroadcastReceiver
                     context?.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentIncoming(
@@ -445,8 +452,16 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     override fun onDetachedFromActivity() {
-        // Application context must remains available:
-        // case when app is in fgs and activity is destroyed; nulling context breaks notification
+        // SnowChat fork fix (2026-05-06): do NOT null instance.context here.
+        // Upstream nulls context on activity detach, which silently breaks
+        // FCM background-isolate-driven showCallkitIncoming() the moment the
+        // user swipe-up-dismisses the app: MainActivity dies → onDetached
+        // fires → context = null → context?.sendBroadcast(...) becomes a
+        // no-op when the FCM payload arrives → no Telecom Connection → no
+        // banner / ringtone. context is initialized in onAttachedToEngine
+        // with applicationContext, which is process-scoped and remains
+        // valid until the process itself is killed. Only the Activity
+        // reference must be released here.
         instance.activity = null
     }
 

@@ -81,6 +81,12 @@ data class Data(val args: Map<String, Any?>) {
     @JsonProperty("actionColor")
     var actionColor: String
 
+    @JsonProperty("acceptColor")
+    var acceptColor: String
+
+    @JsonProperty("declineColor")
+    var declineColor: String
+
     @JsonProperty("incomingCallNotificationChannelName")
     var incomingCallNotificationChannelName: String? = null
 
@@ -154,6 +160,8 @@ data class Data(val args: Map<String, Any?>) {
         backgroundUrl = android["backgroundUrl"] as? String ?: ""
         actionColor = android["actionColor"] as? String ?: "#4CAF50"
         textColor = android["textColor"] as? String ?: "#ffffff"
+        acceptColor = android["acceptColor"] as? String ?: "#4CAF50"
+        declineColor =  android["declineColor"] as? String ?: "#F44336"
         incomingCallNotificationChannelName =
             android["incomingCallNotificationChannelName"] as? String
         missedCallNotificationChannelName = android["missedCallNotificationChannelName"] as? String
@@ -219,6 +227,8 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putLong(CallkitConstants.EXTRA_CALLKIT_DURATION, duration)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, textAccept)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, textDecline)
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_ACCEPT_COLOR, acceptColor)
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_DECLINE_COLOR, declineColor)
 
         missedNotificationId?.let {
             bundle.putInt(
@@ -348,6 +358,10 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
             data.textDecline =
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
+            data.acceptColor =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_ACCEPT_COLOR, "#4caf50")
+            data.declineColor =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_DECLINE_COLOR, "#f44335")
             data.isImportant =
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_IMPORTANT, false)
             data.isBot =
