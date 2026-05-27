@@ -19,11 +19,14 @@ import java.lang.ref.WeakReference
 
 
 /** FlutterCallkitIncomingPlugin */
+@SuppressLint("LongLogTag")
 class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     PluginRegistry.RequestPermissionsResultListener {
     companion object {
 
         const val EXTRA_CALLKIT_CALL_DATA = "EXTRA_CALLKIT_CALL_DATA"
+
+        const val TAG = "FlutterCallkitIncomingPlugin"
 
         @SuppressLint("StaticFieldLeak")
         private lateinit var instance: FlutterCallkitIncomingPlugin
@@ -41,18 +44,30 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
         private val methodChannels = mutableMapOf<BinaryMessenger, MethodChannel>()
         private val eventChannels = mutableMapOf<BinaryMessenger, EventChannel>()
-        private val eventHandlers = mutableListOf<WeakReference<EventCallbackHandler>>()
+        private val eventHandlers = mutableMapOf<BinaryMessenger, EventCallbackHandler>()
         private val eventCallbacks = mutableListOf<WeakReference<CallkitEventCallback>>()
 
         fun sendEvent(event: String, body: Map<String, Any?>) {
-            eventHandlers.reapCollection().forEach {
-                it.get()?.send(event, body)
-            }
+            send(event, body)
         }
 
-        public fun sendEventCustom(event: String, body: Map<String, Any>) {
-            eventHandlers.reapCollection().forEach {
-                it.get()?.send(event, body)
+        fun sendEventCustom(event: String, body: Map<String, Any>) {
+            send(event, body)
+        }
+
+        /**
+         * Send event to Flutter UI if there are active handlers, otherwise send to background executor if registered.
+         * The application has active handlers when the Flutter engine is running (app in foreground or background service with Flutter engine).
+         * If there are no active handlers, the event is sent to the background executor if it has been registered.
+         */
+        private fun send(event: String, body: Map<String, Any?>) {
+            val uiHandlers = eventHandlers.values.filter { it.hasListener() }
+            if (uiHandlers.isNotEmpty()) {
+                Log.d(TAG, "Sending UI event: $event")
+                uiHandlers.forEach { it.send(event, body) }
+            } else if (CallkitBackgroundExecutor.registered) {
+                Log.d(TAG, "Sending background event: $event (no UI handlers)")
+                CallkitBackgroundExecutor.send(event, body)
             }
         }
 
@@ -76,7 +91,10 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
          * Notify all registered event callbacks.
          * Called internally when a call event occurs.
          */
-        internal fun notifyEventCallbacks(event: CallkitEventCallback.CallEvent, callData: android.os.Bundle) {
+        internal fun notifyEventCallbacks(
+            event: CallkitEventCallback.CallEvent,
+            callData: android.os.Bundle
+        ) {
             eventCallbacks.reapCollection().forEach { callbackRef ->
                 callbackRef.get()?.onCallEvent(event, callData)
             }
@@ -94,13 +112,15 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             if (!::instance.isInitialized) {
                 instance = FlutterCallkitIncomingPlugin()
                 instance.callkitSoundPlayerManager = CallkitSoundPlayerManager(context)
-                instance.callkitNotificationManager = CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
+                instance.callkitNotificationManager =
+                    CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
                 instance.context = context
             } else {
                 // Re-initialize managers if they were destroyed but instance still exists
                 if (instance.callkitNotificationManager == null) {
                     instance.callkitSoundPlayerManager = CallkitSoundPlayerManager(context)
-                    instance.callkitNotificationManager = CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
+                    instance.callkitNotificationManager =
+                        CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
                 }
             }
 
@@ -110,12 +130,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
             val events = EventChannel(binaryMessenger, "flutter_callkit_incoming_events")
             eventChannels[binaryMessenger] = events
+
             val handler = EventCallbackHandler()
-            eventHandlers.add(WeakReference(handler))
+            eventHandlers[binaryMessenger] = handler
             events.setStreamHandler(handler)
-
         }
-
     }
 
     /// The MethodChannel that will the communication between Flutter and native Android
@@ -142,7 +161,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         }
     }
 
-    public fun showIncomingNotification(data: Data) {
+    fun showIncomingNotification(data: Data) {
         data.from = "notification"
         //send BroadcastReceiver
         context?.sendBroadcast(
@@ -153,11 +172,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         )
     }
 
-    public fun showMissCallNotification(data: Data) {
+    fun showMissCallNotification(data: Data) {
         callkitNotificationManager?.showMissCallNotification(data.toBundle())
     }
 
-    public fun startCall(data: Data) {
+    fun startCall(data: Data) {
         context?.sendBroadcast(
             CallkitIncomingBroadcastReceiver.getIntentStart(
                 requireNotNull(context),
@@ -166,7 +185,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         )
     }
 
-    public fun endCall(data: Data) {
+    fun endCall(data: Data) {
         context?.sendBroadcast(
             CallkitIncomingBroadcastReceiver.getIntentEnded(
                 requireNotNull(context),
@@ -175,7 +194,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         )
     }
 
-    public fun endAllCalls() {
+    fun endAllCalls() {
         val calls = getDataActiveCalls(context)
         calls.forEach {
             context?.sendBroadcast(
@@ -188,15 +207,27 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         removeAllCalls(context)
     }
 
-    public fun sendEventCustom(body: Map<String, Any>) {
-        eventHandlers.reapCollection().forEach {
-            it.get()?.send(CallkitConstants.ACTION_CALL_CUSTOM, body)
-        }
+    fun sendEventCustom(body: Map<String, Any>) {
+        send(CallkitConstants.ACTION_CALL_CUSTOM, body)
     }
 
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+    override fun onMethodCall(call: MethodCall, result: Result) {
         try {
             when (call.method) {
+                "registerBackgroundHandler" -> {
+                    val args = call.arguments as Map<*, *>
+                    val pluginHandle = (args["pluginHandle"] as Number).toLong()
+                    val userHandle = (args["userHandle"] as Number).toLong()
+                    addBackgroundCallback(context, pluginHandle, userHandle)
+                    CallkitBackgroundExecutor.start(requireNotNull(context), pluginHandle)
+                    result.success(null)
+                }
+
+                "getBackgroundHandler" -> {
+                    val handle = getUserCallback(context)
+                    result.success(handle)
+                }
+
                 "showCallkitIncoming" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
@@ -277,14 +308,14 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     val data = Data(call.arguments() ?: HashMap())
                     val currentCall = calls.firstOrNull { it.id == data.id }
                     if (currentCall != null && context != null) {
-                        if(currentCall.isAccepted) {
+                        if (currentCall.isAccepted) {
                             context?.sendBroadcast(
                                 CallkitIncomingBroadcastReceiver.getIntentEnded(
                                     requireNotNull(context),
                                     currentCall.toBundle()
                                 )
                             )
-                        }else {
+                        } else {
                             context?.sendBroadcast(
                                 CallkitIncomingBroadcastReceiver.getIntentDecline(
                                     requireNotNull(context),
@@ -392,6 +423,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         methodChannels.remove(binding.binaryMessenger)?.setMethodCallHandler(null)
         eventChannels.remove(binding.binaryMessenger)?.setStreamHandler(null)
+        eventHandlers.remove(binding.binaryMessenger)
 
         // Only destroy managers when all engine bindings are detached
         // This prevents issues when foreground services detach but main app is still running
@@ -401,6 +433,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             instance.callkitSoundPlayerManager = null
             instance.callkitNotificationManager = null
         }
+        Log.d(TAG, "onDetachedFromEngine")
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -434,7 +467,10 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
     class EventCallbackHandler : EventChannel.StreamHandler {
 
+        @Volatile
         private var eventSink: EventChannel.EventSink? = null
+
+        fun hasListener(): Boolean = eventSink != null
 
         override fun onListen(arguments: Any?, sink: EventChannel.EventSink) {
             eventSink = sink
@@ -467,6 +503,4 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         )
         return true
     }
-
-
 }
