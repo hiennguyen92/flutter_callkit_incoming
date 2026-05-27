@@ -1,6 +1,7 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 
 class CallkitNotificationService : Service() {
@@ -100,15 +102,28 @@ class CallkitNotificationService : Service() {
         val callkitNotification =
             getCallkitNotificationManager()?.getOnGoingCallNotification(bundle, isConnected)
         if (callkitNotification != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(
-                    callkitNotification.id,
-                    callkitNotification.notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                )
-            } else {
-                startForeground(callkitNotification.id, callkitNotification.notification)
+            val typeCall = bundle.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
+            startForeground(
+                callkitNotification.id,
+                callkitNotification.notification,
+                typeCall > 0
+            )
+        }
+    }
+
+    private fun startForeground(notificationId: Int, notification: Notification, isVideo: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            var mask =
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // 30+
+                mask = mask or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                if (isVideo) {
+                    mask = mask or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+                }
             }
+            startForeground(notificationId, notification, mask)
+        } else {
+            startForeground(notificationId, notification)
         }
     }
 
@@ -126,15 +141,6 @@ class CallkitNotificationService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        }else {
-            stopForeground(true)
-        }
-        stopSelf()
+        //  Don't kill the FGS. the app might be closed by user but the call is still ongoing
     }
-
-
-
 }
-

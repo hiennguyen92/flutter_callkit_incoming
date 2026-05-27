@@ -41,7 +41,51 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private var silenceEvents: Bool = false
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
 
-    
+    // Phase 8.2 v2.1 (2026-05-02) — Cold launch replay state.
+    // PushKit may fire provider:didActivate: before the Flutter isolate finishes
+    // booting → EventChannel listener missing at the moment of fire → event lost
+    // → Dart waits up to 2s on _audioSessionActivatedCompleter then proceeds via
+    // v200 swallow fallback. To eliminate that 2s blank window we cache the last
+    // activation timestamp here (thread-safe via DispatchQueue.sync) and replay
+    // it when Dart first invokes `replayLastActivationIfRecent` (5s window).
+    //
+    // Why thread-safe: didActivate fires on CallKit's internal queue; replay is
+    // invoked from the Flutter platform queue. Without synchronization the read
+    // can tear (TimeInterval is 8 bytes on 64-bit, atomic — but Optional wrapping
+    // and getter/setter still race). DispatchQueue.sync serializes both.
+    private var _lastActivationTimestamp: TimeInterval?
+    private let _activationLock = DispatchQueue(label: "com.snowchat.callkit.activation")
+
+    private var lastActivationTimestamp: TimeInterval? {
+        get { _activationLock.sync { _lastActivationTimestamp } }
+        set { _activationLock.sync { _lastActivationTimestamp = newValue } }
+    }
+
+    // Phase 8.2 v2.2 (2026-05-02) — ACTION_CALL_ACCEPT replay cache.
+    // CallKit invokes provider:perform:CXAnswerCallAction: while the app is still
+    // in the background. Plugin sendEvent → EventCallbackHandler.send → eventSink
+    // — but sink may be nil (FlutterEngine paused or CallNotifier hasn't bound
+    // ckm.events.listen yet). Result: first accept tap is silently dropped, user
+    // forced to tap again after FG transition. Mirrors lastActivationTimestamp.
+    private var _lastAcceptData: [String: Any?]?
+    private var _lastAcceptTimestamp: TimeInterval?
+    private let _acceptLock = DispatchQueue(label: "com.snowchat.callkit.accept")
+
+    private var lastAcceptCache: (data: [String: Any?], ts: TimeInterval)? {
+        get {
+            _acceptLock.sync {
+                guard let data = _lastAcceptData, let ts = _lastAcceptTimestamp else { return nil }
+                return (data, ts)
+            }
+        }
+        set {
+            _acceptLock.sync {
+                _lastAcceptData = newValue?.data
+                _lastAcceptTimestamp = newValue?.ts
+            }
+        }
+    }
+
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
         if silenceEvents {
             print(event, " silenced")
@@ -233,6 +277,21 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         case "setAudioRoute":
             result(true)
             break
+        case "replayLastActivationIfRecent":
+            // Phase 8.2 v2.1 — Dart invokes this on first listener attach to
+            // receive any didActivate event that fired before the EventChannel
+            // was ready (cold launch via PushKit, isolate boot delay).
+            self.replayLastActivationIfRecent()
+            result(true)
+            break
+        case "replayLastAcceptIfRecent":
+            // Phase 8.2 v2.2 — Same shape as activation replay, but for the
+            // CXAnswerCallAction event. CallKit dispatches the answer action
+            // while the app is still BG; sink may be nil → event lost. Cached
+            // data + timestamp; Dart replays on listener attach (5s window).
+            self.replayLastAcceptIfRecent()
+            result(true)
+            break
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -255,7 +314,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         return nil
     }
     
-    @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
+    @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool, onError: ((Error?) -> Void)? = nil) {
         self.isFromPushKit = fromPushKit
         if(fromPushKit){
             self.data = data
@@ -280,21 +339,27 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         
         initCallkitProvider(data)
         
-        let uuid = UUID(uuidString: data.uuid)
-        
+        // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
+        guard let uuid = UUID(uuidString: data.uuid) else {
+            NSLog("[CallkitIncoming] showIncomingCall(no PushKit): invalid UUID '\(data.uuid)' — ignored")
+            return
+        }
+
         self.configureAudioSession()
-        self.sharedProvider?.reportNewIncomingCall(with: uuid!, update: callUpdate) { error in
+        self.sharedProvider?.reportNewIncomingCall(with: uuid, update: callUpdate) { error in
             if(error == nil) {
                 self.configureAudioSession()
-                let call = Call(uuid: uuid!, data: data)
+                let call = Call(uuid: uuid, data: data)
                 call.handle = data.handle
                 self.callManager.addCall(call)
                 self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_INCOMING, data.toJSON())
                 self.endCallNotExist(data)
+            } else {
+                onError?(error)
             }
         }
     }
-    
+
     @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool, completion: @escaping () -> Void) {
         self.isFromPushKit = fromPushKit
         if(fromPushKit){
@@ -319,12 +384,19 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         
         initCallkitProvider(data)
         
-        let uuid = UUID(uuidString: data.uuid)
-        
-        self.sharedProvider?.reportNewIncomingCall(with: uuid!, update: callUpdate) { error in
+        // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
+        // PushKit call MUST report within ~5s deadline; on invalid UUID we still call
+        // completion() so iOS doesn't penalize the app for the missed deadline.
+        guard let uuid = UUID(uuidString: data.uuid) else {
+            NSLog("[CallkitIncoming] showCallkitIncoming: invalid UUID '\(data.uuid)' — ignored")
+            completion()
+            return
+        }
+
+        self.sharedProvider?.reportNewIncomingCall(with: uuid, update: callUpdate) { error in
             if(error == nil) {
                 self.configureAudioSession()
-                let call = Call(uuid: uuid!, data: data)
+                let call = Call(uuid: uuid, data: data)
                 call.handle = data.handle
                 self.callManager.addCall(call)
                 self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_INCOMING, data.toJSON())
@@ -369,26 +441,48 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     @objc public func endCall(_ data: Data) {
-        var call: Call? = nil
-        if(self.isFromPushKit){
-            call = Call(uuid: UUID(uuidString: self.data!.uuid)!, data: data)
+        // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
+        // PushKit branch reads uuid from self.data (stored during showCallkitIncoming);
+        // non-PushKit reads from the incoming data. Either source can be invalid.
+        let uuidSourceString: String
+        if self.isFromPushKit {
+            guard let stored = self.data else {
+                NSLog("[CallkitIncoming] endCall: PushKit branch but self.data is nil — ignored")
+                return
+            }
+            uuidSourceString = stored.uuid
             self.isFromPushKit = false
             self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
-        }else {
-            call = Call(uuid: UUID(uuidString: data.uuid)!, data: data)
+        } else {
+            uuidSourceString = data.uuid
         }
-        self.callManager.endCall(call: call!)
+        guard let uuid = UUID(uuidString: uuidSourceString) else {
+            NSLog("[CallkitIncoming] endCall: invalid UUID '\(uuidSourceString)' — ignored")
+            return
+        }
+        let call = Call(uuid: uuid, data: data)
+        self.callManager.endCall(call: call)
     }
-    
+
     @objc public func connectedCall(_ data: Data) {
-        var call: Call? = nil
-        if(self.isFromPushKit){
-            call = Call(uuid: UUID(uuidString: self.data!.uuid)!, data: data)
+        // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
+        let uuidSourceString: String
+        if self.isFromPushKit {
+            guard let stored = self.data else {
+                NSLog("[CallkitIncoming] connectedCall: PushKit branch but self.data is nil — ignored")
+                return
+            }
+            uuidSourceString = stored.uuid
             self.isFromPushKit = false
-        }else {
-            call = Call(uuid: UUID(uuidString: data.uuid)!, data: data)
+        } else {
+            uuidSourceString = data.uuid
         }
-        self.callManager.connectedCall(call: call!)
+        guard let uuid = UUID(uuidString: uuidSourceString) else {
+            NSLog("[CallkitIncoming] connectedCall: invalid UUID '\(uuidSourceString)' — ignored")
+            return
+        }
+        let call = Call(uuid: uuid, data: data)
+        self.callManager.connectedCall(call: call)
     }
     
     @objc public func activeCalls() -> [[String: Any]] {
@@ -401,21 +495,27 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func saveEndCall(_ uuid: String, _ reason: Int) {
+        // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
+        // Single guard at top covers all five branches.
+        guard let callUuid = UUID(uuidString: uuid) else {
+            NSLog("[CallkitIncoming] saveEndCall: invalid UUID '\(uuid)' (reason=\(reason)) — ignored")
+            return
+        }
         switch reason {
         case 1:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.failed)
+            self.sharedProvider?.reportCall(with: callUuid, endedAt: Date(), reason: CXCallEndedReason.failed)
             break
         case 2, 6:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.remoteEnded)
+            self.sharedProvider?.reportCall(with: callUuid, endedAt: Date(), reason: CXCallEndedReason.remoteEnded)
             break
         case 3:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.unanswered)
+            self.sharedProvider?.reportCall(with: callUuid, endedAt: Date(), reason: CXCallEndedReason.unanswered)
             break
         case 4:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.answeredElsewhere)
+            self.sharedProvider?.reportCall(with: callUuid, endedAt: Date(), reason: CXCallEndedReason.answeredElsewhere)
             break
         case 5:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.declinedElsewhere)
+            self.sharedProvider?.reportCall(with: callUuid, endedAt: Date(), reason: CXCallEndedReason.declinedElsewhere)
             break
         default:
             break
@@ -425,18 +525,28 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     func endCallNotExist(_ data: Data) {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(data.duration)) {
-            let call = self.callManager.callWithUUID(uuid: UUID(uuidString: data.uuid)!)
+            // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
+            guard let uuid = UUID(uuidString: data.uuid) else {
+                NSLog("[CallkitIncoming] endCallNotExist: invalid UUID '\(data.uuid)' — ignored")
+                return
+            }
+            let call = self.callManager.callWithUUID(uuid: uuid)
             if (call != nil && self.answerCall == nil && self.outgoingCall == nil) {
                 self.callEndTimeout(data)
             }
         }
     }
-    
-    
-    
+
+
+
     func callEndTimeout(_ data: Data) {
         self.saveEndCall(data.uuid, 3)
-        guard let call = self.callManager.callWithUUID(uuid: UUID(uuidString: data.uuid)!) else {
+        // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
+        guard let uuid = UUID(uuidString: data.uuid) else {
+            NSLog("[CallkitIncoming] callEndTimeout: invalid UUID '\(data.uuid)' — ignored")
+            return
+        }
+        guard let call = self.callManager.callWithUUID(uuid: uuid) else {
             return
         }
         self.showMissedCallNotification(data)
@@ -523,6 +633,52 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
     }
     
+    // Phase 8.2 v2.1 — Cold launch event replay.
+    // didActivate may fire before Dart EventChannel listener is attached (PushKit
+    // cold launch). Dart invokes this on first attach; we replay if within 5s.
+    @objc public func replayLastActivationIfRecent() {
+        guard let ts = lastActivationTimestamp else { return }
+        let elapsed = Date().timeIntervalSince1970 - ts
+        guard elapsed < 5.0 else {
+            NSLog("[FlutterCallkitIncoming] replay skipped (stale: \(elapsed)s ago)")
+            return
+        }
+        NSLog("[FlutterCallkitIncoming] Replaying didActivate event (\(elapsed)s ago)")
+        sendEvent(
+            "com.hiennv.flutter_callkit_incoming.AUDIO_SESSION_ACTIVATED_REPLAY",
+            ["ts": ts, "elapsed": elapsed]
+        )
+    }
+
+    // Phase 8.2 v2.2 — Cold-BG accept event replay.
+    // CXAnswerCallAction is dispatched on the OS's CallKit queue while the app
+    // is still background-suspended. sendEvent → eventSink may drop because the
+    // FlutterEngine isolate is paused or CallNotifier hasn't bound the listener
+    // yet. Cache the accept payload; Dart calls replayLastAcceptIfRecent on
+    // first listener attach. The replayed event reuses ACTION_CALL_ACCEPT so
+    // CallKitManager._mapAction routes it identically — Dart-side guards (state
+    // machine status check) keep the call idempotent if the original sendEvent
+    // happened to land too.
+    @objc public func replayLastAcceptIfRecent() {
+        guard let cache = lastAcceptCache else { return }
+        let elapsed = Date().timeIntervalSince1970 - cache.ts
+        guard elapsed < 5.0 else {
+            NSLog("[FlutterCallkitIncoming] accept replay skipped (stale: \(elapsed)s ago)")
+            // Stale entries shouldn't linger across calls — clear so a future
+            // accept doesn't get a phantom replay from a previous session.
+            lastAcceptCache = nil
+            return
+        }
+        NSLog("[FlutterCallkitIncoming] Replaying actionCallAccept (\(elapsed)s ago)")
+        sendEvent(
+            SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT,
+            cache.data
+        )
+        // One-shot replay — clear so subsequent calls to this method are no-ops
+        // and the next genuine accept owns the cache slot.
+        lastAcceptCache = nil
+    }
+
     func getAudioSessionMode(_ audioSessionMode: String?) -> AVAudioSession.Mode {
         var mode = AVAudioSession.Mode.default
         switch audioSessionMode {
@@ -561,10 +717,20 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func providerDidReset(_ provider: CXProvider) {
+        NSLog("[FlutterCallkitIncoming] providerDidReset (system reset — airplane mode toggle, callservicesd restart)")
         for call in self.callManager.calls {
             call.endCall()
         }
         self.callManager.removeAllCalls()
+
+        // Phase 8.2 v2.1 — Notify Dart so CallService can _cleanup dangling state.
+        sendEvent("com.hiennv.flutter_callkit_incoming.PROVIDER_DID_RESET", [:])
+        if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
+            appDelegate.providerDidReset()
+        }
+
+        // Clear cold-launch replay cache — the prior activation is no longer valid.
+        self.lastActivationTimestamp = nil
     }
     
     public func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
@@ -588,18 +754,55 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             action.fail()
             return
         }
-        self.configureAudioSession()
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
-            self.configureAudioSession()
-        }
 
+        // Phase 8.2 v2.1 surgery — Apple WWDC 2018 707 권장 패턴.
+        //
+        // 변경 전 (race source):
+        //   self.configureAudioSession()                                         // ❌ 즉시
+        //   DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
+        //       self.configureAudioSession()                                      // ❌ 1.2s 후 또
+        //   }
+        //   → configureAudioSession() 안에서 setActive(true) 호출 → CallKit 이 아직
+        //     ClientPriority=PhoneCall 부여 전 → callservicesd Ringtone interrupt 거부
+        //     → -12983 "Insufficient priority" → audio activate fail → 첫 accept 무시.
+        //
+        // 변경 후 (정공법):
+        //   - category/mode/sampleRate/IOBuffer 만 setup
+        //   - setActive(true) 절대 금지 — CallKit 이 priority=PhoneCall 부여 후 자동 호출
+        //   - 그 결과 provider:didActivate: 콜백이 정상 발사되고, Dart 가 그 시점에
+        //     WebRTC peer connection 시작
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(
+                .playAndRecord,
+                mode: .voiceChat,
+                options: [.allowBluetooth, .allowBluetoothA2DP, .duckOthers]
+            )
+            try session.setPreferredSampleRate(48_000)
+            try session.setPreferredIOBufferDuration(0.005)
+        } catch {
+            NSLog("[FlutterCallkitIncoming] performAnswer audio setup error: \(error)")
+            // 실패해도 진행 — CallKit 이 default 로 처리. v200 swallow 가 보호.
+        }
 
         call.hasConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
         }
         self.data?.isAccepted = true
         self.answerCall = call
-        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
+        let acceptPayload = self.data?.toJSON()
+        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, acceptPayload)
+
+        // Phase 8.2 v2.2 — Cache for replay (5s window). If the FlutterEngine
+        // isolate was paused or CallNotifier hadn't bound the listener at the
+        // moment of the sendEvent above, the event was silently dropped at
+        // EventCallbackHandler.send (eventSink == nil). Dart invokes
+        // replayLastAcceptIfRecent right after attaching, recovering the lost
+        // tap so the user doesn't have to tap twice.
+        if let payload = acceptPayload {
+            lastAcceptCache = (data: payload, ts: Date().timeIntervalSince1970)
+        }
+
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.onAccept(call, action)
         }else {
@@ -705,6 +908,25 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) {
+        NSLog("[FlutterCallkitIncoming] didActivate sample_rate=\(audioSession.sampleRate)")
+
+        // Phase 8.2 v2.1 — Cache timestamp for cold-launch replay (5s window).
+        // PushKit 가 process launch 한 직후엔 Dart isolate 가 아직 boot 안 끝나서
+        // EventChannel listener 가 등록 안 됨 → sendEvent 가 sink 없어 lost.
+        // 캐시해뒀다가 Dart 가 첫 attach 시 replayLastActivationIfRecent 호출 → replay.
+        self.lastActivationTimestamp = Date().timeIntervalSince1970
+
+        // Phase 8.2 v2.1 — Notify Dart that audio session is now active at PhoneCall
+        // priority. CallService awaits this event (via _audioSessionActivatedCompleter)
+        // before starting WebRTC peer connection — avoids -12983 priority race in
+        // flutter_webrtc native path.
+        sendEvent(
+            "com.hiennv.flutter_callkit_incoming.AUDIO_SESSION_ACTIVATED",
+            [
+                "sampleRate": audioSession.sampleRate,
+                "ts": lastActivationTimestamp ?? 0,
+            ]
+        )
 
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.didActivateAudioSession(audioSession)
@@ -730,13 +952,23 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             }
         }
         sendDefaultAudioInterruptionNotificationToStartAudioResource()
-        configureAudioSession()
+
+        // Phase 8.2 v2.1 surgery — configureAudioSession() 호출 삭제.
+        // 이전엔 didActivate 안에서 또 configureAudioSession() (즉 setActive(true))
+        // 호출 → CallKit 이 이미 setActive 한 audio session 을 또 건드려 race 유발.
+        // 함수 정의는 showCallkitIncoming / startCall 등에서 여전히 사용하므로 유지.
 
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": true ])
     }
     
     public func provider(_ provider: CXProvider, didDeactivate audioSession: AVAudioSession) {
-        
+        NSLog("[FlutterCallkitIncoming] didDeactivate")
+
+        // Phase 8.2 v2.1 — Notify Dart so CallService can observe deactivation.
+        // Dart treats this as observation-only (cleanup is driven by endCall/decline,
+        // not by audio session lifecycle). Used for telemetry / metrics.
+        sendEvent("com.hiennv.flutter_callkit_incoming.AUDIO_SESSION_DEACTIVATED", [:])
+
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.didDeactivateAudioSession(audioSession)
         }
@@ -745,7 +977,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             print("Call is on hold")
             return
         }
-        
+
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": false ])
     }
     

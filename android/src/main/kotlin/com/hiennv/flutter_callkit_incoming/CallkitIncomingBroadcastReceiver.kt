@@ -1,12 +1,16 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.telecom.TelecomManager
 import android.util.Log
+import androidx.core.content.ContextCompat
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
@@ -92,14 +96,99 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         return FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
     }
 
+    /**
+     * Inject an incoming call into the Android Telecom framework.
+     *
+     * Self-managed Telecom PhoneAccount was already registered in
+     * [FlutterCallkitIncomingPlugin.onAttachedToEngine] via
+     * [InAppCallManager.registerPhoneAccount]. This call makes the registration
+     * actually do something — [CallkitConnectionService.onCreateIncomingConnection]
+     * fires synchronously and returns a ringing [CallkitConnection] that the OS
+     * treats as a first-party call.
+     *
+     * Why it matters: strict OEMs (Samsung Knox / Xiaomi MIUI) ignore
+     * `setShowWhenLocked` on ordinary Activities. A call hosted in Telecom is
+     * treated as an actual phone call — the Accept button bypasses keyguard,
+     * the Activity we launch from `Connection.onAnswer()` gets full-screen
+     * priority, ringtone routing works through the system dialer.
+     */
+    @SuppressLint("MissingPermission")
+    private fun registerTelecomIncomingCall(context: Context, data: Bundle) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val parsed = try { Data.fromBundle(data) } catch (e: Exception) { null } ?: return
+        if (parsed.id.isEmpty()) return
+        // Already registered — avoid double-entry. The OS would also reject a
+        // duplicate call id but logging the skip is quieter than a stack trace.
+        if (CallkitConnection.find(parsed.id) != null) {
+            Log.d(TAG, "Telecom call already registered id=${parsed.id} — skip")
+            return
+        }
+        // MANAGE_OWN_CALLS is declared in the plugin manifest and auto-granted
+        // (normal protection level), but guard anyway for apps that strip it.
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.MANAGE_OWN_CALLS)
+            != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "MANAGE_OWN_CALLS not granted — Telecom incoming skipped")
+            return
+        }
+        val telecom = context.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return
+        val manager = InAppCallManager(context.applicationContext)
+        val handle = manager.getPhoneAccountHandle()
+        val extras = Bundle().apply {
+            putBundle(CallkitConnection.EXTRA_CALL_BUNDLE, data)
+            putInt(
+                TelecomManager.EXTRA_INCOMING_VIDEO_STATE,
+                android.telecom.VideoProfile.STATE_AUDIO_ONLY,
+            )
+        }
+        try {
+            telecom.addNewIncomingCall(handle, extras)
+            Log.d(TAG, "Telecom addNewIncomingCall id=${parsed.id}")
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Telecom addNewIncomingCall rejected: ${e.message}")
+        } catch (e: Exception) {
+            Log.w(TAG, "Telecom addNewIncomingCall error: ${e.message}")
+        }
+    }
+
+    /** Drive an existing Telecom [CallkitConnection] by call id + action. */
+    private fun driveTelecomConnection(context: Context, data: Bundle, action: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        val parsed = try { Data.fromBundle(data) } catch (e: Exception) { null } ?: return
+        val conn = CallkitConnection.find(parsed.id) ?: return
+        when (action) {
+            CallkitConstants.ACTION_CALL_ACCEPT -> conn.markAccepted()
+            // [SnowChat fork 2026-05-05 H-fix] Pass context so markDeclined can
+            // launch MainActivity from within the self-managed Connection while
+            // the call is still RINGING (PHONE_CALL BAL exemption attempt).
+            CallkitConstants.ACTION_CALL_DECLINE -> conn.markDeclined(context)
+            CallkitConstants.ACTION_CALL_ENDED -> conn.markEnded()
+            CallkitConstants.ACTION_CALL_TIMEOUT -> conn.markMissed()
+        }
+    }
+
 
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
+        // [DIAG-RECV 2026-05-05] Galaxy swipe-up dismiss → no banner regression.
+        // BG isolate logs prove showCallkitIncoming returned, but no Telecom log
+        // ever follows. Confirm here whether the broadcast even reaches us.
+        Log.d(
+            TAG,
+            "[DIAG-RECV] onReceive entry action=${intent.action} hasData=${intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA) != null} pid=${android.os.Process.myPid()}"
+        )
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA) ?: return
+
+        Log.d(TAG, action)
+
         when (action) {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
                 try {
+                    // Self-managed Telecom entry — grants OS-level call privileges
+                    // (keyguard bypass on Samsung Knox / Xiaomi MIUI, system audio
+                    // focus, ringtone). Silent no-op on API < 26 or when MANAGE_OWN_CALLS
+                    // isn't granted; the existing notification path remains as fallback.
+                    registerTelecomIncomingCall(context, data)
                     getCallkitNotificationManager()?.showIncomingNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
@@ -126,6 +215,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ACCEPT}" -> {
                 try {
                     // Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_ACCEPT")
+                    // Transition the Telecom Connection to ACTIVE first — the OS
+                    // uses this to dismiss keyguard on self-managed PhoneAccounts.
+                    driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_ACCEPT)
                     FlutterCallkitIncomingPlugin.notifyEventCallbacks(CallkitEventCallback.CallEvent.ACCEPT, data)
                     // start service and show ongoing call when call is accepted
                     CallkitNotificationService.startServiceWithAction(
@@ -162,13 +254,34 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
-                    // Log.d(TAG, "[CALLKIT] 📱 ACTION_CALL_DECLINE")           
+                    val parsedForLog = Data.fromBundle(data)
+                    Log.d(TAG, "[DIAG-DECLINE] enter id=${parsedForLog.id}")
                     // Notify native decline callbacks
+                    driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_DECLINE)
                     FlutterCallkitIncomingPlugin.notifyEventCallbacks(CallkitEventCallback.CallEvent.DECLINE, data)
                     // clear notification
                     getCallkitNotificationManager()?.clearIncomingNotification(data, false)
+                    Log.d(TAG, "[DIAG-DECLINE] sendEventFlutter id=${parsedForLog.id}")
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
                     removeCall(context, Data.fromBundle(data))
+
+                    // [SnowChat fork 2026-05-05 H-fix verification window]
+                    //
+                    // The cold-launch DECLINE recovery (prefs.write + startActivity)
+                    // has been MOVED to CallkitConnection.markDeclined(context) so it
+                    // fires from inside the self-managed Connection while the call
+                    // is still RINGING. The original implementation (BroadcastReceiver
+                    // context, post-disconnect) hit Android 14+ BAL_BLOCK
+                    // (`callingUidProcState: BOUND_FOREGROUND_SERVICE;
+                    //   callingUidHasVisibleActivity: false`) on Galaxy — see
+                    // logcat trace 2026-05-05 03:49:04.039.
+                    //
+                    // Disabled here intentionally: keeping a second startActivity in
+                    // the receiver path would also hit BAL_BLOCK and pollute the
+                    // logcat with a duplicate failure line, making it harder to read
+                    // the H-fix verification result. If H-fix proves insufficient,
+                    // revert this commit + escalate to PHONE_CALL FGS promotion.
+                    Log.d(TAG, "[DIAG-DECLINE] receiver-path recovery DISABLED — see CS path")
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -176,7 +289,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_ENDED}" -> {
                 try {
+                    FlutterCallkitIncomingPlugin.notifyEventCallbacks(CallkitEventCallback.CallEvent.END, data)
                     // clear notification and stop service
+                    driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_ENDED)
                     getCallkitNotificationManager()?.clearIncomingNotification(data, false)
                     CallkitNotificationService.stopService(context)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
@@ -189,6 +304,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_TIMEOUT}" -> {
                 try {
                     // clear notification and show miss notification
+                    driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_TIMEOUT)
                     val notificationManager = getCallkitNotificationManager()
                     notificationManager?.clearIncomingNotification(data, false)
                     notificationManager?.showMissCallNotification(data)
@@ -284,6 +400,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "duration" to data.getLong(CallkitConstants.EXTRA_CALLKIT_DURATION, 0L),
             "textAccept" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, ""),
             "textDecline" to data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, ""),
+            "acceptColor" to data.getString(CallkitConstants.EXTRA_CALLKIT_ACCEPT_COLOR, ""),
+            "declineColor" to data.getString(CallkitConstants.EXTRA_CALLKIT_DECLINE_COLOR, ""),
             "extra" to data.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA),
             "missedCallNotification" to missedCallNotification,
             "callingNotification" to callingNotification,

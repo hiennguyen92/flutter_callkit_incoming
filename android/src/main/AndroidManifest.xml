@@ -11,6 +11,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-permission android:name="${applicationId}.PERMISSION_CALL" />
 
@@ -37,9 +41,22 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <!--
+             SnowChat fork (2026-05-09): showWhenLocked + turnScreenOn added so
+             this transparent relay Activity bridges the lockscreen-bypass between
+             CallkitIncomingActivity (which already has these flags) and the host
+             MainActivity. Without them, on cold-start where Dart isolate boot
+             takes ~1-2s, the keyguard sees no lock-bypass Activity in the gap
+             and re-engages — surfacing as a system PIN challenge mid-accept and
+             a re-published incoming-call notification (Galaxy field report
+             2026-05-09 first call after +268 install). Warm-start was unaffected
+             because MainActivity came up fast enough.
+        -->
         <activity
             android:exported="false"
             android:theme="@style/TranslucentTheme"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
             android:name="com.hiennv.flutter_callkit_incoming.TransparentActivity"/>
 
         <receiver
@@ -60,14 +77,27 @@
         <service
             android:enabled="true"
             android:exported="true"
-            android:foregroundServiceType="phoneCall"
+            android:stopWithTask="false"
+            android:foregroundServiceType="phoneCall|camera|microphone"
             android:permission="${applicationId}.PERMISSION_CALL"
             android:name="com.hiennv.flutter_callkit_incoming.CallkitNotificationService">
         </service>
 
+        <!--
+            Self-managed Telecom ConnectionService — hosts in-app calls in the
+            Android Telecom framework for OEM keyguard bypass (Samsung Knox,
+            Xiaomi MIUI). The correct permission on Android P+ is
+            BIND_TELECOM_CONNECTION_SERVICE (the older BIND_CONNECTION_SERVICE
+            is deprecated and prevents Telecom from binding on newer OSes).
+
+            foregroundServiceType="phoneCall" allows the OS to keep the service
+            alive during an active call (required on Android 10+ self-managed
+            apps that want mic + audio).
+        -->
         <service
             android:name="com.hiennv.flutter_callkit_incoming.CallkitConnectionService"
-            android:permission="android.permission.BIND_CONNECTION_SERVICE"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
+            android:foregroundServiceType="phoneCall"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.telecom.ConnectionService" />
