@@ -129,7 +129,7 @@ class CallkitConnection(
     /**
      * Mark the call as declined/ended — user declined via app notification.
      *
-     * [SnowChat fork 2026-05-05 H-fix] Cold-launch DECLINE recovery is fired
+     * Cold-launch DECLINE recovery is fired
      * from inside the self-managed [Connection] context (and *before*
      * [setDisconnected] runs) so the call is still in the RINGING state when
      * [Context.startActivity] is invoked. The hope: Android 14+ BAL grants a
@@ -174,7 +174,7 @@ class CallkitConnection(
     private fun triggerDeclineRecovery(context: Context) {
         try {
             val prefs = context.getSharedPreferences(
-                "snowchat_voip_decline",
+                "flutter_callkit_incoming_decline",
                 Context.MODE_PRIVATE,
             )
             prefs.edit()

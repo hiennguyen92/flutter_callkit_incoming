@@ -22,7 +22,7 @@ object CallkitBackgroundExecutor {
         get() = backgroundFlutterEngine != null
 
     fun start(context: Context, pluginCallbackHandle: Long) {
-        if (backgroundFlutterEngine!= null) {
+        if (backgroundFlutterEngine != null) {
             Log.d(TAG, "Background engine already running")
             return
         }
@@ -45,14 +45,17 @@ object CallkitBackgroundExecutor {
         )
 
         backgroundFlutterEngine!!.dartExecutor.executeDartCallback(args)
-        backgroundChannel = MethodChannel(backgroundFlutterEngine!!.dartExecutor.binaryMessenger, CHANNEL)
+        backgroundChannel = MethodChannel(
+            backgroundFlutterEngine!!.dartExecutor.binaryMessenger,
+            CHANNEL
+        )
 
         Log.d(TAG, "Background engine started")
     }
 
     fun send(event: String, body: Map<String, Any?>) {
         if (backgroundFlutterEngine == null) {
-            Log.e(TAG, "Background engin not started, cannot send event: $event")
+            Log.e(TAG, "Background engine not started, cannot send event: $event")
             return
         }
         backgroundChannel!!.invokeMethod(event, body)

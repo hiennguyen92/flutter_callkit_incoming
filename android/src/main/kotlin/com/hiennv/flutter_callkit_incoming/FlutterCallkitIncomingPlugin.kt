@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -55,10 +56,26 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             send(event, body)
         }
 
+        fun acceptCallHandleCallback(bundle: Bundle) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                val extra = bundle.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA)
+                methodChannels.values.forEach {
+                    it.invokeMethod("acceptCallHandle", extra)
+                }
+            }, 750)
+        }
+
+        fun invokeFlutterCallback(data: Any) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                methodChannels.values.forEach {
+                    it.invokeMethod("invokeFlutter", data)
+                }
+            }, 750)
+        }
+
         /**
-         * Send event to Flutter UI if there are active handlers, otherwise send to background executor if registered.
-         * The application has active handlers when the Flutter engine is running (app in foreground or background service with Flutter engine).
-         * If there are no active handlers, the event is sent to the background executor if it has been registered.
+         * Send event to Flutter UI if there are active handlers, otherwise send to background
+         * executor if registered.
          */
         private fun send(event: String, body: Map<String, Any?>) {
             val uiHandlers = eventHandlers.values.filter { it.hasListener() }
@@ -91,10 +108,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
          * Notify all registered event callbacks.
          * Called internally when a call event occurs.
          */
-        internal fun notifyEventCallbacks(
-            event: CallkitEventCallback.CallEvent,
-            callData: android.os.Bundle
-        ) {
+        internal fun notifyEventCallbacks(event: CallkitEventCallback.CallEvent, callData: android.os.Bundle) {
             eventCallbacks.reapCollection().forEach { callbackRef ->
                 callbackRef.get()?.onCallEvent(event, callData)
             }
@@ -129,8 +143,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 // Re-initialize managers if they were destroyed but instance still exists
                 if (instance.callkitNotificationManager == null) {
                     instance.callkitSoundPlayerManager = CallkitSoundPlayerManager(context)
-                    instance.callkitNotificationManager =
-                        CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
+                    instance.callkitNotificationManager = CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
                 }
             }
 
@@ -140,11 +153,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
             val events = EventChannel(binaryMessenger, "flutter_callkit_incoming_events")
             eventChannels[binaryMessenger] = events
-
             val handler = EventCallbackHandler()
             eventHandlers[binaryMessenger] = handler
             events.setStreamHandler(handler)
+
         }
+
     }
 
     /// The MethodChannel that will the communication between Flutter and native Android
@@ -171,7 +185,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         }
     }
 
-    fun showIncomingNotification(data: Data) {
+    public fun showIncomingNotification(data: Data) {
         data.from = "notification"
         //send BroadcastReceiver
         context?.sendBroadcast(
@@ -182,11 +196,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         )
     }
 
-    fun showMissCallNotification(data: Data) {
+    public fun showMissCallNotification(data: Data) {
         callkitNotificationManager?.showMissCallNotification(data.toBundle())
     }
 
-    fun startCall(data: Data) {
+    public fun startCall(data: Data) {
         context?.sendBroadcast(
             CallkitIncomingBroadcastReceiver.getIntentStart(
                 requireNotNull(context),
@@ -195,7 +209,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         )
     }
 
-    fun endCall(data: Data) {
+    public fun endCall(data: Data) {
         context?.sendBroadcast(
             CallkitIncomingBroadcastReceiver.getIntentEnded(
                 requireNotNull(context),
@@ -204,7 +218,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         )
     }
 
-    fun endAllCalls() {
+    public fun endAllCalls() {
         val calls = getDataActiveCalls(context)
         calls.forEach {
             context?.sendBroadcast(
@@ -221,7 +235,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         send(CallkitConstants.ACTION_CALL_CUSTOM, body)
     }
 
-    override fun onMethodCall(call: MethodCall, result: Result) {
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         try {
             when (call.method) {
                 "registerBackgroundHandler" -> {
@@ -238,16 +252,19 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success(handle)
                 }
 
+                "setAcceptCallHandle" -> {
+                    val args = call.arguments as? List<*>
+                    if (args != null && args.size >= 2) {
+                        val handle = args[0] as? Int ?: 0
+                        val key = args[1] as? String ?: ""
+                        saveHandle(context, key, handle)
+                    }
+                    result.success(null)
+                }
+
                 "showCallkitIncoming" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
-                    // [DIAG-SEND 2026-05-05] Galaxy swipe-up no-banner regression.
-                    // Pair with [DIAG-RECV] in CallkitIncomingBroadcastReceiver to
-                    // confirm broadcast dispatch survives BG isolate teardown.
-                    Log.d(
-                        "FltCallkitPlugin",
-                        "[DIAG-SEND] showCallkitIncoming → sendBroadcast id=${data.id} ctx=${context != null} pid=${android.os.Process.myPid()}"
-                    )
                     //send BroadcastReceiver
                     context?.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentIncoming(
@@ -318,14 +335,14 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     val data = Data(call.arguments() ?: HashMap())
                     val currentCall = calls.firstOrNull { it.id == data.id }
                     if (currentCall != null && context != null) {
-                        if (currentCall.isAccepted) {
+                        if(currentCall.isAccepted) {
                             context?.sendBroadcast(
                                 CallkitIncomingBroadcastReceiver.getIntentEnded(
                                     requireNotNull(context),
                                     currentCall.toBundle()
                                 )
                             )
-                        } else {
+                        }else {
                             context?.sendBroadcast(
                                 CallkitIncomingBroadcastReceiver.getIntentDecline(
                                     requireNotNull(context),
@@ -433,16 +450,19 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         methodChannels.remove(binding.binaryMessenger)?.setMethodCallHandler(null)
         eventChannels.remove(binding.binaryMessenger)?.setStreamHandler(null)
+        eventHandlers.remove(binding.binaryMessenger)
+
         // Only destroy and null the shared managers when the LAST engine detaches.
         // When multiple engines are attached (e.g. main UI engine + FCM background
         // isolate engine), tearing down the main engine must not pull the managers
         // out from under the background isolate that still needs them.
-        if (methodChannels.isEmpty()) {
+        if (methodChannels.isEmpty() && eventChannels.isEmpty()) {
             instance.callkitSoundPlayerManager?.destroy()
             instance.callkitNotificationManager?.destroy()
             instance.callkitSoundPlayerManager = null
             instance.callkitNotificationManager = null
         }
+        Log.d(TAG, "onDetachedFromEngine")
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -461,16 +481,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     override fun onDetachedFromActivity() {
-        // SnowChat fork fix (2026-05-06): do NOT null instance.context here.
-        // Upstream nulls context on activity detach, which silently breaks
-        // FCM background-isolate-driven showCallkitIncoming() the moment the
-        // user swipe-up-dismisses the app: MainActivity dies → onDetached
-        // fires → context = null → context?.sendBroadcast(...) becomes a
-        // no-op when the FCM payload arrives → no Telecom Connection → no
-        // banner / ringtone. context is initialized in onAttachedToEngine
-        // with applicationContext, which is process-scoped and remains
-        // valid until the process itself is killed. Only the Activity
-        // reference must be released here.
+        // Keep instance.context alive. It is the applicationContext, shared by
+        // every engine attachment and safe to hold for the lifetime of the JVM.
+        // Nulling it here would break background-isolate method channel calls
+        // (showCallkitIncoming relies on `context?.sendBroadcast(...)`) whenever
+        // the activity is destroyed while a cached background engine keeps the
+        // static `instance` alive.
         instance.activity = null
     }
 
@@ -512,4 +528,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         )
         return true
     }
+
+
 }

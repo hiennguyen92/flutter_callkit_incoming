@@ -25,8 +25,7 @@ Future<void> showCallkitIncoming(String uuid) async {
     handle: '0123456789',
     type: 0,
     duration: 30000,
-    textAccept: 'Accept',
-    textDecline: 'Decline',
+    isAccepted: false,
     missedCallNotification: const NotificationParams(
       showNotification: true,
       isShowCallback: true,
@@ -44,6 +43,8 @@ Future<void> showCallkitIncoming(String uuid) async {
       backgroundUrl: 'assets/test.png',
       actionColor: '#4CAF50',
       textColor: '#ffffff',
+      textAccept: 'Accept',
+      textDecline: 'Decline',
     ),
     ios: const IOSParams(
       iconName: 'CallKitLogo',
@@ -102,30 +103,28 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     await Permission.notification.status;
   }
 
-  Future<dynamic> getCurrentCall() async {
-    //check current call from pushkit if possible
-    var calls = await FlutterCallkitIncoming.activeCalls();
-    if (calls is List) {
-      if (calls.isNotEmpty) {
-        print('DATA: $calls');
-        if(calls[0]['id'] != null && calls[0]['isAccepted'] == true) {
-          _currentUuid = calls[0]['id'];
-          return calls[0];
-        } else {
-          _currentUuid = "";
-          return null;
-        }
-      } else {
-        _currentUuid = "";
-        return null;
+  Future<CallKitParams?> getCurrentCall() async {
+    final calls = await FlutterCallkitIncoming.activeCalls();
+    if (calls.isNotEmpty) {
+      print('DATA: $calls');
+      if (calls[0].isAccepted) {
+        _currentUuid = calls[0].id;
+        return calls[0];
       }
+      _currentUuid = "";
+      return null;
     }
+    _currentUuid = "";
+    return null;
   }
 
   Future<void> checkAndNavigationCallingPage() async {
-    var currentCall = await getCurrentCall();
+    final currentCall = await getCurrentCall();
     if (currentCall != null) {
-      NavigationService.instance.pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
+      NavigationService.instance.pushNamedIfNotCurrent(
+        AppRoute.callingPage,
+        args: currentCall.id,
+      );
     }
   }
 

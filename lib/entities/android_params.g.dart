@@ -17,8 +17,6 @@ AndroidParams _$AndroidParamsFromJson(Map<String, dynamic> json) =>
       backgroundColor: json['backgroundColor'] as String?,
       backgroundUrl: json['backgroundUrl'] as String?,
       actionColor: json['actionColor'] as String?,
-      acceptColor: json['acceptColor'] as String?,
-      declineColor: json['declineColor'] as String?,
       textColor: json['textColor'] as String?,
       incomingCallNotificationChannelName:
           json['incomingCallNotificationChannelName'] as String?,
@@ -27,6 +25,10 @@ AndroidParams _$AndroidParamsFromJson(Map<String, dynamic> json) =>
       isShowFullLockedScreen: json['isShowFullLockedScreen'] as bool?,
       isImportant: json['isImportant'] as bool?,
       isBot: json['isBot'] as bool?,
+      isFullScreen: json['isFullScreen'] as bool?,
+      from: json['from'] as String?,
+      textAccept: json['textAccept'] as String?,
+      textDecline: json['textDecline'] as String?,
     );
 
 Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
@@ -40,8 +42,6 @@ Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
       'backgroundColor': instance.backgroundColor,
       'backgroundUrl': instance.backgroundUrl,
       'actionColor': instance.actionColor,
-      'acceptColor': instance.acceptColor,
-      'declineColor': instance.declineColor,
       'textColor': instance.textColor,
       'incomingCallNotificationChannelName':
           instance.incomingCallNotificationChannelName,
@@ -50,4 +50,8 @@ Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
       'isShowFullLockedScreen': instance.isShowFullLockedScreen,
       'isImportant': instance.isImportant,
       'isBot': instance.isBot,
+      'isFullScreen': instance.isFullScreen,
+      'from': instance.from,
+      'textAccept': instance.textAccept,
+      'textDecline': instance.textDecline,
     };

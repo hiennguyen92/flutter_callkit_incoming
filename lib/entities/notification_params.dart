@@ -23,5 +23,18 @@ class NotificationParams {
 
   factory NotificationParams.fromJson(Map<String, dynamic> json) =>
       _$NotificationParamsFromJson(json);
+
   Map<String, dynamic> toJson() => _$NotificationParamsToJson(this);
+
+  @override
+  String toString() {
+    return 'NotificationParams{'
+        'id: $id, '
+        'showNotification: $showNotification, '
+        'subtitle: $subtitle, '
+        'callbackText: $callbackText, '
+        'isShowCallback: $isShowCallback, '
+        'count: $count'
+        '}';
+  }
 }

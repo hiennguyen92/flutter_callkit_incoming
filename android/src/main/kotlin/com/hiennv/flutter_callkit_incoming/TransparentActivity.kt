@@ -8,6 +8,8 @@ import android.os.Bundle
 class TransparentActivity : Activity() {
 
     companion object {
+        var isVisible: Boolean = false
+
         fun getIntent(context: Context, action: String, data: Bundle?): Intent {
             val intent = Intent(context, TransparentActivity::class.java)
             intent.action = action

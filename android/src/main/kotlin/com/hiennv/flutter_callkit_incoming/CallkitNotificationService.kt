@@ -9,7 +9,6 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 
 class CallkitNotificationService : Service() {
@@ -100,9 +99,8 @@ class CallkitNotificationService : Service() {
 
     private fun startForeground(notificationId: Int, notification: Notification, isVideo: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            var mask =
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // 30+
+            var mask = ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 mask = mask or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
                 if (isVideo) {
                     mask = mask or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
@@ -128,6 +126,6 @@ class CallkitNotificationService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        //  Don't kill the FGS. the app might be closed by user but the call is still ongoing
+        // Don't kill the FGS. The app might be closed by user but the call is still ongoing
     }
 }

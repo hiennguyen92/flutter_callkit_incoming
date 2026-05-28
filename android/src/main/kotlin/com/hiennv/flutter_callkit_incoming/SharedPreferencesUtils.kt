@@ -16,8 +16,8 @@ private fun initInstance(context: Context) {
 }
 
 fun addBackgroundCallback(context: Context?, pluginHandler: Long, userHandle: Long) {
-   putLong(context, "CALLBACK_HANDLE", pluginHandler)
-   putLong(context, "CALLBACK_USER_HANDLE", userHandle)
+    putLong(context, "CALLBACK_HANDLE", pluginHandler)
+    putLong(context, "CALLBACK_USER_HANDLE", userHandle)
 }
 
 fun addCall(context: Context?, data: Data, isAccepted: Boolean = false) {
@@ -98,4 +98,17 @@ fun remove(context: Context?, key: String) {
     initInstance(context)
     editor?.remove(key)
     editor?.commit()
+}
+
+fun saveHandle(context: Context?, key: String, handle: Int) {
+    if (context == null) return
+    initInstance(context)
+    editor?.putInt(key, handle)
+    editor?.commit()
+}
+
+fun getRawHandle(context: Context?, key: String): Int? {
+    if (context == null) return null
+    initInstance(context)
+    return prefs?.getInt(key, 0)
 }

@@ -5,6 +5,10 @@
 //  Created by Hien Nguyen on 2/8/25.
 //
 
+import Foundation
+import UIKit
+import UserNotifications
+
 public class CallkitNotificationManager: NSObject {
     
     public static let MISSED_CALL_CATEGORY = "MISSED_CALL_CATEGORY"
