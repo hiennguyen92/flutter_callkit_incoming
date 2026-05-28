@@ -1,6 +1,7 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 
 class CallkitNotificationService : Service() {
@@ -45,8 +47,10 @@ class CallkitNotificationService : Service() {
 
     }
 
-    private val callkitNotificationManager: CallkitNotificationManager? =
-        FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
+    // Get notification manager dynamically to handle plugin lifecycle properly
+    private fun getCallkitNotificationManager(): CallkitNotificationManager? {
+        return FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
+    }
 
 
     override fun onCreate() {
@@ -58,8 +62,7 @@ class CallkitNotificationService : Service() {
             intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
                 ?.let {
                     if(it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
-                        FlutterCallkitIncomingPlugin.getInstance()?.getCallkitNotificationManager()
-                            ?.createNotificationChanel(it)
+                        getCallkitNotificationManager()?.createNotificationChanel(it)
                         showOngoingCallNotification(it)
                     }else {
                         stopSelf()
@@ -69,7 +72,7 @@ class CallkitNotificationService : Service() {
         if (intent?.action === CallkitConstants.ACTION_CALL_ACCEPT) {
             intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
                 ?.let {
-                    callkitNotificationManager?.clearIncomingNotification(it, true)
+                    getCallkitNotificationManager()?.clearIncomingNotification(it, true)
                     if (it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
                         showOngoingCallNotification(it)
                     }else {
@@ -84,24 +87,38 @@ class CallkitNotificationService : Service() {
     private fun showOngoingCallNotification(bundle: Bundle) {
 
         val callkitNotification =
-            this.callkitNotificationManager?.getOnGoingCallNotification(bundle, false)
+            getCallkitNotificationManager()?.getOnGoingCallNotification(bundle, false)
         if (callkitNotification != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(
-                    callkitNotification.id,
-                    callkitNotification.notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                )
-            } else {
-                startForeground(callkitNotification.id, callkitNotification.notification)
+            val typeCall = bundle.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
+            startForeground(
+                callkitNotification.id,
+                callkitNotification.notification,
+                typeCall > 0
+            )
+        }
+    }
+
+    private fun startForeground(notificationId: Int, notification: Notification, isVideo: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            var mask =
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // 30+
+                mask = mask or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                if (isVideo) {
+                    mask = mask or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+                }
             }
+            startForeground(notificationId, notification, mask)
+        } else {
+            startForeground(notificationId, notification)
         }
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        callkitNotificationManager?.destroy()
+        // Don't destroy the notification manager here as it's shared across the app
+        // The plugin will handle cleanup when all engines are detached
     }
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -111,15 +128,6 @@ class CallkitNotificationService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        }else {
-            stopForeground(true)
-        }
-        stopSelf()
+        //  Don't kill the FGS. the app might be closed by user but the call is still ongoing
     }
-
-
-
 }
-
