@@ -13,7 +13,7 @@ Flutter Callkit Incoming
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Hien Nguyen' => 'hien@hiennv.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'flutter_callkit_incoming/Classes/**/*'
   s.dependency 'Flutter'
   s.dependency 'CryptoSwift'
   s.platform = :ios, '10.0'
