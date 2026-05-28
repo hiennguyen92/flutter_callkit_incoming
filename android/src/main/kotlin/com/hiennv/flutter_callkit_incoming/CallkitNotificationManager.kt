@@ -1,3 +1,10 @@
+//  Modification by Signify in this file are under the following license:
+//
+//  Copyright 2024, Signify Holding
+//  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 package com.hiennv.flutter_callkit_incoming
 
 import android.Manifest
@@ -7,11 +14,14 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.media.AudioManager
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
@@ -39,13 +49,18 @@ class CallkitNotificationManager(
 
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
-        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
+        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id_v2"
+        private const val LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
         const val NOTIFICATION_CHANNEL_ID_ONGOING = "callkit_ongoing_channel_id"
         const val NOTIFICATION_CHANNEL_ID_MISSED = "callkit_missed_channel_id"
 
     }
 
     private var dataNotificationPermission: Map<String, Any> = HashMap()
+
+    // Start Signify modification
+    private var volumeKeyReceiver: VolumeKeyBroadcastReceiver? = null
+    // End Signify modification
 
     private var notificationBuilder: NotificationCompat.Builder? = null
     private var notificationViews: RemoteViews? = null
@@ -588,12 +603,10 @@ class CallkitNotificationManager(
             data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)
         if (!isCallingNotificationShow) return null
 
-        val callingId = data.getString(
+        val onGoingNotificationId = data.getString(
             CallkitConstants.EXTRA_CALLKIT_CALLING_ID,
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming")
-        )
-
-        val onGoingNotificationId = ("ongoing_$callingId").hashCode()
+        ).hashCode()
 
         notificationOngoingBuilder = NotificationCompat.Builder(
             context, NOTIFICATION_CHANNEL_ID_ONGOING
@@ -823,8 +836,19 @@ class CallkitNotificationManager(
         return notification?.let { CallkitNotification(onGoingNotificationId, it) }
     }
 
-
     fun clearIncomingNotification(data: Bundle, isAccepted: Boolean) {
+        // Start Signify modification
+        // Unregister volume key receiver
+        volumeKeyReceiver?.let {
+            try {
+                context.unregisterReceiver(it)
+            } catch (e: Exception) {
+                // Ignore Receiver may not be registered
+            }
+            volumeKeyReceiver = null
+        }
+        // End Signify modification
+
         callkitSoundPlayerManager?.stop()
 
         context.sendBroadcast(CallkitIncomingActivity.getIntentEnded(context, isAccepted))
@@ -990,11 +1014,30 @@ class CallkitNotificationManager(
         return NotificationManagerCompat.from(context)
     }
 
+    // Start Signify modification
+    inner class VolumeKeyBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
+                if (callkitSoundPlayerManager?.isPlaying == true) {
+                    callkitSoundPlayerManager.stop()
+                }
+            }
+        }
+    }
+    // End Signify modification
+
     @SuppressLint("MissingPermission")
     fun showIncomingNotification(data: Bundle) {
         val callkitNotification = getIncomingNotification(data)
         if (incomingChannelEnabled()) {
             callkitSoundPlayerManager?.play(data)
+            // Start Signify modification
+            volumeKeyReceiver = VolumeKeyBroadcastReceiver()
+            context.registerReceiver(
+                volumeKeyReceiver,
+                IntentFilter("android.media.VOLUME_CHANGED_ACTION")
+            )
+            // End Signify modification
         }
         callkitNotification?.let {
             getNotificationManager().notify(
@@ -1011,6 +1054,7 @@ class CallkitNotificationManager(
                 callkitNotification.id, it.notification
             )
         }
+        callkitSoundPlayerManager?.stop()
     }
 
 
@@ -1094,6 +1138,7 @@ class CallkitNotificationManager(
                                         Uri.fromParts("package", it.packageName, null)
                                     )
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                                     it.startActivity(intent)
                                 }
                             } else {
@@ -1108,6 +1153,7 @@ class CallkitNotificationManager(
                                         Uri.fromParts("package", it.packageName, null)
                                     )
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                                     it.startActivity(intent)
                                 }
                             }

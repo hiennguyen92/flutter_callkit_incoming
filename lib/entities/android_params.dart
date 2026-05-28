@@ -2,6 +2,13 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'android_params.g.dart';
 
+/// DMTF action type enum
+enum DTMFActionType {
+  singleTone,
+  softPause,
+  hardPause,
+}
+
 /// Object config for Android.
 @JsonSerializable(explicitToJson: true)
 class AndroidParams {
@@ -21,6 +28,10 @@ class AndroidParams {
     this.isShowFullLockedScreen,
     this.isImportant,
     this.isBot,
+    this.isFullScreen,
+    this.from,
+    this.textAccept,
+    this.textDecline,
   });
 
   /// Using custom notifications.
@@ -70,8 +81,44 @@ class AndroidParams {
   /// https://developer.android.com/reference/androidx/core/app/Person#isBot()
   final bool? isBot;
 
+  /// Show incoming call as full-screen activity instead of notification.
+  final bool? isFullScreen;
+
+  final String? from;
+
+  /// Text for accept button
+  final String? textAccept;
+
+  /// Text for decline button
+  final String? textDecline;
+
   factory AndroidParams.fromJson(Map<String, dynamic> json) =>
       _$AndroidParamsFromJson(json);
 
   Map<String, dynamic> toJson() => _$AndroidParamsToJson(this);
+
+  @override
+  String toString() {
+    return 'AndroidParams{'
+        'isCustomNotification: $isCustomNotification, '
+        'isCustomSmallExNotification: $isCustomSmallExNotification, '
+        'isShowLogo: $isShowLogo, '
+        'logoUrl: $logoUrl, '
+        'isShowCallID: $isShowCallID, '
+        'ringtonePath: $ringtonePath, '
+        'backgroundColor: $backgroundColor, '
+        'backgroundUrl: $backgroundUrl, '
+        'actionColor: $actionColor, '
+        'textColor: $textColor, '
+        'incomingCallNotificationChannelName: $incomingCallNotificationChannelName, '
+        'missedCallNotificationChannelName: $missedCallNotificationChannelName, '
+        'isShowFullLockedScreen: $isShowFullLockedScreen, '
+        'isImportant: $isImportant, '
+        'isBot: $isBot, '
+        'isFullScreen: $isFullScreen, '
+        'from: $from, '
+        'textAccept: $textAccept, '
+        'textDecline: $textDecline'
+        '}';
+  }
 }

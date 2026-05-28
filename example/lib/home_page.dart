@@ -113,20 +113,16 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-  Future<dynamic> initCurrentCall() async {
+  Future<CallKitParams?> initCurrentCall() async {
     await requestNotificationPermission();
-    //check current call from pushkit if possible
-    var calls = await FlutterCallkitIncoming.activeCalls();
-    if (calls is List) {
-      if (calls.isNotEmpty) {
-        print('DATA: $calls');
-        _currentUuid = calls[0]['id'];
-        return calls[0];
-      } else {
-        _currentUuid = "";
-        return null;
-      }
+    final calls = await FlutterCallkitIncoming.activeCalls();
+    if (calls.isNotEmpty) {
+      print('DATA: $calls');
+      _currentUuid = calls[0].id;
+      return calls[0];
     }
+    _currentUuid = "";
+    return null;
   }
 
   Future<void> makeFakeCallInComing() async {
@@ -134,15 +130,14 @@ class HomePageState extends State<HomePage> {
       _currentUuid = _uuid.v4();
 
       final params = CallKitParams(
-        id: _currentUuid,
+        id: _currentUuid!,
         nameCaller: 'Hien Nguyen',
         appName: 'Callkit',
         avatar: 'https://fastly.picsum.photos/id/773/200/300.jpg?hmac=nhH4e4UtqcS6I0hy7eCr9waIFzMYNaMkzety6PQnOHM',
         handle: '0123456789',
         type: 0,
         duration: 30000,
-        textAccept: 'Accept',
-        textDecline: 'Decline',
+        isAccepted: false,
         missedCallNotification: const NotificationParams(
           showNotification: true,
           isShowCallback: true,
@@ -171,6 +166,8 @@ class HomePageState extends State<HomePage> {
           missedCallNotificationChannelName: 'Missed Call',
           isImportant: true,
           isBot: false,
+          textAccept: 'Accept',
+          textDecline: 'Decline',
         ),
         ios: const IOSParams(
           iconName: 'CallKitLogo',
@@ -201,7 +198,7 @@ class HomePageState extends State<HomePage> {
   Future<void> startOutGoingCall() async {
     _currentUuid = _uuid.v4();
     final params = CallKitParams(
-        id: _currentUuid,
+        id: _currentUuid!,
         nameCaller: 'Hien Nguyen',
         handle: '0123456789',
         type: 1,
@@ -235,62 +232,48 @@ class HomePageState extends State<HomePage> {
     print(devicePushTokenVoIP);
   }
 
-  Future<void> listenerEvent(void Function(CallEvent) callback) async {
+  Future<void> listenerEvent(void Function(CallEvent?) callback) async {
     try {
       FlutterCallkitIncoming.onEvent.listen((event) async {
         print('HOME: $event');
-        switch (event!.event) {
-          case Event.actionCallIncoming:
-            // TODO: received an incoming call
+        switch (event) {
+          case CallEventActionCallIncoming():
             break;
-          case Event.actionCallStart:
-            // TODO: started an outgoing call
-            // TODO: show screen calling in Flutter
+          case CallEventActionCallStart():
             NavigationService.instance
-                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
+                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.id);
             break;
-          case Event.actionCallAccept:
-            // TODO: accepted an incoming call
-            // TODO: show screen calling in Flutter
+          case CallEventActionCallAccept():
             NavigationService.instance
-                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
+                .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.id);
             break;
-          case Event.actionCallDecline:
-            // TODO: declined an incoming call
+          case CallEventActionCallDecline():
             await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
             break;
-          case Event.actionCallEnded:
-            // TODO: ended an incoming/outgoing call
-            // TOTO: have check correct current call
+          case CallEventActionCallEnded():
             NavigationService.instance.popUntil(AppRoute.homePage);
             break;
-          case Event.actionCallConnected:
+          case CallEventActionCallConnected():
             break;
-          case Event.actionCallTimeout:
-            // TODO: missed an incoming call
+          case CallEventActionCallTimeout():
             break;
-          case Event.actionCallCallback:
-            // TODO: only Android - click action `Call back` from missed call notification
+          case CallEventActionCallCallback():
             break;
-          case Event.actionCallToggleHold:
-            // TODO: only iOS
+          case CallEventActionCallToggleHold():
             break;
-          case Event.actionCallToggleMute:
-            // TODO: only iOS
+          case CallEventActionCallToggleMute():
             break;
-          case Event.actionCallToggleDmtf:
-            // TODO: only iOS
+          case CallEventActionCallToggleDmtf():
             break;
-          case Event.actionCallToggleGroup:
-            // TODO: only iOS
+          case CallEventActionCallToggleGroup():
             break;
-          case Event.actionCallToggleAudioSession:
-            // TODO: only iOS
+          case CallEventActionCallToggleAudioSession():
             break;
-          case Event.actionDidUpdateDevicePushTokenVoip:
-            // TODO: only iOS
+          case CallEventActionDidUpdateDevicePushTokenVoip():
             break;
-          case Event.actionCallCustom:
+          case CallEventActionCallCustom():
+            break;
+          case null:
             break;
         }
         callback(event);
@@ -301,12 +284,11 @@ class HomePageState extends State<HomePage> {
   }
 
   //check with https://events.hiennv.com
-  Future<void> requestHttp(content) async {
-    get(Uri.parse(
-        'https://events.hiennv.com/api/logs?data=$content'));
+  Future<void> requestHttp(String content) async {
+    get(Uri.parse('https://events.hiennv.com/api/logs?data=$content'));
   }
 
-  void onEvent(CallEvent event) {
+  void onEvent(CallEvent? event) {
     if (!mounted) return;
     setState(() {
       textEvents += '-----------------------\n${event.toString()}\n';

@@ -4,10 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 
 class TransparentActivity : Activity() {
 
     companion object {
+        var isVisible: Boolean = false
+
         fun getIntent(context: Context, action: String, data: Bundle?): Intent {
             val intent = Intent(context, TransparentActivity::class.java)
             intent.action = action
@@ -30,13 +33,20 @@ class TransparentActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val action = intent.action
+        if (action == null) {
+            Log.w("TransparentActivity", "Intent action is null, finishing activity")
+            finish()
+            return
+        }
+
         val data = intent.getBundleExtra("data")
 
-        val broadcastIntent = CallkitIncomingBroadcastReceiver.getIntent(this, intent.action!!, data)
+        val broadcastIntent = CallkitIncomingBroadcastReceiver.getIntent(this, action, data)
         broadcastIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
         sendBroadcast(broadcastIntent)
 
-        val activityIntent = AppUtils.getAppIntent(this, intent.action, data)
+        val activityIntent = AppUtils.getAppIntent(this, action, data)
         startActivity(activityIntent)
 
         finish()

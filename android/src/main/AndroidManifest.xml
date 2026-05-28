@@ -11,6 +11,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.TURN_SCREEN_ON" />
 
     <uses-permission android:name="${applicationId}.PERMISSION_CALL" />
 
@@ -22,7 +27,7 @@
 
         <activity
             android:name="com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity"
-            android:taskAffinity="com.hiennv.flutter_callkit_incoming.INCOMING_CALL_AFFINITY"
+            android:taskAffinity=""
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:turnScreenOn="true"
@@ -40,6 +45,8 @@
         <activity
             android:exported="false"
             android:theme="@style/TranslucentTheme"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
             android:name="com.hiennv.flutter_callkit_incoming.TransparentActivity"/>
 
         <receiver
@@ -59,14 +66,16 @@
         <service
             android:enabled="true"
             android:exported="true"
-            android:foregroundServiceType="phoneCall"
+            android:stopWithTask="false"
+            android:foregroundServiceType="phoneCall|microphone|camera"
             android:permission="${applicationId}.PERMISSION_CALL"
             android:name="com.hiennv.flutter_callkit_incoming.CallkitNotificationService">
         </service>
 
         <service
             android:name="com.hiennv.flutter_callkit_incoming.CallkitConnectionService"
-            android:permission="android.permission.BIND_CONNECTION_SERVICE"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
+            android:foregroundServiceType="phoneCall"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.telecom.ConnectionService" />

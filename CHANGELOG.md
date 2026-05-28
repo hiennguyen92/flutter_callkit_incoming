@@ -1,3 +1,23 @@
+## 3.1.0
+* Add native **Swift Package Manager (SPM)** support for iOS with auto-linked `CryptoSwift` dependency.
+* Add explicit Objective-C compatible overload `showCallkitIncoming(_:fromPushKit:)` in `SwiftFlutterCallkitIncomingPlugin` to fix compilation issues in native Objective-C runner.
+* Conform `AppDelegate` in example project to `CallkitIncomingAppDelegate` by implementing the missing `providerDidReset()` method.
+* Update environment constraints in `pubspec.yaml` to require Dart SDK `>=3.0.0` and Flutter `>=3.10.0`.
+* Add optional `onError` completion handler to `showCallkitIncoming` for iOS, thank @nukeolay https://github.com/hiennguyen92/flutter_callkit_incoming/pull/803
+* Implement self-managed Telecom ConnectionService on Android, thank @kennss https://github.com/hiennguyen92/flutter_callkit_incoming/pull/809
+* Add Background Message Handler and Enhanced Android Foreground Service Support, thank @fedehsq https://github.com/hiennguyen92/flutter_callkit_incoming/pull/800
+* Fix Android duplicated notification on call connected event, thank @skutimechanic https://github.com/hiennguyen92/flutter_callkit_incoming/pull/764
+* Refactor and improve type safety, thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/772
+* Implement volume key handling to mute incoming call sound on key press, thank @jawad1257 https://github.com/hiennguyen92/flutter_callkit_incoming/pull/781
+* Fix ongoing ringtone and vibrations on the action call connected, thank @skutimechanic https://github.com/hiennguyen92/flutter_callkit_incoming/pull/783
+* Add custom color option for accept and decline buttons for Android, thank @baldarama https://github.com/hiennguyen92/flutter_callkit_incoming/pull/790
+* Fix Android ringtone/vibration stopping on auto lock, thank @phildupuis https://github.com/hiennguyen92/flutter_callkit_incoming/pull/792
+* Dynamically update CXProvider configuration for subsequent calls on iOS, thank @MS-Rex https://github.com/hiennguyen92/flutter_callkit_incoming/pull/805
+* Fix Android showCallkitIncoming silently dropping calls when host process is kept alive, thank @sherzodkamoldinov https://github.com/hiennguyen92/flutter_callkit_incoming/pull/808
+* Refactor notification and sound management: Updated incoming notification, thank @AbdurahmanAlmehdi https://github.com/hiennguyen92/flutter_callkit_incoming/pull/812
+* Fix iOS outgoing call actionCallAccept emitting default/empty Data instead of original call params, thank @mechtech-mind https://github.com/hiennguyen92/flutter_callkit_incoming/pull/813
+* Fix and handle null intent.action in TransparentActivity, thank @AlexBacich https://github.com/hiennguyen92/flutter_callkit_incoming/pull/814
+
 ## 3.0.0
 * Using Plugin DSL for Android, thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/743
 * Add Android native callback, thank @joshoconnor89 https://github.com/hiennguyen92/flutter_callkit_incoming/pull/736

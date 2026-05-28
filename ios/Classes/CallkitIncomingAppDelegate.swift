@@ -24,4 +24,6 @@ public protocol CallkitIncomingAppDelegate : NSObjectProtocol {
     
     func didDeactivateAudioSession(_ audioSession: AVAudioSession)
     
+    func providerDidReset()
+
 }
