@@ -26,6 +26,19 @@ Our top sponsors are shown below!
   <img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174">
 </a>
 
+## 📌 Table of Contents
+- [⭐ Features](#-features)
+- [🚀 Installation](#-installation)
+  - [1. Install Packages](#1-install-packages)
+  - [2. Configure Project](#2-configure-project)
+    - [Android Configuration](#android)
+    - [iOS Configuration](#ios)
+    - [Swift Package Manager (SPM) Support](#swift-package-manager-spm-support-flutter-324)
+  - [3. Usage](#3-usage)
+- [📋 Properties](#-properties)
+- [📱 Pushkit Setup](#-pushkit---received-voip-and-wake-app-from-terminated-state-ios-only)
+- [🎯 Demo](#-demo)
+
 ## ⭐ Features
 
 - Show an incoming call
@@ -33,11 +46,11 @@ Our top sponsors are shown below!
 - Custom UI Android/Callkit for iOS
 - Example using Pushkit/VoIP for iOS
 
-## ⚠️ iOS: ONLY WORKING ON REAL DEVICE
-
-**Please make sure setup/using [PUSHKIT](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/PUSHKIT.md) FOR VOIP**
-
-> **Note:** Please do not use on simulator (Callkit framework not working on simulator)
+> [!WARNING]
+> ### iOS: ONLY WORKING ON REAL DEVICE
+> **Please make sure setup/using [PUSHKIT](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/PUSHKIT.md) FOR VOIP**
+>
+> *Note:* Please do not use on simulator (Callkit framework is not fully supported on simulator for incoming VoIP calls).
 
 ## 🚀 Installation
 
@@ -93,6 +106,17 @@ The following rule needs to be added in the `proguard-rules.pro` to avoid obfusc
     <string>processing</string> <!-- you can add this if needed -->
 </array>
 ```
+
+#### Swift Package Manager (SPM) Support (Flutter 3.24+)
+
+This plugin natively supports Swift Package Manager (SPM). To configure your project to build using SPM instead of CocoaPods, run:
+
+```bash
+flutter config --enable-swift-package-manager
+```
+
+> [!IMPORTANT]
+> Swift Package Manager is highly recommended for modern Flutter projects as CocoaPods is in maintenance mode and will become read-only in December 2026.
 
 ### 3. Usage
 
@@ -666,7 +690,8 @@ Please check [PUSHKIT.md](https://github.com/hiennguyen92/flutter_callkit_incomi
 
 ## 📋 Todo
 
-- [ ] Run background
+- [X] Run background / background execution support (implemented via self-managed Telecom service & didActivate background replay cache)
+- [X] Swift Package Manager (SPM) support
 - [ ] Simplify the setup process
 - [X] Custom notification for iOS (Missing notification)
 - [X] Keep notification when calling
