@@ -1,3 +1,8 @@
+## 3.1.1
+* Reorganize iOS native source directory to support Swift Package Manager (SPM) by placing all source files inside the package root (`ios/flutter_callkit_incoming/Classes/`).
+* Resolve SPM mixed-language constraint by removing Objective-C wrappers and implementing a pure-Swift registrar class `@objc(FlutterCallkitIncomingPlugin)` to ensure seamless CocoaPods backward compatibility.
+* Modernize example app's Objective-C imports in `AppDelegate.m` using Clang module import syntax `@import flutter_callkit_incoming;`.
+
 ## 3.1.0
 * Add native **Swift Package Manager (SPM)** support for iOS with auto-linked `CryptoSwift` dependency.
 * Add explicit Objective-C compatible overload `showCallkitIncoming(_:fromPushKit:)` in `SwiftFlutterCallkitIncomingPlugin` to fix compilation issues in native Objective-C runner.
