@@ -226,10 +226,10 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             if(self.isFromPushKit){
                 self.connectedCall(self.data!)
             }else{
-                if let getArgs = args as? [String: Any] {
+                    if let getArgs = args as? [String: Any] {
                     self.data = Data(args: getArgs)
                     self.connectedCall(self.data!)
-                }
+                    }
             }
             result(true)
             break
@@ -790,21 +790,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         call.hasConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
         }
-        self.data?.isAccepted = true
+        call.data.isAccepted = true
         self.answerCall = call
-        let acceptPayload = self.data?.toJSON()
-        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, acceptPayload)
-
-        // Phase 8.2 v2.2 — Cache for replay (5s window). If the FlutterEngine
-        // isolate was paused or CallNotifier hadn't bound the listener at the
-        // moment of the sendEvent above, the event was silently dropped at
-        // EventCallbackHandler.send (eventSink == nil). Dart invokes
-        // replayLastAcceptIfRecent right after attaching, recovering the lost
-        // tap so the user doesn't have to tap twice.
-        if let payload = acceptPayload {
-            lastAcceptCache = (data: payload, ts: Date().timeIntervalSince1970)
-        }
-
+        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, call.data.toJSON())
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.onAccept(call, action)
         }else {
