@@ -39,7 +39,8 @@ class CallkitNotificationManager(
 
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
-        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
+        const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id_v2"
+        private const val LEGACY_NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
         const val NOTIFICATION_CHANNEL_ID_ONGOING = "callkit_ongoing_channel_id"
         const val NOTIFICATION_CHANNEL_ID_MISSED = "callkit_missed_channel_id"
 
@@ -588,12 +589,10 @@ class CallkitNotificationManager(
             data.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)
         if (!isCallingNotificationShow) return null
 
-        val callingId = data.getString(
+        val onGoingNotificationId = data.getString(
             CallkitConstants.EXTRA_CALLKIT_CALLING_ID,
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming")
-        )
-
-        val onGoingNotificationId = ("ongoing_$callingId").hashCode()
+        ).hashCode()
 
         notificationOngoingBuilder = NotificationCompat.Builder(
             context, NOTIFICATION_CHANNEL_ID_ONGOING
@@ -1011,6 +1010,7 @@ class CallkitNotificationManager(
                 callkitNotification.id, it.notification
             )
         }
+        callkitSoundPlayerManager?.stop()
     }
 
 

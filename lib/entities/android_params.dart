@@ -15,6 +15,8 @@ class AndroidParams {
     this.backgroundColor,
     this.backgroundUrl,
     this.actionColor,
+    this.acceptColor,
+    this.declineColor,
     this.textColor,
     this.incomingCallNotificationChannelName,
     this.missedCallNotificationChannelName,
@@ -49,6 +51,12 @@ class AndroidParams {
 
   /// Color used in button/text on notification.
   final String? actionColor;
+
+  /// Color used in accept button on notification.
+  final String? acceptColor;
+
+  /// Color used in decline button on notification.
+  final String? declineColor;
 
   /// Color used for the text in the full screen notification
   final String? textColor;

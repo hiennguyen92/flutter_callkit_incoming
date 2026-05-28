@@ -7,6 +7,7 @@ import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_callkit_incoming_example/app_router.dart';
 import 'package:flutter_callkit_incoming_example/navigation_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -89,9 +90,16 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     initFirebase();
     WidgetsBinding.instance.addObserver(this);
     FlutterCallkitIncoming.requestFullIntentPermission();
+    setupPermissions();
 
     //Check call when open app from terminated
     checkAndNavigationCallingPage();
+  }
+
+  Future<void> setupPermissions() async {
+    await Permission.camera.status;
+    await Permission.microphone.status;
+    await Permission.notification.status;
   }
 
   Future<dynamic> getCurrentCall() async {

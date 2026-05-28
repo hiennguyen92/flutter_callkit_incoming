@@ -1,5 +1,7 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.app.ActivityManager
+import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -12,7 +14,6 @@ class Utils {
     companion object {
 
         private var mapper: ObjectMapper? = null
-
 
         fun getGsonInstance(): ObjectMapper {
             if (mapper == null) {
