@@ -1009,6 +1009,7 @@ class CallkitNotificationManager(
                 callkitNotification.id, it.notification
             )
         }
+        callkitSoundPlayerManager?.stop()
     }
 
 
