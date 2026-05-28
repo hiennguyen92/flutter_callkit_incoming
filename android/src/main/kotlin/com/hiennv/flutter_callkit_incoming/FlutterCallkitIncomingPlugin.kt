@@ -111,9 +111,19 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         fun initSharedInstance(context: Context, binaryMessenger: BinaryMessenger) {
             if (!::instance.isInitialized) {
                 instance = FlutterCallkitIncomingPlugin()
+            }
+            // Restore instance fields that may have been nulled during a previous
+            // detach. The static `instance` survives across FlutterEngine teardown
+            // when the host process is kept alive (e.g. foreground services),
+            // so `onAttachedToEngine` must refresh these fields every time;
+            // otherwise background-isolate calls end up as silent no-ops.
+            if (instance.callkitSoundPlayerManager == null) {
                 instance.callkitSoundPlayerManager = CallkitSoundPlayerManager(context)
-                instance.callkitNotificationManager =
-                    CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
+            }
+            if (instance.callkitNotificationManager == null) {
+                instance.callkitNotificationManager = CallkitNotificationManager(context, instance.callkitSoundPlayerManager)
+            }
+            if (instance.context == null) {
                 instance.context = context
             } else {
                 // Re-initialize managers if they were destroyed but instance still exists
@@ -423,17 +433,16 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         methodChannels.remove(binding.binaryMessenger)?.setMethodCallHandler(null)
         eventChannels.remove(binding.binaryMessenger)?.setStreamHandler(null)
-        eventHandlers.remove(binding.binaryMessenger)
-
-        // Only destroy managers when all engine bindings are detached
-        // This prevents issues when foreground services detach but main app is still running
-        if (methodChannels.isEmpty() && eventChannels.isEmpty()) {
+        // Only destroy and null the shared managers when the LAST engine detaches.
+        // When multiple engines are attached (e.g. main UI engine + FCM background
+        // isolate engine), tearing down the main engine must not pull the managers
+        // out from under the background isolate that still needs them.
+        if (methodChannels.isEmpty()) {
             instance.callkitSoundPlayerManager?.destroy()
             instance.callkitNotificationManager?.destroy()
             instance.callkitSoundPlayerManager = null
             instance.callkitNotificationManager = null
         }
-        Log.d(TAG, "onDetachedFromEngine")
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
