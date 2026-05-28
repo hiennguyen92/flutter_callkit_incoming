@@ -876,3 +876,11 @@ class EventCallbackHandler: NSObject, FlutterStreamHandler {
         return nil
     }
 }
+
+@available(iOS 10.0, *)
+@objc(FlutterCallkitIncomingPlugin)
+public class FlutterCallkitIncomingPlugin: NSObject, FlutterPlugin {
+    @objc public static func register(with registrar: FlutterPluginRegistrar) {
+        SwiftFlutterCallkitIncomingPlugin.register(with: registrar)
+    }
+}

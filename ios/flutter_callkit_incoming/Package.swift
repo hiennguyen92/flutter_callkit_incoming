@@ -21,7 +21,7 @@ let package = Package(
             dependencies: [
                 .product(name: "CryptoSwift", package: "CryptoSwift")
             ],
-            path: "../Classes",
+            path: "Classes",
             resources: []
         )
     ]
