@@ -251,25 +251,25 @@ class FlutterCallkitIncoming {
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_START] id is null.');
         }
-        return CallEventActionCallStart(callkitParams.id);
+        return CallEventActionCallStart(callkitParams);
       case CallEventConstants.actionCallAccept:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_ACCEPT] id is null.');
         }
-        return CallEventActionCallAccept(callkitParams.id);
+        return CallEventActionCallAccept(callkitParams);
       case CallEventConstants.actionCallDecline:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_DECLINE] id is null.');
         }
-        return CallEventActionCallDecline(callkitParams.id);
+        return CallEventActionCallDecline(callkitParams);
       case CallEventConstants.actionCallEnded:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
           throw const FormatException('[ACTION_CALL_ENDED] id is null.');
         }
-        return CallEventActionCallEnded(callkitParams.id);
+        return CallEventActionCallEnded(callkitParams);
       case CallEventConstants.actionCallTimeout:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
