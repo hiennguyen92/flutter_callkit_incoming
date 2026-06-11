@@ -381,7 +381,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             return
         }
         if call.isOnHold == onHold {
-            self.sendMuteEvent(callId.uuidString,  onHold)
+            self.sendHoldEvent(callId.uuidString, onHold)
         } else {
             self.callManager.holdCall(call: call, onHold: onHold)
         }
@@ -532,8 +532,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     func createConfiguration(_ data: Data) -> CXProviderConfiguration {
         let configuration = CXProviderConfiguration(localizedName: data.appName)
         configuration.supportsVideo = data.supportsVideo
-        configuration.maximumCallGroups = 1
-        configuration.maximumCallsPerCallGroup = 1
+        // NOTE(alora fork / attended-transfer): keep data-driven values so
+        // callers can set maximumCallGroups = 2 for attended transfer. The
+        // upstream 3.1.1 hardcoded both to 1 (commit 08dfdc9, regression).
+        configuration.maximumCallGroups = data.maximumCallGroups
+        configuration.maximumCallsPerCallGroup = data.maximumCallsPerCallGroup
         
         configuration.supportedHandleTypes = [
             CXHandle.HandleType.generic,
@@ -556,16 +559,16 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         return configuration
     }
     
-    func sendDefaultAudioInterruptionNotificationToStartAudioResource(){
-        var userInfo : [AnyHashable : Any] = [:]
-        let intrepEndeRaw = AVAudioSession.InterruptionType.ended.rawValue
-        userInfo[AVAudioSessionInterruptionTypeKey] = intrepEndeRaw
-        userInfo[AVAudioSessionInterruptionOptionKey] = AVAudioSession.InterruptionOptions.shouldResume.rawValue
-        NotificationCenter.default.post(name: AVAudioSession.interruptionNotification, object: self, userInfo: userInfo)
-    }
+    // NOTE(alora fork, T2 / flutter-webrtc#1957): removed
+    // sendDefaultAudioInterruptionNotificationToStartAudioResource(). It posted
+    // a FAKE AVAudioSession interruption-ended notification to kick WebRTC's
+    // audio unit, which caused RTCAudioSession to attempt session activation
+    // it does not own under CallKit ("Failed to set session active"). ADM
+    // recovery is handled by the Dart layer via startLocalRecording instead.
     
-    func configureAudioSession(){
-        if data?.configureAudioSession != false {
+    func configureAudioSession(_ callData: Data? = nil){
+        let sessionData = callData ?? data
+        if sessionData?.configureAudioSession ?? true {
             let session = AVAudioSession.sharedInstance()
             do{
                 try session.setCategory(AVAudioSession.Category.playAndRecord, options: [
@@ -573,11 +576,16 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                     .duckOthers,
                     .allowBluetooth,
                 ])
-                
-                try session.setMode(self.getAudioSessionMode(data?.audioSessionMode))
-                try session.setActive(data?.audioSessionActive ?? true)
-                try session.setPreferredSampleRate(data?.audioSessionPreferredSampleRate ?? 44100.0)
-                try session.setPreferredIOBufferDuration(data?.audioSessionPreferredIOBufferDuration ?? 0.005)
+
+                try session.setMode(self.getAudioSessionMode(sessionData?.audioSessionMode))
+                // NOTE(alora fork, T1 / flutter-webrtc#1957): never call
+                // session.setActive(...) here. Under CallKit, the system owns
+                // AVAudioSession activation; calling setActive ourselves races
+                // CallKit and desyncs RTCAudioSession's internal activation
+                // count ("Failed to set session active. Error: Session
+                // deactivation failed"). We only configure category/mode.
+                try session.setPreferredSampleRate(sessionData?.audioSessionPreferredSampleRate ?? 44100.0)
+                try session.setPreferredIOBufferDuration(sessionData?.audioSessionPreferredIOBufferDuration ?? 0.005)
             }catch{
                 print(error)
             }
@@ -717,7 +725,26 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
-        action.fail()
+        guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
+            action.fail()
+            return
+        }
+        call.isOnHold = action.isOnHold
+        call.isMuted = action.isOnHold
+        self.callManager.setHold(call: call, onHold: action.isOnHold)
+        sendHoldEvent(action.callUUID.uuidString, action.isOnHold)
+        if !action.isOnHold {
+            // NOTE(alora fork, T3 / flutter-webrtc#1957): do NOT reconfigure or
+            // force-activate the audio session here, and do NOT synthesize
+            // didActivateAudioSession. CallKit owns AVAudioSession activation:
+            // if it (re)activates the session it calls provider(_:didActivate:),
+            // which bridges into RTCAudioSession via the AppDelegate. Forging
+            // that callback corrupts RTCAudioSession's activation count.
+            // We only notify Dart so the app layer can restart the WebRTC ADM
+            // (NativeAudioManagement.startLocalRecording) if recording stalled.
+            self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, ["id": call.uuid.uuidString, "isActivate": true])
+        }
+        action.fulfill()
     }
     
     public func provider(_ provider: CXProvider, perform action: CXSetMutedCallAction) {
@@ -767,27 +794,33 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             appDelegate.didActivateAudioSession(audioSession)
         }
 
-        if(self.answerCall?.hasConnected ?? false){
-            sendDefaultAudioInterruptionNotificationToStartAudioResource()
-            return
-        }
-        if(self.outgoingCall?.hasConnected ?? false){
-            sendDefaultAudioInterruptionNotificationToStartAudioResource()
-            return
-        }
-        self.outgoingCall?.startCall(withAudioSession: audioSession) {success in
-            if success {
-                self.callManager.addCall(self.outgoingCall!)
-                self.outgoingCall?.startAudio()
+        // NOTE(alora fork, T1+T2 / flutter-webrtc#1957): removed the synthetic
+        // AVAudioSession interruption notification and the configureAudioSession()
+        // call that previously ran here. Posting a fake interruption-ended made
+        // WebRTC's RTCAudioSession attempt its own setActive during CallKit's
+        // activation window, and reconfiguring the session inside didActivate
+        // races the activation CallKit just performed. The AppDelegate bridge
+        // above (audioSessionDidActivate + isAudioEnabled) is the only thing
+        // WebRTC needs at this point.
+        //
+        // Initial start/answer bridging only applies to calls that have not
+        // connected yet; re-activations (e.g. after unhold) skip straight to
+        // notifying Dart — which must happen on EVERY activation, so it is no
+        // longer short-circuited by the early returns that used to live here.
+        let alreadyConnected = (self.answerCall?.hasConnected ?? false) || (self.outgoingCall?.hasConnected ?? false)
+        if !alreadyConnected {
+            self.outgoingCall?.startCall(withAudioSession: audioSession) {success in
+                if success {
+                    self.callManager.addCall(self.outgoingCall!)
+                    self.outgoingCall?.startAudio()
+                }
+            }
+            self.answerCall?.ansCall(withAudioSession: audioSession) { success in
+                if success{
+                    self.answerCall?.startAudio()
+                }
             }
         }
-        self.answerCall?.ansCall(withAudioSession: audioSession) { success in
-            if success{
-                self.answerCall?.startAudio()
-            }
-        }
-        sendDefaultAudioInterruptionNotificationToStartAudioResource()
-        configureAudioSession()
 
         self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": true ])
     }
