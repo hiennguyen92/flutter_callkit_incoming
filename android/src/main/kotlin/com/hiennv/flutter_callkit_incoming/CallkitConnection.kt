@@ -144,26 +144,10 @@ class CallkitConnection(
      */
     fun markDeclined(context: Context) {
         Log.d(TAG, "markDeclined id=$callId")
-        triggerDeclineRecovery(context)
-        // [H' fix 2026-05-05 v2] Delay finishWithCause so the self-managed
-        // call stays RINGING long enough for:
-        //   1. MainActivity to bootstrap the main FlutterEngine (~100ms).
-        //   2. SealedSender service to cold-init (secure_storage open +
-        //      JWT load + server verify-key fetch — ~1~2s, network-bound).
-        //   3. callSignalingProvider → callServiceProvider → callProvider
-        //      to rebuild from _IdleCallNotifier into the real CallNotifier
-        //      whose ctor finally fires _consumePendingVoipDecline.
-        // The 1500ms first attempt was insufficient (logcat showed Activity
-        // booted + Dart plugins ran, but real CallNotifier ctor never reached
-        // before delay expired and Activity was killed).
-        // Trade-off: Telecom phone state stays RINGING for ~3s after decline.
-        // The notification is already dismissed by the BroadcastReceiver
-        // path, so the user sees no UI artifact — only the system-level
-        // call state lingers briefly while Dart finishes wiring.
-        Handler(Looper.getMainLooper()).postDelayed({
-            Log.d(TAG, "[H' fix] delayed finishWithCause id=$callId")
-            finishWithCause(DisconnectCause.REJECTED)
-        }, 3000L)
+        // Do not launch the app on decline. End the self-managed Telecom call
+        // immediately so declining from the notification/lock screen leaves a
+        // backgrounded or terminated app closed (3.0.0 behavior).
+        finishWithCause(DisconnectCause.REJECTED)
     }
 
     /**
