@@ -381,7 +381,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             return
         }
         if call.isOnHold == onHold {
-            self.sendMuteEvent(callId.uuidString,  onHold)
+            self.sendHoldEvent(callId.uuidString, onHold)
         } else {
             self.callManager.holdCall(call: call, onHold: onHold)
         }
@@ -532,8 +532,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     func createConfiguration(_ data: Data) -> CXProviderConfiguration {
         let configuration = CXProviderConfiguration(localizedName: data.appName)
         configuration.supportsVideo = data.supportsVideo
-        configuration.maximumCallGroups = 1
-        configuration.maximumCallsPerCallGroup = 1
+        configuration.maximumCallGroups = data.maximumCallGroups
+        configuration.maximumCallsPerCallGroup = data.maximumCallsPerCallGroup
         
         configuration.supportedHandleTypes = [
             CXHandle.HandleType.generic,
@@ -717,7 +717,18 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     public func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
-        action.fail()
+        guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
+            action.fail()
+            return
+        }
+        call.isOnHold = action.isOnHold
+        call.isMuted = action.isOnHold
+        self.callManager.setHold(call: call, onHold: action.isOnHold)
+        sendHoldEvent(action.callUUID.uuidString, action.isOnHold)
+        if !action.isOnHold {
+            sendDefaultAudioInterruptionNotificationToStartAudioResource()
+        }
+        action.fulfill()
     }
     
     public func provider(_ provider: CXProvider, perform action: CXSetMutedCallAction) {
@@ -884,3 +895,4 @@ public class FlutterCallkitIncomingPlugin: NSObject, FlutterPlugin {
         SwiftFlutterCallkitIncomingPlugin.register(with: registrar)
     }
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
