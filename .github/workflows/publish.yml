@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # needed to push git tag
-      id-token: write  # needed for pub.dev OIDC authentication
+      id-token: write  # needed for pub.dev OIDC authentication (if configured on pub.dev admin)
 
     steps:
       - name: Checkout repository
@@ -57,6 +57,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag ${{ steps.version.outputs.tag }}
           git push origin ${{ steps.version.outputs.tag }}
+
+      - name: Setup pub credentials
+        run: |
+          mkdir -p ~/.config/dart
+          echo '${{ secrets.PUB_CREDENTIALS }}' > ~/.config/dart/pub-credentials.json
 
       - name: Publish to pub.dev
         if: steps.tag_check.outputs.exists == 'false'
