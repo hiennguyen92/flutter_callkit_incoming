@@ -6,11 +6,7 @@
 #import <Flutter/Flutter.h>
 #import "GeneratedPluginRegistrant.h"
 
-#if __has_include(<flutter_callkit_incoming/flutter_callkit_incoming-Swift.h>)
-#import <flutter_callkit_incoming/flutter_callkit_incoming-Swift.h>
-#else
-#import "flutter_callkit_incoming-Swift.h"
-#endif
+@import flutter_callkit_incoming;
 
 @implementation AppDelegate
 

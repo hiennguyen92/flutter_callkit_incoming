@@ -5,7 +5,7 @@ import PushKit
 import Flutter
 import flutter_callkit_incoming
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate, CallkitIncomingAppDelegate {
     
     
@@ -192,6 +192,10 @@ import flutter_callkit_incoming
         //Use if using WebRTC
         //RTCAudioSession.sharedInstance().audioSessionDidDeactivate(audioSession)
         //RTCAudioSession.sharedInstance().isAudioEnabled = false
+    }
+    
+    func providerDidReset() {
+        print("LOG: providerDidReset")
     }
     
     func performRequest(parameters: [String: Any], completion: @escaping (Result<Any, Error>) -> Void) {

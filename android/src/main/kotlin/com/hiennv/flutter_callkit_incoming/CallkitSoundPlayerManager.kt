@@ -1,3 +1,10 @@
+//  Modification by Signify in this file are under the following license:
+//
+//  Copyright 2024, Signify Holding
+//  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 package com.hiennv.flutter_callkit_incoming
 
 import android.content.BroadcastReceiver
@@ -9,8 +16,14 @@ import android.media.AudioManager
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.text.TextUtils
+import java.util.Timer
+import java.util.TimerTask
 
 class CallkitSoundPlayerManager(private val context: Context) {
 
@@ -19,18 +32,23 @@ class CallkitSoundPlayerManager(private val context: Context) {
 
     private var ringtone: Ringtone? = null
 
-    private var isPlaying: Boolean = false
+    // Start Signify modification
+    var isPlaying: Boolean = false
+        private set
+    // End Signify modification
 
+    private var keepRingingForFullScreenIntent: Boolean = false
 
     inner class ScreenOffCallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (isPlaying){
+            if (isPlaying && !keepRingingForFullScreenIntent) {
                 stop()
             }
         }
     }
 
-    private var screenOffCallkitIncomingBroadcastReceiver = ScreenOffCallkitIncomingBroadcastReceiver()
+    private var screenOffCallkitIncomingBroadcastReceiver =
+        ScreenOffCallkitIncomingBroadcastReceiver()
 
 
     fun play(data: Bundle) {
@@ -52,7 +70,8 @@ class CallkitSoundPlayerManager(private val context: Context) {
         vibrator = null
         try {
             context.unregisterReceiver(screenOffCallkitIncomingBroadcastReceiver)
-        }catch (_: Exception){}
+        } catch (_: Exception) {
+        }
     }
 
     fun destroy() {
@@ -64,7 +83,8 @@ class CallkitSoundPlayerManager(private val context: Context) {
         vibrator = null
         try {
             context.unregisterReceiver(screenOffCallkitIncomingBroadcastReceiver)
-        }catch (_: Exception){}
+        } catch (_: Exception) {
+        }
     }
 
     private fun prepare() {
@@ -81,22 +101,29 @@ class CallkitSoundPlayerManager(private val context: Context) {
             context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        when (audioManager?.ringerMode) {
-            AudioManager.RINGER_MODE_SILENT -> {
-            }
+        if (audioManager?.ringerMode == AudioManager.RINGER_MODE_SILENT) return
 
-            else -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator?.vibrate(
-                        VibrationEffect.createWaveform(
-                            longArrayOf(0L, 1000L, 1000L),
-                            0
-                        )
-                    )
-                } else {
-                    vibrator?.vibrate(longArrayOf(0L, 1000L, 1000L), 0)
-                }
+        val pattern = longArrayOf(0L, 1000L, 1000L)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val audioAttrs = AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setLegacyStreamType(AudioManager.STREAM_RING)
+                .build()
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator?.vibrate(
+                    VibrationEffect.createWaveform(pattern, 0),
+                    audioAttrs
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator?.vibrate(pattern, 0, audioAttrs)
             }
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator?.vibrate(pattern, 0)
         }
     }
 
@@ -114,12 +141,12 @@ class CallkitSoundPlayerManager(private val context: Context) {
             ringtone = RingtoneManager.getRingtone(context, uri)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 val attribution = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                .setLegacyStreamType(AudioManager.STREAM_RING)
-                .build()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setLegacyStreamType(AudioManager.STREAM_RING)
+                    .build()
                 ringtone?.setAudioAttributes(attribution)
-            }else {
+            } else {
                 ringtone?.streamType = AudioManager.STREAM_RING
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -135,7 +162,7 @@ class CallkitSoundPlayerManager(private val context: Context) {
         if (TextUtils.isEmpty(fileName)) {
             return getDefaultRingtoneUri()
         }
-        
+
         // If system_ringtone_default is explicitly requested, bypass resource check
         if (fileName.equals("system_ringtone_default", true)) {
             return getDefaultRingtoneUri(useSystemDefault = true)
@@ -159,7 +186,8 @@ class CallkitSoundPlayerManager(private val context: Context) {
         try {
             if (!useSystemDefault) {
                 // First try to use ringtone_default resource if it exists
-                val resId = context.resources.getIdentifier("ringtone_default", "raw", context.packageName)
+                val resId =
+                    context.resources.getIdentifier("ringtone_default", "raw", context.packageName)
                 if (resId != 0) {
                     return Uri.parse("android.resource://${context.packageName}/$resId")
                 }
@@ -207,5 +235,21 @@ class CallkitSoundPlayerManager(private val context: Context) {
             e.printStackTrace()
         }
         return null
+    }
+
+    private var ringingTimer: Timer? = null
+
+    // This function is called when the incoming call full intent (CallkitIncomingActivity) is shown
+    // It prevents the sound from stopping when the screen is turned off because of an auto lock
+    fun keepRingingOnFullScreen() {
+        keepRingingForFullScreenIntent = true
+        ringingTimer?.cancel()
+        ringingTimer = Timer().apply {
+            schedule(object : TimerTask() {
+                override fun run() {
+                    keepRingingForFullScreenIntent = false
+                }
+            }, 500)
+        }
     }
 }

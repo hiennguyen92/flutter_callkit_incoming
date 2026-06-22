@@ -1,0 +1,68 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    branches:
+      - master  # pub.dev OIDC only supports 'push' events, not 'pull_request'
+  workflow_dispatch:  # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  publish:
+    name: Publish Flutter Package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # needed to push git tag
+      id-token: write  # needed for pub.dev OIDC authentication (if configured on pub.dev admin)
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.32.x'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run dry-run publish
+        run: flutter pub publish --dry-run
+
+      - name: Extract version from pubspec.yaml
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Detected version: $VERSION"
+
+      - name: Check if tag already exists
+        id: tag_check
+        run: |
+          if git ls-remote --tags origin "refs/tags/v${{ steps.version.outputs.version }}" | grep -q "v${{ steps.version.outputs.version }}"; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag v${{ steps.version.outputs.version }} already exists, skipping publish."
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and push git tag
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.version.outputs.tag }}
+          git push origin ${{ steps.version.outputs.tag }}
+
+      - name: Setup pub credentials
+        run: |
+          mkdir -p ~/.config/dart
+          echo '${{ secrets.PUB_CREDENTIALS }}' > ~/.config/dart/pub-credentials.json
+
+      - name: Publish to pub.dev
+        if: steps.tag_check.outputs.exists == 'false'
+        run: flutter pub publish --force
