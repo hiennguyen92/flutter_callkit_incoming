@@ -1,17 +1,14 @@
 name: Publish to pub.dev
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
-      - master
+      - master  # pub.dev OIDC only supports 'push' events, not 'pull_request'
   workflow_dispatch:  # Allow manual trigger from GitHub Actions UI
 
 jobs:
   publish:
     name: Publish Flutter Package
-    # Run when PR is merged, or when triggered manually
-    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write  # needed to push git tag
