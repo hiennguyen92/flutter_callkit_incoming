@@ -37,7 +37,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     private var outgoingCall : Call?
     private var answerCall : Call?
-    
+    // UUIDs of calls that were on hold when another call was answered.
+    // These must never be timed out by endCallNotExist even after being unheld,
+    // because iOS resets isOnHold to false before our timer fires.
+    private var suppressTimeoutCallUUIDs: Set<UUID> = []
+
     private var data: Data?
     private var isFromPushKit: Bool = false
     private var silenceEvents: Bool = false
@@ -480,7 +484,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 return
             }
             let call = self.callManager.callWithUUID(uuid: uuid)
-            if (call != nil && self.answerCall == nil && self.outgoingCall == nil) {
+            let suppressed = self.suppressTimeoutCallUUIDs.contains(uuid)
+            if (call != nil && !suppressed && self.answerCall == nil && self.outgoingCall == nil) {
                 self.callEndTimeout(data)
             }
         }
@@ -664,6 +669,12 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         call.data.isAccepted = true
         self.answerCall = call
+        // Suppress endCallNotExist timeout for every other active call — iOS will unhold
+        // them when this call ends, resetting isOnHold to false, so an isOnHold check alone
+        // is not sufficient.
+        for otherCall in self.callManager.calls where otherCall.uuid != call.uuid {
+            self.suppressTimeoutCallUUIDs.insert(otherCall.uuid)
+        }
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, call.data.toJSON())
         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
             appDelegate.onAccept(call, action)
@@ -686,7 +697,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
+        print("[ENDCALL] CXEndCallAction uuid=\(action.callUUID.uuidString) selfData=\(self.data?.uuid ?? "nil") answerCall=\(self.answerCall?.uuid.uuidString ?? "nil") outgoingCall=\(self.outgoingCall?.uuid.uuidString ?? "nil")")
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
+            print("[ENDCALL] call NOT in callManager — guard failed, selfData=\(self.data?.uuid ?? "nil")")
             if(self.answerCall == nil && self.outgoingCall == nil){
                 sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TIMEOUT, self.data?.toJSON())
             } else {
@@ -695,16 +708,19 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             action.fail()
             return
         }
+        print("[ENDCALL] call FOUND uuid=\(call.uuid.uuidString)")
         call.endCall()
         self.callManager.removeCall(call)
         if (self.answerCall == nil && self.outgoingCall == nil) {
-            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
+            print("[ENDCALL] → DECLINE event call.uuid=\(call.uuid.uuidString)")
+            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
                 appDelegate.onDecline(call, action)
             } else {
                 action.fulfill()
             }
         }else {
+            print("[ENDCALL] → ENDED event call.uuid=\(call.uuid.uuidString)")
             self.answerCall = nil
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
