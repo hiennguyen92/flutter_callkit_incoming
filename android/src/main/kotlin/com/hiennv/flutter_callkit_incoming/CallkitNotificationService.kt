@@ -57,27 +57,50 @@ class CallkitNotificationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action === CallkitConstants.ACTION_CALL_START) {
-            intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
-                ?.let {
-                    if(it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
-                        getCallkitNotificationManager()?.createNotificationChanel(it)
-                        showOngoingCallNotification(it)
-                    }else {
+        when (intent?.action) {
+            CallkitConstants.ACTION_CALL_START -> {
+                intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
+                    ?.let {
+                        if (it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
+                            getCallkitNotificationManager()?.createNotificationChanel(it)
+                            showOngoingCallNotification(it)
+                        } else {
+                            stopSelf()
+                        }
+                    }
+            }
+            CallkitConstants.ACTION_CALL_ACCEPT -> {
+                intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
+                    ?.let {
+                        getCallkitNotificationManager()?.clearIncomingNotification(it, true)
+                        if (it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
+                            showOngoingCallNotification(it)
+                        } else {
+                            stopSelf()
+                        }
+                    }
+            }
+            null -> {
+                // OS restarted the service after kill (START_STICKY with null intent).
+                // Flutter engine may not be running yet — create a standalone manager
+                // using only Context so we can restore startForeground() without the plugin.
+                val activeCalls = getDataActiveCalls(this)
+                val bundle = activeCalls.firstOrNull()?.toBundle()
+                if (bundle != null) {
+                    val manager = getCallkitNotificationManager()
+                        ?: CallkitNotificationManager(this, null)
+                    manager.createNotificationChanel(bundle)
+                    val notification = manager.getOnGoingCallNotification(bundle, false)
+                    if (notification != null) {
+                        val typeCall = bundle.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
+                        startForeground(notification.id, notification.notification, typeCall > 0)
+                    } else {
                         stopSelf()
                     }
+                } else {
+                    stopSelf()
                 }
-        }
-        if (intent?.action === CallkitConstants.ACTION_CALL_ACCEPT) {
-            intent.getBundleExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
-                ?.let {
-                    getCallkitNotificationManager()?.clearIncomingNotification(it, true)
-                    if (it.getBoolean(CallkitConstants.EXTRA_CALLKIT_CALLING_SHOW, true)) {
-                        showOngoingCallNotification(it)
-                    }else {
-                        stopSelf()
-                    }
-                }
+            }
         }
         return START_STICKY
     }
