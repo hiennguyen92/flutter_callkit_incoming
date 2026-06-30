@@ -88,7 +88,7 @@ class CallkitNotificationService : Service() {
                 val bundle = activeCalls.firstOrNull()?.toBundle()
                 if (bundle != null) {
                     val manager = getCallkitNotificationManager()
-                        ?: CallkitNotificationManager(this, null)
+                        ?: CallkitNotificationManager(this, CallkitSoundPlayerManager(this))
                     manager.createNotificationChanel(bundle)
                     val notification = manager.getOnGoingCallNotification(bundle, false)
                     if (notification != null) {
