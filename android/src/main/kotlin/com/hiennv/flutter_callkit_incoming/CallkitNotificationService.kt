@@ -87,14 +87,17 @@ class CallkitNotificationService : Service() {
                 val activeCalls = getDataActiveCalls(this)
                 val bundle = activeCalls.firstOrNull()?.toBundle()
                 if (bundle != null) {
-                    val manager = getCallkitNotificationManager()
+                    val pluginManager = getCallkitNotificationManager()
+                    val manager = pluginManager
                         ?: CallkitNotificationManager(this, CallkitSoundPlayerManager(this))
                     manager.createNotificationChanel(bundle)
                     val notification = manager.getOnGoingCallNotification(bundle, false)
                     if (notification != null) {
                         val typeCall = bundle.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
                         startForeground(notification.id, notification.notification, typeCall > 0)
+                        if (pluginManager == null) manager.destroy()
                     } else {
+                        if (pluginManager == null) manager.destroy()
                         stopSelf()
                     }
                 } else {
