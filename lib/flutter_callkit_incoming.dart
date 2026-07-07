@@ -349,7 +349,7 @@ class FlutterCallkitIncoming {
         }
         return CallEventActionCallToggleAudioSession(isActive);
       case CallEventConstants.actionCallCustom:
-        final body = data['body'] as Map<String, dynamic>?;
+        final body = _convertMap(data['body']) as Map<String, dynamic>?;
         if (body == null) {
           throw const FormatException('[ACTION_CALL_CUSTOM] body is null.');
         }
