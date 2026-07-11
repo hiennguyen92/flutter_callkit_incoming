@@ -10,7 +10,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="flutter_callkit_incoming_example"
-        android:icon="@mipmap/ic_launcher">
+       android:name="${applicationName}"
+       android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleInstance"
