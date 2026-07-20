@@ -259,9 +259,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool, onError: ((Error?) -> Void)? = nil) {
         self.isFromPushKit = fromPushKit
-        if(fromPushKit){
-            self.data = data
-        }
+        // Mervey fork: see startCall — self.data must track every surface.
+        self.data = data
         
         if(data.isShowMissedCallNotification){
             CallkitNotificationManager.shared.addNotificationCategory(data.missedNotificationCallbackText)
@@ -356,9 +355,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     @objc public func startCall(_ data: Data, fromPushKit: Bool) {
         self.isFromPushKit = fromPushKit
-        if(fromPushKit){
-            self.data = data
-        }
+        // Mervey fork: track the latest call data on every surface (not only
+        // PushKit) — configureAudioSession()'s per-call guard and the
+        // CXStartCallAction handler read self.data, and the Dart-initiated
+        // paths otherwise leave it stale or nil.
+        self.data = data
         initCallkitProvider(data)
         self.callManager.startCall(data)
     }
@@ -633,7 +634,14 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
-        let call = Call(uuid: action.callUUID, data: self.data!, isOutGoing: true)
+        // Mervey fork: never force-unwrap — a CXStartCallAction with no call
+        // data must fail the action, not crash the process.
+        guard let data = self.data else {
+            NSLog("[CallkitIncoming] CXStartCallAction with no call data — failing action")
+            action.fail()
+            return
+        }
+        let call = Call(uuid: action.callUUID, data: data, isOutGoing: true)
         call.handle = action.handle.value
         configureAudioSession()
         call.hasStartedConnectDidChange = { [weak self] in
