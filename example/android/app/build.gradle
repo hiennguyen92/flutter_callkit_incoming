@@ -8,6 +8,7 @@ plugins {
 android {
     namespace "com.example.flutter_callkit_incoming_example"
     compileSdk 35
+    ndkVersion "28.2.13676358"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'

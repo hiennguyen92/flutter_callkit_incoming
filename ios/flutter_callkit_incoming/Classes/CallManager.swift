@@ -74,6 +74,9 @@ class CallManager: NSObject {
     
     func connectedCall(call: Call) {
         let callItem = self.callWithUUID(uuid: call.uuid)
+        if callItem?.hasConnected == true {
+            return
+        }
         callItem?.connectedCall(completion: nil)
         
         let answerAction = CXAnswerCallAction(call: call.uuid)        

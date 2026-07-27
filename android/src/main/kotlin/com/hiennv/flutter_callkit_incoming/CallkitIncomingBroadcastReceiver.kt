@@ -203,6 +203,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     )
                     sendEventFlutter(CallkitConstants.ACTION_CALL_START, data)
                     addCall(context, Data.fromBundle(data), true)
+                    checkAndSetSystemSpeakerphone(context, data)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -221,6 +222,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ACCEPT, data)
                     addCall(context, Data.fromBundle(data), true)
                     FlutterCallkitIncomingPlugin.acceptCallHandleCallback(data)
+                    checkAndSetSystemSpeakerphone(context, data)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -355,5 +357,20 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "android" to android
         )
         FlutterCallkitIncomingPlugin.sendEvent(event, forwardData)
+    }
+
+    private fun checkAndSetSystemSpeakerphone(context: Context, data: Bundle) {
+        val callData = Data.fromBundle(data)
+        if (callData.isSpeakerOn || callData.type > 0) {
+            try {
+                val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? android.media.AudioManager
+                audioManager?.let {
+                    it.mode = android.media.AudioManager.MODE_IN_COMMUNICATION
+                    it.isSpeakerphoneOn = true
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to set system speakerphone: ${e.message}")
+            }
+        }
     }
 }
