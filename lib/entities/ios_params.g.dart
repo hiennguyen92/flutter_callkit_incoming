@@ -27,6 +27,8 @@ IOSParams _$IOSParamsFromJson(Map<String, dynamic> json) => IOSParams(
           (json['audioSessionPreferredSampleRate'] as num?)?.toDouble(),
       audioSessionPreferredIOBufferDuration:
           (json['audioSessionPreferredIOBufferDuration'] as num?)?.toDouble(),
+      audioSessionDefaultToSpeaker:
+          json['audioSessionDefaultToSpeaker'] as bool?,
     );
 
 Map<String, dynamic> _$IOSParamsToJson(IOSParams instance) => <String, dynamic>{
@@ -49,4 +51,5 @@ Map<String, dynamic> _$IOSParamsToJson(IOSParams instance) => <String, dynamic>{
           instance.audioSessionPreferredSampleRate,
       'audioSessionPreferredIOBufferDuration':
           instance.audioSessionPreferredIOBufferDuration,
+      'audioSessionDefaultToSpeaker': instance.audioSessionDefaultToSpeaker,
     };

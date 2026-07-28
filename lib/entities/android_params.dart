@@ -29,6 +29,7 @@ class AndroidParams {
     this.isImportant,
     this.isBot,
     this.isFullScreen,
+    this.isSpeakerOn,
     this.from,
     this.textAccept,
     this.textDecline,
@@ -84,6 +85,9 @@ class AndroidParams {
   /// Show incoming call as full-screen activity instead of notification.
   final bool? isFullScreen;
 
+  /// Route audio output to speakerphone initially.
+  final bool? isSpeakerOn;
+
   final String? from;
 
   /// Text for accept button
@@ -116,6 +120,7 @@ class AndroidParams {
         'isImportant: $isImportant, '
         'isBot: $isBot, '
         'isFullScreen: $isFullScreen, '
+        'isSpeakerOn: $isSpeakerOn, '
         'from: $from, '
         'textAccept: $textAccept, '
         'textDecline: $textDecline'

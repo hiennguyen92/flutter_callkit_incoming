@@ -1018,8 +1018,11 @@ class CallkitNotificationManager(
     inner class VolumeKeyBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
-                if (callkitSoundPlayerManager?.isPlaying == true) {
-                    callkitSoundPlayerManager.stop()
+                val streamType = intent.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", -1)
+                if (streamType == AudioManager.STREAM_RING) {
+                    if (callkitSoundPlayerManager?.isPlaying == true) {
+                        callkitSoundPlayerManager.stop()
+                    }
                 }
             }
         }

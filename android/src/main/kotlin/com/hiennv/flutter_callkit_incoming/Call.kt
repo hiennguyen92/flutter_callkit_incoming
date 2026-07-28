@@ -137,6 +137,9 @@ data class Data(val args: Map<String, Any?>) {
     @JsonProperty("isFullScreen")
     var isFullScreen: Boolean = false
 
+    @JsonProperty("isSpeakerOn")
+    var isSpeakerOn: Boolean = false
+
     @JsonProperty("from")
     var from: String = ""
 
@@ -160,6 +163,7 @@ data class Data(val args: Map<String, Any?>) {
         isImportant = android["isImportant"] as? Boolean ?: false
         isBot = android["isBot"] as? Boolean ?: false
         isFullScreen = android["isFullScreen"] as? Boolean ?: false
+        isSpeakerOn = android["isSpeakerOn"] as? Boolean ?: (args["isSpeakerOn"] as? Boolean ?: false)
         from = android["from"] as? String ?: ""
         textAccept = android["textAccept"] as? String ?: ""
         textDecline = android["textDecline"] as? String ?: ""
@@ -332,6 +336,10 @@ data class Data(val args: Map<String, Any?>) {
             CallkitConstants.EXTRA_CALLKIT_IS_FULL_SCREEN,
             isFullScreen,
         )
+        bundle.putBoolean(
+            CallkitConstants.EXTRA_CALLKIT_IS_SPEAKER_ON,
+            isSpeakerOn,
+        )
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_ACTION_FROM, from)
         return bundle
     }
@@ -362,6 +370,8 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_BOT, false)
             data.isFullScreen =
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_FULL_SCREEN, false)
+            data.isSpeakerOn =
+                bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SPEAKER_ON, false)
 
             data.missedNotificationId =
                 bundle.getInt(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_ID)

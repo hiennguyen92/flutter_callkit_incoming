@@ -30,11 +30,12 @@ class IOSParams {
   final bool? audioSessionActive;
   final double? audioSessionPreferredSampleRate;
   final double? audioSessionPreferredIOBufferDuration;
+  final bool? audioSessionDefaultToSpeaker;
 
   const IOSParams({
     this.iconName,
     this.handleType,
-    this.normalHandle,
+    this.normalHandle = 1,
     this.supportsVideo,
     this.maximumCallGroups,
     this.maximumCallsPerCallGroup,
@@ -49,6 +50,7 @@ class IOSParams {
     this.audioSessionActive,
     this.audioSessionPreferredSampleRate,
     this.audioSessionPreferredIOBufferDuration,
+    this.audioSessionDefaultToSpeaker,
   });
 
   factory IOSParams.fromJson(Map<String, dynamic> json) =>
@@ -75,7 +77,8 @@ class IOSParams {
         'audioSessionMode: $audioSessionMode, '
         'audioSessionActive: $audioSessionActive, '
         'audioSessionPreferredSampleRate: $audioSessionPreferredSampleRate, '
-        'audioSessionPreferredIOBufferDuration: $audioSessionPreferredIOBufferDuration'
+        'audioSessionPreferredIOBufferDuration: $audioSessionPreferredIOBufferDuration, '
+        'audioSessionDefaultToSpeaker: $audioSessionDefaultToSpeaker'
         '}';
   }
 }

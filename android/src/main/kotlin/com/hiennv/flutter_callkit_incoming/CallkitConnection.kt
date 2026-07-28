@@ -68,7 +68,7 @@ class CallkitConnection(
     init {
         connectionProperties = PROPERTY_SELF_MANAGED
         audioModeIsVoip = true
-        connectionCapabilities = CAPABILITY_MUTE or CAPABILITY_SUPPORT_HOLD
+        connectionCapabilities = CAPABILITY_MUTE or CAPABILITY_SUPPORT_HOLD or CAPABILITY_HOLD
         register(callId, this)
         Log.d(TAG, "Connection created id=$callId active=${activeCount()}")
     }
@@ -82,10 +82,21 @@ class CallkitConnection(
     // the OS can also trigger these — we must honor both paths.
     // -------------------------------------------------------------------------
 
+    override fun onSilence() {
+        super.onSilence()
+        Log.d(TAG, "onSilence id=$callId")
+        try {
+            FlutterCallkitIncomingPlugin.getInstance()?.getCallkitSoundPlayerManager()?.stop()
+        } catch (e: Exception) {
+            Log.w(TAG, "onSilence sound stop failed: ${e.message}")
+        }
+    }
+
     override fun onAnswer() {
         super.onAnswer()
         Log.d(TAG, "onAnswer id=$callId")
         setActive()
+        checkAndSetSpeakerphone()
     }
 
     override fun onReject() {
@@ -108,12 +119,23 @@ class CallkitConnection(
 
     override fun onHold() {
         super.onHold()
+        Log.d(TAG, "onHold id=$callId")
         setOnHold()
+        sendHoldEvent(true)
     }
 
     override fun onUnhold() {
         super.onUnhold()
+        Log.d(TAG, "onUnhold id=$callId")
         setActive()
+        sendHoldEvent(false)
+    }
+
+    private fun sendHoldEvent(isOnHold: Boolean) {
+        val data = HashMap<String, Any?>()
+        data["id"] = callId
+        data["isOnHold"] = isOnHold
+        FlutterCallkitIncomingPlugin.sendEvent(CallkitConstants.ACTION_CALL_TOGGLE_HOLD, data)
     }
 
     // -------------------------------------------------------------------------
@@ -124,6 +146,25 @@ class CallkitConnection(
     fun markAccepted() {
         Log.d(TAG, "markAccepted id=$callId")
         setActive()
+        checkAndSetSpeakerphone()
+    }
+
+    fun checkAndSetSpeakerphone() {
+        val isSpeakerOn = bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SPEAKER_ON, false) ||
+                bundle.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, 0) > 0
+        if (isSpeakerOn) {
+            setSpeakerphone(true)
+        }
+    }
+
+    fun setSpeakerphone(on: Boolean) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setAudioRoute(if (on) android.telecom.CallAudioState.ROUTE_SPEAKER else android.telecom.CallAudioState.ROUTE_EARPIECE)
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to set Telecom audio route: ${e.message}")
+        }
     }
 
     /**
