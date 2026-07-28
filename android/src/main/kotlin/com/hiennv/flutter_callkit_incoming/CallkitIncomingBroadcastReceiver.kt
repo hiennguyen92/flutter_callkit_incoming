@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.telecom.TelecomManager
@@ -236,6 +238,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     getCallkitNotificationManager()?.clearIncomingNotification(data, false)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
                     removeCall(context, Data.fromBundle(data))
+                    resetSystemAudio(context)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -250,6 +253,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     CallkitNotificationService.stopService(context)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
                     removeCall(context, Data.fromBundle(data))
+                    resetSystemAudio(context)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -264,6 +268,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     notificationManager?.showMissCallNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_TIMEOUT, data)
                     removeCall(context, Data.fromBundle(data))
+                    resetSystemAudio(context)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -363,14 +368,44 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val callData = Data.fromBundle(data)
         if (callData.isSpeakerOn || callData.type > 0) {
             try {
-                val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? android.media.AudioManager
+                val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
                 audioManager?.let {
-                    it.mode = android.media.AudioManager.MODE_IN_COMMUNICATION
-                    it.isSpeakerphoneOn = true
+                    it.mode = AudioManager.MODE_IN_COMMUNICATION
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        val speakerDevice = it.availableCommunicationDevices.firstOrNull { device ->
+                            device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
+                        }
+                        if (speakerDevice != null) {
+                            it.setCommunicationDevice(speakerDevice)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            it.isSpeakerphoneOn = true
+                        }
+                    } else {
+                        @Suppress("DEPRECATION")
+                        it.isSpeakerphoneOn = true
+                    }
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to set system speakerphone: ${e.message}")
             }
+        }
+    }
+
+    private fun resetSystemAudio(context: Context) {
+        try {
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+            audioManager?.let {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    it.clearCommunicationDevice()
+                } else {
+                    @Suppress("DEPRECATION")
+                    it.isSpeakerphoneOn = false
+                }
+                it.mode = AudioManager.MODE_NORMAL
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to reset system audio: ${e.message}")
         }
     }
 }
