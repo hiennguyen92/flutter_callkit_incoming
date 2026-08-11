@@ -1,10 +1,12 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Bundle
@@ -101,8 +103,15 @@ class CallkitNotificationService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             var mask = ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                mask = mask or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-                if (isVideo) {
+                // Since Android 14 (API 34), starting a foreground service with the
+                // MICROPHONE or CAMERA type throws a SecurityException unless the
+                // corresponding runtime permission is already granted. Only add the
+                // types whose permission is granted (e.g. the user may answer a call
+                // before the app ever requested RECORD_AUDIO).
+                if (isPermissionGranted(Manifest.permission.RECORD_AUDIO)) {
+                    mask = mask or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                }
+                if (isVideo && isPermissionGranted(Manifest.permission.CAMERA)) {
                     mask = mask or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
                 }
             }
@@ -111,6 +120,9 @@ class CallkitNotificationService : Service() {
             startForeground(notificationId, notification)
         }
     }
+
+    private fun isPermissionGranted(permission: String): Boolean =
+        ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
 
     override fun onDestroy() {
