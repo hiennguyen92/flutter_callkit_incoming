@@ -342,14 +342,14 @@ class FlutterCallkitIncoming {
         return CallEventActionCallToggleGroup(id, callUUIDToGroupWith);
       case CallEventConstants.actionCallToggleAudioSession:
         final body = data['body'] as Map<Object?, Object?>?;
-        final isActive = body?['isActive'] as bool?;
+        final isActive = body?['isActivate'] as bool?;
         if (isActive == null) {
           throw const FormatException(
               '[ACTION_CALL_TOGGLE_AUDIO_SESSION] id is null.');
         }
         return CallEventActionCallToggleAudioSession(isActive);
       case CallEventConstants.actionCallCustom:
-        final body = data['body'] as Map<String, dynamic>?;
+        final body = _convertMap(data['body']) as Map<String, dynamic>?;
         if (body == null) {
           throw const FormatException('[ACTION_CALL_CUSTOM] body is null.');
         }
