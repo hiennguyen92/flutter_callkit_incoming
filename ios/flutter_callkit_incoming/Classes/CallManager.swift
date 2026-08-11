@@ -74,9 +74,20 @@ class CallManager: NSObject {
     
     func connectedCall(call: Call) {
         let callItem = self.callWithUUID(uuid: call.uuid)
+
+        // Never re-answer an already-connected call. The CXAnswerCallAction
+        // requested below makes the plugin re-emit ACTION_CALL_ACCEPT to the
+        // app; if the app's accept handler calls setCallConnected again, that
+        // becomes an accept -> connect -> answer -> accept loop that freezes
+        // the call UI. Requesting another answer action for a connected call
+        // is never useful.
+        if callItem?.hasConnected == true {
+            print("connectedCall ignored: call already connected \(call.uuid.uuidString)")
+            return
+        }
         callItem?.connectedCall(completion: nil)
-        
-        let answerAction = CXAnswerCallAction(call: call.uuid)        
+
+        let answerAction = CXAnswerCallAction(call: call.uuid)
         let transaction = CXTransaction(action: answerAction)
 
         callController.request(transaction) { error in

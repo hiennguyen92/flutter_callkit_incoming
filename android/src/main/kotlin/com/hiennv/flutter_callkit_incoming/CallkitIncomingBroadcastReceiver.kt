@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.telecom.TelecomManager
@@ -151,6 +152,54 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
+    /**
+     * Register an *outgoing* call with Telecom as a self-managed call, so the
+     * OS knows the app has an active call (and can hold it via
+     * [CallkitConnection.onHold] when e.g. a cellular call is answered).
+     * Mirrors [registerTelecomIncomingCall]; Telecom copies
+     * EXTRA_OUTGOING_CALL_EXTRAS into the ConnectionRequest handed to
+     * [CallkitConnectionService.onCreateOutgoingConnection].
+     */
+    @SuppressLint("MissingPermission")
+    private fun registerTelecomOutgoingCall(context: Context, data: Bundle) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val parsed = try {
+            Data.fromBundle(data)
+        } catch (e: Exception) {
+            null
+        } ?: return
+        if (parsed.id.isEmpty()) return
+        if (CallkitConnection.find(parsed.id) != null) {
+            Log.d(TAG, "Telecom call already registered id=${parsed.id} — skip")
+            return
+        }
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.MANAGE_OWN_CALLS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.w(TAG, "MANAGE_OWN_CALLS not granted — Telecom outgoing skipped")
+            return
+        }
+        val telecom = context.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return
+        val manager = InAppCallManager(context.applicationContext)
+        val handle = manager.getPhoneAccountHandle()
+        val outgoingExtras = Bundle().apply {
+            putBundle(CallkitConnection.EXTRA_CALL_BUNDLE, data)
+        }
+        val extras = Bundle().apply {
+            putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
+            putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, outgoingExtras)
+        }
+        val address = parsed.handle.ifEmpty { parsed.id }
+        try {
+            telecom.placeCall(Uri.fromParts("tel", address, null), extras)
+            Log.d(TAG, "Telecom placeCall id=${parsed.id}")
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Telecom placeCall rejected: ${e.message}")
+        } catch (e: Exception) {
+            Log.w(TAG, "Telecom placeCall error: ${e.message}")
+        }
+    }
+
     private fun driveTelecomConnection(context: Context, data: Bundle, action: String) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
         val parsed = try {
@@ -161,6 +210,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         val conn = CallkitConnection.find(parsed.id) ?: return
         when (action) {
             CallkitConstants.ACTION_CALL_ACCEPT -> conn.markAccepted()
+            // Outgoing call answered by the remote side — drive the dialing
+            // connection to active so Telecom treats it as an ongoing call.
+            CallkitConstants.ACTION_CALL_CONNECTED -> conn.markAccepted()
             CallkitConstants.ACTION_CALL_DECLINE -> conn.markDeclined(context)
             CallkitConstants.ACTION_CALL_ENDED -> conn.markEnded()
             CallkitConstants.ACTION_CALL_TIMEOUT -> conn.markMissed()
@@ -195,6 +247,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_START}" -> {
                 try {
+                    registerTelecomOutgoingCall(context, data)
                     // start service and show ongoing call when call is accepted
                     CallkitNotificationService.startServiceWithAction(
                         context,
@@ -269,6 +322,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
             "${context.packageName}.${CallkitConstants.ACTION_CALL_CONNECTED}" -> {
                 try {
+                    driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_CONNECTED)
                     // update notification on going connected
                     getCallkitNotificationManager()?.showOngoingCallNotification(data, true)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_CONNECTED, data)

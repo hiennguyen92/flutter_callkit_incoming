@@ -7,29 +7,13 @@ import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity: FlutterActivity(){
 
-    private var callkitEventCallback = object: CallkitEventCallback{
-        override fun onCallEvent(event: CallkitEventCallback.CallEvent, callData: Bundle) {
-            when (event) {
-                CallkitEventCallback.CallEvent.ACCEPT -> {
-                    // Do something with answer
-                }
-                CallkitEventCallback.CallEvent.DECLINE -> {
-                    // Do something with decline
-                }
-                else -> {
 
-                }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FlutterCallkitIncomingPlugin.registerEventCallback(callkitEventCallback)
     }
 
     override fun onDestroy() {
-        FlutterCallkitIncomingPlugin.unregisterEventCallback(callkitEventCallback)
         super.onDestroy()
     }
 

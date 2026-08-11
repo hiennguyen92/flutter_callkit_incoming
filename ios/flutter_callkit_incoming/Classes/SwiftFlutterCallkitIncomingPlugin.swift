@@ -288,7 +288,12 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             return
         }
         
-        self.configureAudioSession()
+        // Do NOT configure the audio session before reportNewIncomingCall.
+        // When maximumCallsPerCallGroup == 1 and a call is already active, iOS
+        // rejects the new call (error != nil). Re-activating the shared
+        // AVAudioSession up front would, in that rejected case, still interrupt
+        // the active call's audio (e.g. WebRTC breakage). Configure it only once
+        // the call is successfully reported, matching the fromPushKit variant.
         self.sharedProvider?.reportNewIncomingCall(with: uuid, update: callUpdate) { error in
             if(error == nil) {
                 self.configureAudioSession()
@@ -687,12 +692,20 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
+            // The call is not in the manager. This happens when:
+            //   1. iOS relaunched the (killed) app just to deliver this end action, or
+            //   2. a programmatic endCall raced with the user-initiated CXEndCallAction
+            //      that already removed the call.
+            // The user actively ended/declined the call, so report DECLINE (not
+            // TIMEOUT) so the app can notify its backend and stop ringing elsewhere.
+            // Fulfill (not fail) the action: failing a legitimate end action leaves
+            // a stale call in the system UI.
             if(self.answerCall == nil && self.outgoingCall == nil){
-                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TIMEOUT, self.data?.toJSON())
+                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
             } else {
                 sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, self.data?.toJSON())
             }
-            action.fail()
+            action.fulfill()
             return
         }
         call.endCall()
@@ -800,7 +813,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         sendDefaultAudioInterruptionNotificationToStartAudioResource()
         configureAudioSession()
 
-        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": true ])
+        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActive": true ])
     }
     
     public func provider(_ provider: CXProvider, didDeactivate audioSession: AVAudioSession) {
@@ -814,7 +827,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             return
         }
         
-        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": false ])
+        self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActive": false ])
     }
     
     private func sendMuteEvent(_ id: String, _ isMuted: Bool) {
