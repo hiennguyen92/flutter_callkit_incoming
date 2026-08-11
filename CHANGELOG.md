@@ -1,4 +1,20 @@
+## 3.1.5
+* Fix Android: resolve build errors introduced in 3.1.4.
+* Fix Android: always call `startForeground` to prevent `ForegroundServiceDidNotStartInTimeException`, thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/857
+* Fix Android: remove automatic launch of full screen intent settings that crashes `CallkitIncomingActivity` on Android 14+, thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/856
+* Fix Android: stop incoming ringtone from silencing itself, and silence it correctly on volume-key press, thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/855
+* Fix Android: native `OnDecline` callback not running when app is in terminated state, thank @salamay https://github.com/hiennguyen92/flutter_callkit_incoming/pull/854
+* Fix Android: complete Telecom hold integration for self-managed calls, thank @m-lhb https://github.com/hiennguyen92/flutter_callkit_incoming/pull/852
+* Fix Android: only add `MICROPHONE`/`CAMERA` foreground service types when permission is granted, thank @m-lhb https://github.com/hiennguyen92/flutter_callkit_incoming/pull/848
+* Fix Android: restore foreground service on OS restart to prevent microphone loss in background, thank @skutimechanic https://github.com/hiennguyen92/flutter_callkit_incoming/pull/842
+* Fix Android: `ActionCallToggleAudioSession` key name `isActivate` inconsistency, thank @skutimechanic https://github.com/hiennguyen92/flutter_callkit_incoming/pull/836
+* Fix iOS: send `isActive` (not `isActivate`) in `ACTION_CALL_TOGGLE_AUDIO_SESSION` events, thank @m-lhb https://github.com/hiennguyen92/flutter_callkit_incoming/pull/853
+* Fix iOS: audio session ordering and end-call action handling for edge cases, thank @m-lhb https://github.com/hiennguyen92/flutter_callkit_incoming/pull/850
+* Fix iOS: don't re-answer an already-connected call in `connectedCall`, thank @m-lhb https://github.com/hiennguyen92/flutter_callkit_incoming/pull/849
+* Fix iOS: crash on `ACTION_CALL_CUSTOM` — convert event body instead of unsafe cast, thank @andrei-uni https://github.com/hiennguyen92/flutter_callkit_incoming/pull/847
+
 ## 3.1.4
+
 * Fix Android: always call `startForeground` to prevent `ForegroundServiceDidNotStartInTimeException`, thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/857
 * Fix Android: remove automatic launch of full screen intent settings that crashes `CallkitIncomingActivity` on Android 14+, thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/856
 * Fix Android: stop incoming ringtone from silencing itself, and silence it correctly on volume-key press, thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/855
