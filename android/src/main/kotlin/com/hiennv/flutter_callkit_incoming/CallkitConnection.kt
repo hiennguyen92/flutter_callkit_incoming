@@ -136,6 +136,18 @@ class CallkitConnection(
         startResumeWatcher()
     }
 
+    /**
+     * While a Telecom call is ringing, volume-key presses never reach
+     * AudioService — PhoneWindowManager intercepts them and calls
+     * [android.telecom.TelecomManager.silenceRinger], which lands here.
+     * Self-managed connections do their own ringing, so stop our ringtone.
+     */
+    override fun onSilence() {
+        super.onSilence()
+        Log.d(TAG, "onSilence id=$callId")
+        FlutterCallkitIncomingPlugin.getInstance()?.getCallkitSoundPlayerManager()?.stop()
+    }
+
     override fun onUnhold() {
         super.onUnhold()
         Log.d(TAG, "onUnhold id=$callId")
