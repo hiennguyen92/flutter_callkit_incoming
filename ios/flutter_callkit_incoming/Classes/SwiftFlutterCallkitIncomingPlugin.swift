@@ -128,17 +128,25 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             result(true)
             break
         case "endCall":
-            guard let args = call.arguments else {
+            guard let getArgs = call.arguments as? [String: Any] else {
                 result(true)
                 return
             }
-            if(self.isFromPushKit){
-                self.endCall(self.data!)
-            }else{
-                if let getArgs = args as? [String: Any] {
-                    self.data = Data(args: getArgs)
-                    self.endCall(self.data!)
+            let endData = Data(args: getArgs)
+            // Honour the id the caller passed. The PushKit branch used to end
+            // `self.data` — the most recently *raised* call — and discard the
+            // argument, so with two push calls in one session, ending the
+            // first one tore down the second. `self.data` is only the fallback
+            // now, for a caller that passes no id at all.
+            if endData.uuid.isEmpty {
+                guard let stored = self.data else {
+                    result(true)
+                    return
                 }
+                self.endCall(stored)
+            } else {
+                self.data = endData
+                self.endCall(endData)
             }
             result(true)
             break
@@ -259,9 +267,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool, onError: ((Error?) -> Void)? = nil) {
         self.isFromPushKit = fromPushKit
-        if(fromPushKit){
-            self.data = data
-        }
+        // Mervey fork: see startCall — self.data must track every surface.
+        self.data = data
         
         if(data.isShowMissedCallNotification){
             CallkitNotificationManager.shared.addNotificationCategory(data.missedNotificationCallbackText)
@@ -361,9 +368,11 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     @objc public func startCall(_ data: Data, fromPushKit: Bool) {
         self.isFromPushKit = fromPushKit
-        if(fromPushKit){
-            self.data = data
-        }
+        // Mervey fork: track the latest call data on every surface (not only
+        // PushKit) — configureAudioSession()'s per-call guard and the
+        // CXStartCallAction handler read self.data, and the Dart-initiated
+        // paths otherwise leave it stale or nil.
+        self.data = data
         initCallkitProvider(data)
         self.callManager.startCall(data)
     }
@@ -397,16 +406,17 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         // PushKit branch reads uuid from self.data (stored during showCallkitIncoming);
         // non-PushKit reads from the incoming data. Either source can be invalid.
         let uuidSourceString: String
-        if self.isFromPushKit {
-            guard let stored = self.data else {
-                NSLog("[CallkitIncoming] endCall: PushKit branch but self.data is nil — ignored")
-                return
-            }
+        if !data.uuid.isEmpty {
+            uuidSourceString = data.uuid
+        } else if let stored = self.data {
             uuidSourceString = stored.uuid
+        } else {
+            NSLog("[CallkitIncoming] endCall: no call id given and self.data is nil — ignored")
+            return
+        }
+        if self.isFromPushKit {
             self.isFromPushKit = false
             self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
-        } else {
-            uuidSourceString = data.uuid
         }
         guard let uuid = UUID(uuidString: uuidSourceString) else {
             NSLog("[CallkitIncoming] endCall: invalid UUID '\(uuidSourceString)' — ignored")
@@ -421,15 +431,16 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     @objc public func connectedCall(_ data: Data) {
         // Guard against malformed UUID — see CallManager.swift:startCall for rationale.
         let uuidSourceString: String
-        if self.isFromPushKit {
-            guard let stored = self.data else {
-                NSLog("[CallkitIncoming] connectedCall: PushKit branch but self.data is nil — ignored")
-                return
-            }
-            uuidSourceString = stored.uuid
-            self.isFromPushKit = false
-        } else {
+        if !data.uuid.isEmpty {
             uuidSourceString = data.uuid
+        } else if let stored = self.data {
+            uuidSourceString = stored.uuid
+        } else {
+            NSLog("[CallkitIncoming] connectedCall: no call id given and self.data is nil — ignored")
+            return
+        }
+        if self.isFromPushKit {
+            self.isFromPushKit = false
         }
         guard let uuid = UUID(uuidString: uuidSourceString) else {
             NSLog("[CallkitIncoming] connectedCall: invalid UUID '\(uuidSourceString)' — ignored")
@@ -441,6 +452,36 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     @objc public func activeCalls() -> [[String: Any]] {
         return self.callManager.activeCalls()
+    }
+
+    /// Reports a call ended by the *remote* side — peer hung up, caller
+    /// cancelled, ring timed out, answered on another device — and drops it
+    /// from the call list. `reason` uses the `saveEndCall` codes
+    /// (1 failed, 2/6 remoteEnded, 3 unanswered, 4 answeredElsewhere,
+    /// 5 declinedElsewhere).
+    ///
+    /// `endCall(_:)` requests a CXEndCallAction, which tells CallKit the *local
+    /// user* hung up. For a remote end that is the wrong semantic — it is what
+    /// puts a cancelled incoming call in Recents as a normal ended call rather
+    /// than a missed one — and it is a transaction the system can refuse, where
+    /// a provider report cannot be.
+    ///
+    /// Removing the call has to happen here: `reportCall(with:endedAt:reason:)`
+    /// does not run the CXEndCallAction delegate, so without this the Call would
+    /// linger in `activeCalls()` and be replayed as live on the next launch.
+    @objc public func reportEndedCall(_ id: String, _ reason: Int) {
+        guard let uuid = UUID(uuidString: id) else {
+            NSLog("[CallkitIncoming] reportEndedCall: invalid UUID '\(id)' — ignored")
+            return
+        }
+        self.saveEndCall(id, reason)
+        if let call = self.callManager.callWithUUID(uuid: uuid) {
+            call.endCall()
+            self.callManager.removeCall(call)
+        }
+        if self.data?.uuid == id {
+            self.isFromPushKit = false
+        }
     }
     
     @objc public func endAllCalls() {
@@ -638,7 +679,14 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
-        let call = Call(uuid: action.callUUID, data: self.data!, isOutGoing: true)
+        // Mervey fork: never force-unwrap — a CXStartCallAction with no call
+        // data must fail the action, not crash the process.
+        guard let data = self.data else {
+            NSLog("[CallkitIncoming] CXStartCallAction with no call data — failing action")
+            action.fail()
+            return
+        }
+        let call = Call(uuid: action.callUUID, data: data, isOutGoing: true)
         call.handle = action.handle.value
         configureAudioSession()
         call.hasStartedConnectDidChange = { [weak self] in
