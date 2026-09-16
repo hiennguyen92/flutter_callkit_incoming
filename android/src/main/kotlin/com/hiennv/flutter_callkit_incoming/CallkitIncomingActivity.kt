@@ -57,13 +57,18 @@ class CallkitIncomingActivity : Activity() {
             }
 
         fun getIntentEnded(context: Context, isAccepted: Boolean): Intent {
+            // No component is named on purpose. The receiver waiting for this
+            // is registered at runtime in onCreate, and the framework gathers
+            // registered receivers only for an intent without a component
+            // (ActivityManagerService.broadcastIntentLocked). Naming one — an
+            // Activity class, which can never be a receiver — delivered the
+            // broadcast to nobody, so a call ended while the full-screen UI
+            // was up left it on screen until its own timeout fired.
+            //
+            // setPackage still keeps the broadcast inside the app.
             val intent = Intent("${context.packageName}.${ACTION_ENDED_CALL_INCOMING}")
             intent.putExtra("ACCEPTED", isAccepted)
             intent.setPackage(context.packageName)
-            intent.setClassName(
-                context.packageName,
-                "com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity"
-            )
             return intent
         }
     }
