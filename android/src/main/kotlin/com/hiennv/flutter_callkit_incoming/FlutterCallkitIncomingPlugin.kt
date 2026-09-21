@@ -236,6 +236,9 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        // A MethodChannel result may be submitted exactly once. Wrapping it means a
+        // throw after a successful reply cannot turn into "Reply already submitted".
+        val reply = SingleReply(result)
         try {
             when (call.method) {
                 "registerBackgroundHandler" -> {
@@ -244,12 +247,12 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     val userHandle = (args["userHandle"] as Number).toLong()
                     addBackgroundCallback(context, pluginHandle, userHandle)
                     CallkitBackgroundExecutor.start(requireNotNull(context), pluginHandle)
-                    result.success(null)
+                    reply.success(null)
                 }
 
                 "getBackgroundHandler" -> {
                     val handle = getUserCallback(context)
-                    result.success(handle)
+                    reply.success(handle)
                 }
 
                 "setAcceptCallHandle" -> {
@@ -259,7 +262,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                         val key = args[1] as? String ?: ""
                         saveHandle(context, key, handle)
                     }
-                    result.success(null)
+                    reply.success(null)
                 }
 
                 "showCallkitIncoming" -> {
@@ -273,21 +276,21 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                         )
                     )
 
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "showCallkitIncomingSilently" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
 
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "showMissCallNotification" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
                     callkitNotificationManager?.showMissCallNotification(data.toBundle())
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "startCall" -> {
@@ -299,7 +302,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                         )
                     )
 
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "muteCall" -> {
@@ -311,7 +314,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     }
                     sendEvent(CallkitConstants.ACTION_CALL_TOGGLE_MUTE, map)
 
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "holdCall" -> {
@@ -323,11 +326,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     }
                     sendEvent(CallkitConstants.ACTION_CALL_TOGGLE_HOLD, map)
 
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "isMuted" -> {
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "endCall" -> {
@@ -351,7 +354,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             )
                         }
                     }
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "callConnected" -> {
@@ -366,7 +369,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             )
                         )
                     }
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "endAllCalls" -> {
@@ -389,21 +392,21 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                         }
                     }
                     removeAllCalls(context)
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "activeCalls" -> {
-                    result.success(getDataActiveCallsForFlutter(context))
+                    reply.success(getDataActiveCallsForFlutter(context))
                 }
 
                 "getDevicePushTokenVoIP" -> {
-                    result.success("")
+                    reply.success("")
                 }
 
                 "silenceEvents" -> {
                     val silence = call.arguments as? Boolean ?: false
                     CallkitIncomingBroadcastReceiver.silenceEvents = silence
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "requestNotificationPermission" -> {
@@ -414,16 +417,16 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                         }
                     }
                     callkitNotificationManager?.requestNotificationPermission(activity, map)
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "requestFullIntentPermission" -> {
                     callkitNotificationManager?.requestFullIntentPermission(activity)
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "canUseFullScreenIntent" -> {
-                    result.success(callkitNotificationManager?.canUseFullScreenIntent() ?: true)
+                    reply.success(callkitNotificationManager?.canUseFullScreenIntent() ?: true)
                 }
 
                 // EDIT - clear the incoming notification/ring (after accept/decline/timeout)
@@ -431,19 +434,51 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     val data = Data(call.arguments() ?: HashMap())
                     callkitSoundPlayerManager?.stop()
                     callkitNotificationManager?.clearIncomingNotification(data.toBundle(), false)
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "endNativeSubsystemOnly" -> {
-                    result.success(true)
+                    reply.success(true)
                 }
 
                 "setAudioRoute" -> {
-                    result.success(true)
+                    reply.success(true)
+                }
+
+                else -> {
+                    // Without this an unknown method returns without submitting a
+                    // result, leaving the Dart Future pending forever.
+                    reply.notImplemented()
                 }
             }
         } catch (error: Exception) {
-            result.error("error", error.message, "")
+            Log.e(TAG, "onMethodCall(${call.method}) failed", error)
+            reply.error("error", error.message, "")
+        }
+    }
+
+    /**
+     * Forwards at most one reply to the underlying [Result]; later calls are dropped.
+     */
+    private class SingleReply(private val delegate: Result) : Result {
+        private var replied = false
+
+        override fun success(value: Any?) {
+            if (replied) return
+            replied = true
+            delegate.success(value)
+        }
+
+        override fun error(code: String, message: String?, details: Any?) {
+            if (replied) return
+            replied = true
+            delegate.error(code, message, details)
+        }
+
+        override fun notImplemented() {
+            if (replied) return
+            replied = true
+            delegate.notImplemented()
         }
     }
 

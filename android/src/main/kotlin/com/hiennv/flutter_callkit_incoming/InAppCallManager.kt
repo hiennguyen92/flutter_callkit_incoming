@@ -20,25 +20,38 @@ class InAppCallManager(private val context: Context) {
     fun registerPhoneAccount() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-        val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-        val componentName = ComponentName(context, CallkitConnectionService::class.java)
-        val handle = PhoneAccountHandle(componentName, ACCOUNT_ID)
+        // Runs on the plugin-attach path, so anything thrown here crashes the host app
+        // at startup. Telecom raises SecurityException without MANAGE_OWN_CALLS and
+        // IllegalArgumentException on some OEM builds; neither is worth a crash.
+        try {
+            val telecomManager =
+                context.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return
+            val componentName = ComponentName(context, CallkitConnectionService::class.java)
+            val handle = PhoneAccountHandle(componentName, ACCOUNT_ID)
 
-        val phoneAccount = PhoneAccount.builder(handle, "Callkit Incoming In-App Call")
-            .setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED)
-            .build()
+            val phoneAccount = PhoneAccount.builder(handle, "Callkit Incoming In-App Call")
+                .setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED)
+                .build()
 
-        telecomManager.registerPhoneAccount(phoneAccount)
-        Log.d(TAG, "PhoneAccount registered.")
+            telecomManager.registerPhoneAccount(phoneAccount)
+            Log.d(TAG, "PhoneAccount registered.")
+        } catch (e: Exception) {
+            Log.e(TAG, "registerPhoneAccount failed — self-managed Telecom unavailable", e)
+        }
     }
 
     fun unregisterPhoneAccount() {
-        val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-        val componentName = ComponentName(context, CallkitConnectionService::class.java)
-        val handle = PhoneAccountHandle(componentName, ACCOUNT_ID)
+        try {
+            val telecomManager =
+                context.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return
+            val componentName = ComponentName(context, CallkitConnectionService::class.java)
+            val handle = PhoneAccountHandle(componentName, ACCOUNT_ID)
 
-        telecomManager.unregisterPhoneAccount(handle)
-        Log.d(TAG, "PhoneAccount unregistered.")
+            telecomManager.unregisterPhoneAccount(handle)
+            Log.d(TAG, "PhoneAccount unregistered.")
+        } catch (e: Exception) {
+            Log.e(TAG, "unregisterPhoneAccount failed", e)
+        }
     }
 
     fun getPhoneAccountHandle(): PhoneAccountHandle {

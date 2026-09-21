@@ -1,3 +1,32 @@
+## 3.1.6
+
+Hotfix release. Low-risk corrections only — no API changes.
+
+**Behaviour changes to be aware of**
+* Android: `${applicationId}.PERMISSION_CALL` is now `signature` instead of `normal`. Any app could previously request it and forge incoming/accept/decline broadcasts. Only affects setups where a separately-signed companion app sends these broadcasts.
+* Android: the incoming and ongoing notifications now use the app's own icon as the small icon. Previously an internal drawable always won, so the app icon could never appear.
+* Android: the ringtone now respects silent and vibrate ringer modes. It previously played in silent mode.
+* iOS: **minimum deployment target raised to 15.0** (podspec was 10.0, `Package.swift` was 13.0). Xcode 26/27 refuse any target below 15.0 outright, so 3.1.5 could not be built with current Xcode at all. Apps still on an older Xcode that need iOS 13/14 should stay on 3.1.5.
+  If your own `Podfile`/Xcode project is still below 15.0 you must raise it too, and you may need a `post_install` hook forcing `IPHONEOS_DEPLOYMENT_TARGET` for dependencies that declare very old targets — the example app's `Podfile` shows the pattern.
+
+**Fixes**
+* iOS: `ACTION_CALL_DECLINE` stopped being emitted, and incoming calls stopped timing out, after the first outgoing call in a process. The internal call-state slots were never cleared.
+* iOS: `timedOutPerforming` resolved the call by the action's own identifier instead of `CXCallAction.callUUID`, so it never matched and `onTimeOut` never fired. It also fulfilled/failed a timed-out action, which `CXProvider` forbids.
+* iOS: the ringtone condition used `||` where `&&` was meant, setting an empty `ringtoneSound` on the provider configuration.
+* iOS: removed 2602 trailing NUL bytes from `SwiftFlutterCallkitIncomingPlugin.swift`, which made `grep`/`rg` treat the file as binary and skip it. Line endings normalised to LF.
+* iOS: the podspec pinned `VALID_ARCHS` to `x86_64` for the simulator, breaking arm64 simulator builds on Apple Silicon. Now uses `EXCLUDED_ARCHS`.
+* iOS: added `PrivacyInfo.xcprivacy` declaring the `UserDefaults` required-reason API (`CA92.1`). Verified to ship on both integration paths — inside `flutter_callkit_incoming.framework` under CocoaPods, and as a resource bundle under Swift Package Manager.
+* iOS: podspec version now tracks the package version instead of being pinned at `0.0.1`.
+* Android: an unknown method channel call returned without submitting a result, leaving the Dart `Future` pending forever. Replies are now routed through a guard so a throw after a successful reply can no longer raise `Reply already submitted`.
+* Android: `registerPhoneAccount` could throw on the plugin-attach path and crash the host app at startup.
+* Android: the incoming-call screen acquired a wake lock and never released it, keeping the screen on for the full ring duration even after the call was answered or declined.
+* Android: `incomingChannelEnabled()` had an operator-precedence bug that reported channels as enabled on pre-Android-8 devices even when notifications were disabled.
+* Android: the accept action's label fell back to the default when `textDecline` was empty rather than `textAccept`.
+* Android: the incoming-call screen's dynamic receiver was registered as `RECEIVER_EXPORTED` for an app-private action.
+* Android: `unregisterReceiver` is now guarded against `IllegalArgumentException`.
+* Android: added `android:showWhenLocked` to the incoming-call activity; several OEMs honour only the manifest attribute.
+* Android: dropped the unused `androidx.localbroadcastmanager` dependency.
+
 ## 3.1.5
 * Fix Android: resolve build errors introduced in 3.1.4.
 * Fix Android: always call `startForeground` to prevent `ForegroundServiceDidNotStartInTimeException`, thank @AAkira https://github.com/hiennguyen92/flutter_callkit_incoming/pull/857
