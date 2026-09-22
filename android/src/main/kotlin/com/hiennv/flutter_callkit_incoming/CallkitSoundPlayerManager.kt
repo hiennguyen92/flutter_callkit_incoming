@@ -54,8 +54,17 @@ class CallkitSoundPlayerManager(private val context: Context) {
     fun play(data: Bundle) {
         this.isPlaying = true
         this.prepare()
-        this.playSound(data)
-        this.playVibrator()
+
+        // Honour the ringer mode before making any sound: SILENT is fully quiet and
+        // VIBRATE vibrates without a ringtone. The check used to live inside
+        // playVibrator(), which left the ringtone audible in silent mode.
+        val ringerMode = (context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager)?.ringerMode
+        if (ringerMode != AudioManager.RINGER_MODE_SILENT) {
+            if (ringerMode != AudioManager.RINGER_MODE_VIBRATE) {
+                this.playSound(data)
+            }
+            this.playVibrator()
+        }
 
         val filter = IntentFilter(Intent.ACTION_SCREEN_OFF)
         context.registerReceiver(screenOffCallkitIncomingBroadcastReceiver, filter)

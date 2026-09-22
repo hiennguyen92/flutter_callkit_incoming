@@ -13,3 +13,13 @@ example/pubspec.lock
 
 .idea/*
 
+
+# Maintainer tooling and local working notes — not part of the package
+.claude/
+CLAUDE.md
+docs/
+plans/
+
+# Editor / scratch files
+CMD.md
+*.iml

@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "flutter_callkit_incoming",
     platforms: [
-        .iOS(.v13)
+        .iOS(.v15)
     ],
     products: [
         .library(
@@ -22,7 +22,7 @@ let package = Package(
                 .product(name: "CryptoSwift", package: "CryptoSwift")
             ],
             path: "Classes",
-            resources: []
+            resources: [.process("PrivacyInfo.xcprivacy")]
         )
     ]
 )

@@ -42,6 +42,8 @@ class CallkitIncomingActivity : Activity() {
 
     companion object {
 
+        private const val TAG = "CallkitIncomingActivity"
+
         private const val ACTION_ENDED_CALL_INCOMING =
             "com.hiennv.flutter_callkit_incoming.ACTION_ENDED_CALL_INCOMING"
 
@@ -80,6 +82,8 @@ class CallkitIncomingActivity : Activity() {
     }
 
     private var endedCallkitIncomingBroadcastReceiver = EndedCallkitIncomingBroadcastReceiver()
+
+    private var wakeLock: PowerManager.WakeLock? = null
 
     private lateinit var ivBackground: ImageView
     private lateinit var llBackgroundAnimation: RippleRelativeLayout
@@ -121,7 +125,7 @@ class CallkitIncomingActivity : Activity() {
             registerReceiver(
                 endedCallkitIncomingBroadcastReceiver,
                 IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}"),
-                Context.RECEIVER_EXPORTED,
+                Context.RECEIVER_NOT_EXPORTED,
             )
         } else {
             registerReceiver(
@@ -133,13 +137,25 @@ class CallkitIncomingActivity : Activity() {
     }
 
     private fun wakeLockRequest(duration: Long) {
-
+        releaseWakeLock()
         val pm = applicationContext.getSystemService(POWER_SERVICE) as PowerManager
-        val wakeLock = pm.newWakeLock(
+        wakeLock = pm.newWakeLock(
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
             "Callkit:PowerManager"
-        )
-        wakeLock.acquire(duration)
+        ).also { it.acquire(duration) }
+    }
+
+    /**
+     * Without this the screen stays forced on for the whole ring duration even after
+     * the call has been answered or declined.
+     */
+    private fun releaseWakeLock() {
+        try {
+            wakeLock?.takeIf { it.isHeld }?.release()
+        } catch (e: Exception) {
+            Log.e(TAG, "releaseWakeLock failed", e)
+        }
+        wakeLock = null
     }
 
     private fun transparentStatusAndNavigation() {
@@ -388,7 +404,13 @@ class CallkitIncomingActivity : Activity() {
     }
 
     override fun onDestroy() {
-        unregisterReceiver(endedCallkitIncomingBroadcastReceiver)
+        releaseWakeLock()
+        try {
+            unregisterReceiver(endedCallkitIncomingBroadcastReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Registration failed earlier, or onDestroy ran twice.
+            Log.w(TAG, "endedCallkitIncomingBroadcastReceiver was not registered")
+        }
         super.onDestroy()
     }
 

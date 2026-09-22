@@ -19,9 +19,11 @@
 
     <uses-permission android:name="${applicationId}.PERMISSION_CALL" />
 
+    <!-- signature: only the app itself may drive these components. With "normal" any
+         installed app could request it and forge incoming/accept/decline broadcasts. -->
     <permission
         android:name="${applicationId}.PERMISSION_CALL"
-        android:protectionLevel="normal" />
+        android:protectionLevel="signature" />
 
     <application>
 
@@ -30,6 +32,7 @@
             android:taskAffinity=""
             android:excludeFromRecents="true"
             android:noHistory="true"
+            android:showWhenLocked="true"
             android:turnScreenOn="true"
             android:configChanges="orientation"
             android:exported="true"
