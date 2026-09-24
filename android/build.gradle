@@ -37,6 +37,5 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
-    //noinspection GradleDependency
-    implementation "io.coil-kt:coil:1.4.0"
+    implementation "io.coil-kt:coil:2.7.0"
 }

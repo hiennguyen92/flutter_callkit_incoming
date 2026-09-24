@@ -10,7 +10,7 @@ import android.widget.ImageView
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.target.Target
-import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
+import coil.transform.CircleCropTransformation
 import okhttp3.OkHttpClient
 
 object ImageLoaderProvider {
@@ -48,7 +48,7 @@ object ImageLoaderProvider {
         }
         requestBuilder.data(url)
         requestBuilder.allowHardware(false)
-        requestBuilder.transformations(CircleTransform())
+        requestBuilder.transformations(CircleCropTransformation())
         requestBuilder.target(target)
 
         imageLoader.enqueue(requestBuilder.build())
