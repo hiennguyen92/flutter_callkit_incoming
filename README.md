@@ -299,6 +299,31 @@ await FlutterCallkitIncoming.setCallConnected(this._currentUuid);
 
 > **Note:** After the call is ACCEPT or startCall, please call this function. Normally it should be called when WebRTC/P2P is established.
 
+#### Set Audio Route (Android)
+
+Android only, and only for calls hosted in Telecom as self-managed connections (Android 8+, the plugin's default when `MANAGE_OWN_CALLS` is granted). Use it during an ongoing call to move the audio between the earpiece, the loudspeaker and a connected headset:
+
+| `AudioRoute` | Audio goes to |
+|--------------|---------------|
+| `AudioRoute.earpiece` | Earpiece. This is also what "speaker off" means: if a Bluetooth or wired headset is connected, the call goes back to that headset instead of the earpiece. |
+| `AudioRoute.speaker` | Loudspeaker. |
+| `AudioRoute.bluetooth` | Bluetooth (SCO) headset. |
+| `AudioRoute.wiredHeadset` | Wired headset. |
+
+```dart
+import 'package:flutter_callkit_incoming/entities/entities.dart';
+
+final isSpeaker = true;
+await FlutterCallkitIncoming.setAudioRoute(
+  this._currentUuid,
+  isSpeaker ? AudioRoute.speaker : AudioRoute.earpiece,
+);
+```
+
+> **Note:** `AudioRoute` lives with the other public types in `lib/entities`, so import `package:flutter_callkit_incoming/entities/entities.dart` (or `.../entities/audio_route.dart`) next to the plugin import.
+
+Returns `true` when the request was accepted for an active call, and `false` when there is none (or the platform does not support it — e.g. on iOS, where the route belongs to `AVAudioSession`). The platform applies the closest route it supports, so on a device with no earpiece `AudioRoute.earpiece` lands on the speaker. The route is re-applied automatically when the system reports an audio change (headset connecting/disconnecting, another call taking the audio), so the app does not need to listen for those events.
+
 #### Get Device Push Token VoIP
 
 iOS: returns deviceToken, Android: returns none

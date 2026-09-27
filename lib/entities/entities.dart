@@ -1,4 +1,5 @@
 export './android_params.dart';
+export './audio_route.dart';
 export './call_event.dart';
 export './call_kit_params.dart';
 export './ios_params.dart';

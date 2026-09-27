@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.telecom.CallAudioState
 import android.telecom.Connection
 import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
@@ -50,9 +51,34 @@ class CallkitConnection(
         /** Bundle key — pass the full call Data bundle through Telecom extras. */
         const val EXTRA_CALL_BUNDLE = "com.hiennv.flutter_callkit_incoming.CALL_BUNDLE"
 
+        /**
+         * Routes this plugin exposes to the app, as `CallAudioState.ROUTE_*`
+         * values. Anything else is rejected.
+         */
+        private val KNOWN_ROUTES = setOf(
+            CallAudioState.ROUTE_EARPIECE,
+            CallAudioState.ROUTE_SPEAKER,
+            CallAudioState.ROUTE_BLUETOOTH,
+            CallAudioState.ROUTE_WIRED_HEADSET,
+        )
+
         private val activeConnections = ConcurrentHashMap<String, CallkitConnection>()
 
         fun find(callId: String): CallkitConnection? = activeConnections[callId]
+
+        /**
+         * Connection the app should be routing audio on: the one registered
+         * under [callId] when it is known, otherwise the only active
+         * self-managed connection (the plugin hosts a single call in practice).
+         * Null when there is nothing to route.
+         */
+        fun resolveActive(callId: String?): CallkitConnection? {
+            if (callId != null) {
+                activeConnections[callId]?.let { return it }
+                Log.d(TAG, "resolveActive: no connection for id=$callId, falling back")
+            }
+            return activeConnections.values.singleOrNull()
+        }
 
         fun register(callId: String, conn: CallkitConnection) {
             activeConnections[callId] = conn
@@ -161,6 +187,122 @@ class CallkitConnection(
             CallkitConstants.ACTION_CALL_TOGGLE_HOLD,
             mapOf("id" to callId, "isOnHold" to false),
         )
+    }
+
+    // -------------------------------------------------------------------------
+    // Audio routing (self-managed call contract)
+    //
+    // For a self-managed call Telecom owns the platform audio mode, so the app
+    // can no longer route audio with AudioManager: measured on Android 14,
+    // setCommunicationDevice(SPEAKER) is accepted but the active communication
+    // device stays on earpiece, and the legacy setSpeakerphoneOn(true) does not
+    // even flip its own flag. Android's contract for a self-managed call is
+    // that the app states its route on its own Connection — this section
+    // implements exactly that via Connection.setAudioRoute(int) and the
+    // android.telecom.CallAudioState.ROUTE_* constants.
+    // -------------------------------------------------------------------------
+
+    /** Route the app asked for, or null when it never asked (system default). */
+    private var requestedRoute: Int? = null
+
+    /**
+     * Apply a `CallAudioState.ROUTE_*` route to this connection and remember it
+     * so it can be restored on the next audio state change.
+     *
+     * @return true when the route was handed to Telecom, false otherwise.
+     */
+    fun requestAudioRoute(route: Int): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            // Connection.setAudioRoute() and CallAudioState are API 23+, while
+            // this module's minSdk is 16 — guard instead of crashing.
+            Log.w(TAG, "requestAudioRoute unsupported below API 23 id=$callId")
+            return false
+        }
+        if (route !in KNOWN_ROUTES) {
+            Log.w(TAG, "requestAudioRoute unknown route=$route id=$callId")
+            return false
+        }
+        requestedRoute = route
+        val supported = currentSupportedRouteMask()
+        val resolved = resolveRoute(route, supported)
+        Log.d(
+            TAG,
+            "requestAudioRoute id=$callId requested=$route supported=$supported resolved=$resolved",
+        )
+        return applyAudioRoute(resolved)
+    }
+
+    /**
+     * Telecom notifies route changes here — a Bluetooth headset connecting or
+     * disconnecting, another call taking the audio, the system re-picking a
+     * device. Re-apply the route the app asked for, mapped onto the routes
+     * Telecom reports as available right now; without this override a single
+     * system event silently drops the app's choice.
+     */
+    override fun onCallAudioStateChanged(audioState: CallAudioState?) {
+        super.onCallAudioStateChanged(audioState)
+        val state = audioState ?: return
+        // The app never asked for a route: keep the system default behaviour.
+        val requested = requestedRoute ?: return
+        val resolved = resolveRoute(requested, state.supportedRouteMask)
+        // Already there — also stops a setAudioRoute / onCallAudioStateChanged loop.
+        if (state.route == resolved) return
+        Log.d(
+            TAG,
+            "onCallAudioStateChanged id=$callId requested=$requested current=${state.route} " +
+                "supported=${state.supportedRouteMask} resolved=$resolved",
+        )
+        applyAudioRoute(resolved)
+    }
+
+    private fun applyAudioRoute(route: Int): Boolean {
+        return try {
+            setAudioRoute(route)
+            true
+        } catch (e: Exception) {
+            // Stale or destroyed connection: report the failure instead of
+            // throwing at the MethodChannel caller.
+            Log.w(TAG, "setAudioRoute($route) failed id=$callId: ${e.message}")
+            false
+        }
+    }
+
+    /**
+     * Map the route the app asked for onto the routes Telecom reports as
+     * available, so a request is not dropped just because a headset is, or is
+     * not, connected at that moment.
+     *
+     * Asking for earpiece means "speaker off", not "earpiece": when a headset
+     * is connected the call must go back to it — this is what the platform
+     * itself does when the user turns the speaker off on the system call UI.
+     */
+    private fun resolveRoute(requested: Int, supportedRouteMask: Int): Int {
+        if (supportedRouteMask == 0) return requested // no route hint from Telecom
+        if (requested == CallAudioState.ROUTE_EARPIECE) {
+            return preferredHeadsetRoute(supportedRouteMask)
+        }
+        if (isRouteSupported(requested, supportedRouteMask)) return requested
+        return preferredHeadsetRoute(supportedRouteMask)
+    }
+
+    /** Bluetooth, then wired headset, then earpiece — the non-speaker preference order. */
+    private fun preferredHeadsetRoute(supportedRouteMask: Int): Int = when {
+        isRouteSupported(CallAudioState.ROUTE_BLUETOOTH, supportedRouteMask) ->
+            CallAudioState.ROUTE_BLUETOOTH
+        isRouteSupported(CallAudioState.ROUTE_WIRED_HEADSET, supportedRouteMask) ->
+            CallAudioState.ROUTE_WIRED_HEADSET
+        isRouteSupported(CallAudioState.ROUTE_EARPIECE, supportedRouteMask) ->
+            CallAudioState.ROUTE_EARPIECE
+        else -> CallAudioState.ROUTE_SPEAKER
+    }
+
+    private fun isRouteSupported(route: Int, supportedRouteMask: Int): Boolean =
+        supportedRouteMask and route == route
+
+    private fun currentSupportedRouteMask(): Int = try {
+        callAudioState?.supportedRouteMask ?: 0
+    } catch (e: Exception) {
+        0
     }
 
     // -------------------------------------------------------------------------

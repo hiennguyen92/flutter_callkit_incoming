@@ -163,6 +163,29 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("holdCall", {'id': id, 'isOnHold': isOnHold});
   }
 
+  /// Set the audio route of an ongoing call.
+  ///
+  /// Only Android, and only for calls hosted in Telecom as self-managed
+  /// connections: unlike an ordinary app, a self-managed call states its route
+  /// on its own Telecom connection, so this method is the only way to route
+  /// audio for such a call. On iOS the route belongs to `AVAudioSession`.
+  ///
+  /// Returns `true` when the request was accepted for an active call, `false`
+  /// when there is no such call (or the platform does not support routing).
+  /// The platform applies the closest route it supports, so on a device with no
+  /// earpiece [AudioRoute.earpiece] lands on the speaker.
+  ///
+  /// Turning the speaker off is [AudioRoute.earpiece]; if a Bluetooth or wired
+  /// headset is connected, the call returns to that device instead of the
+  /// earpiece.
+  static Future<bool> setAudioRoute(String id, AudioRoute route) async {
+    return (await _channel.invokeMethod('setAudioRoute', {
+          'id': id,
+          'route': route.value,
+        })) as bool? ??
+        false;
+  }
+
   /// End an Incoming/Outgoing call.
   /// On iOS, using Callkit(update a history into the Phone app).
   /// On Android, Nothing(only callback event listener).

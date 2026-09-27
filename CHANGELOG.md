@@ -1,3 +1,9 @@
+## Unreleased
+
+* Android: implemented `FlutterCallkitIncoming.setAudioRoute` for self-managed calls, and added the `AudioRoute` enum (`earpiece`, `speaker`, `bluetooth`, `wiredHeadset`). The route is now stated on the self-managed Telecom `Connection` and re-applied whenever the system reports an audio state change, so it survives a headset connecting or disconnecting. `AudioManager` is deliberately not used: for a self-managed call Telecom owns the audio mode, and both `setCommunicationDevice()` and the legacy `setSpeakerphoneOn()` are ineffective there (measured on Android 14).
+* Android: the `setAudioRoute` channel handler used to reply `true` unconditionally. It now returns `true` only when there is an active self-managed connection to route to, and `false` when there is none. The method was not reachable from Dart before, so no shipped code depended on the old value.
+* Android: with no call to `setAudioRoute`, behaviour is unchanged — the route stays whatever the system picks (earpiece by default).
+
 ## 3.1.6
 
 Hotfix release. Low-risk corrections only — no API changes.

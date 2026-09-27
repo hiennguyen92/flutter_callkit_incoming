@@ -441,8 +441,22 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     reply.success(true)
                 }
 
+                // Routes an ongoing self-managed (Telecom) call. The route is
+                // stated on the Connection, not through AudioManager, because
+                // Telecom owns the audio mode for self-managed calls. Replies
+                // false — instead of throwing or leaving the Dart Future
+                // pending — when there is no active connection to route.
                 "setAudioRoute" -> {
-                    reply.success(true)
+                    val args = call.arguments as? Map<*, *>
+                    val id = args?.get("id") as? String
+                    val route = (args?.get("route") as? Number)?.toInt()
+                    val connection = CallkitConnection.resolveActive(id)
+                    if (connection == null || route == null) {
+                        Log.w(TAG, "setAudioRoute: no active self-managed connection id=$id")
+                        reply.success(false)
+                    } else {
+                        reply.success(connection.requestAudioRoute(route))
+                    }
                 }
 
                 else -> {

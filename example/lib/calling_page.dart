@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_callkit_incoming_example/navigation_service.dart';
 import 'package:http/http.dart';
@@ -19,6 +20,7 @@ class CallingPageState extends State<CallingPage> {
 
   Timer? _timer;
   int _start = 0;
+  bool _isSpeakerOn = false;
 
   void startTimer() {
     const oneSec = Duration(seconds: 1);
@@ -74,6 +76,25 @@ class CallingPageState extends State<CallingPage> {
                   }
                 },
                 child: const Text('Fake Connected Call'),
+              ),
+              // Manual QA harness for `setAudioRoute` on a self-managed call:
+              // the route only changes through the Telecom Connection, and the
+              // button reports whether the plugin really applied it.
+              TextButton(
+                onPressed: () async {
+                  if (callingId == null) return;
+                  final route =
+                      _isSpeakerOn ? AudioRoute.earpiece : AudioRoute.speaker;
+                  final applied = await FlutterCallkitIncoming.setAudioRoute(
+                    callingId!,
+                    route,
+                  );
+                  debugPrint('setAudioRoute $route applied=$applied');
+                  if (applied && mounted) {
+                    setState(() => _isSpeakerOn = !_isSpeakerOn);
+                  }
+                },
+                child: Text(_isSpeakerOn ? 'Speaker Off' : 'Speaker On'),
               ),
               TextButton(
                 style: ButtonStyle(
