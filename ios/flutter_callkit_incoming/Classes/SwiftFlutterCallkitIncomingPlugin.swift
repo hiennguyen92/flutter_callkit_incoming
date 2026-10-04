@@ -132,13 +132,19 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 result(true)
                 return
             }
-            if(self.isFromPushKit){
-                self.endCall(self.data!)
-            }else{
-                if let getArgs = args as? [String: Any] {
-                    self.data = Data(args: getArgs)
-                    self.endCall(self.data!)
+            // End the call the caller asked for. `self.data` only holds the
+            // LAST call delivered via PushKit, so with two calls it is the
+            // wrong one.
+            if let getArgs = args as? [String: Any],
+               let id = getArgs["id"] as? String,
+               UUID(uuidString: id) != nil {
+                let requested = Data(args: getArgs)
+                if !self.isFromPushKit {
+                    self.data = requested
                 }
+                self.endCall(requested)
+            } else if(self.isFromPushKit){
+                self.endCall(self.data!)
             }
             result(true)
             break
@@ -402,7 +408,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 NSLog("[CallkitIncoming] endCall: PushKit branch but self.data is nil — ignored")
                 return
             }
-            uuidSourceString = stored.uuid
+            // The requested uuid wins; `stored` is only the last PushKit call.
+            uuidSourceString = UUID(uuidString: data.uuid) != nil ? data.uuid : stored.uuid
             self.isFromPushKit = false
             self.sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, data.toJSON())
         } else {
@@ -702,6 +709,17 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
 //    }
     
     
+    /// Event body for a call that is no longer in callManager.
+    /// `self.data` only holds the LAST call delivered via PushKit, so it is
+    /// used only when it is the same call. Otherwise send just the id, so the
+    /// app does not act on (decline / end) a different call.
+    private func eventBody(for uuid: UUID) -> [String: Any] {
+        if let stored = self.data, UUID(uuidString: stored.uuid) == uuid {
+            return stored.toJSON()
+        }
+        return ["id": uuid.uuidString]
+    }
+    
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
             // The call is not in the manager. This happens when:
@@ -713,9 +731,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             // Fulfill (not fail) the action: failing a legitimate end action leaves
             // a stale call in the system UI.
             if(self.answerCall == nil && self.outgoingCall == nil){
-                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
+                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.eventBody(for: action.callUUID))
             } else {
-                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, self.data?.toJSON())
+                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ENDED, self.eventBody(for: action.callUUID))
             }
             self.clearCallStateSlots(for: action.callUUID)
             action.fulfill()
@@ -726,7 +744,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         let wasUnanswered = (self.answerCall == nil && self.outgoingCall == nil)
         self.clearCallStateSlots(for: action.callUUID)
         if wasUnanswered {
-            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
+            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_DECLINE, call.data.toJSON())
             if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
                 appDelegate.onDecline(call, action)
             } else {
