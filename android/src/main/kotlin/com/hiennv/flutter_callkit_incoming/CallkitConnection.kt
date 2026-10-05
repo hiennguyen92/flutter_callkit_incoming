@@ -68,6 +68,24 @@ class CallkitConnection(
         }
 
         fun activeCount(): Int = activeConnections.size
+
+        /**
+         * Incoming calls shown from Dart whose broadcast the receiver has not
+         * handled yet. `showCallkitIncoming` only sends that broadcast; the
+         * call's stored data exists once it is handled, and an `endCall` in
+         * between found none and did nothing.
+         */
+        private val incomingRequested = ConcurrentHashMap.newKeySet<String>()
+
+        fun markIncomingRequested(callId: String) {
+            incomingRequested.add(callId)
+        }
+
+        fun incomingHandled(callId: String) {
+            incomingRequested.remove(callId)
+        }
+
+        fun isIncomingRequested(callId: String): Boolean = incomingRequested.contains(callId)
     }
 
     init {

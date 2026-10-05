@@ -268,6 +268,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "showCallkitIncoming" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     data.from = "notification"
+                    CallkitConnection.markIncomingRequested(data.id)
                     //send BroadcastReceiver
                     context?.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getIntentIncoming(
@@ -337,7 +338,18 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     val calls = getDataActiveCalls(context)
                     val data = Data(call.arguments() ?: HashMap())
                     val currentCall = calls.firstOrNull { it.id == data.id }
-                    if (currentCall != null && context != null) {
+                    if (currentCall == null && context != null &&
+                        CallkitConnection.isIncomingRequested(data.id)
+                    ) {
+                        // Its incoming broadcast is still queued: this decline
+                        // queues behind it, so the call is shown, then ended.
+                        context?.sendBroadcast(
+                            CallkitIncomingBroadcastReceiver.getIntentDecline(
+                                requireNotNull(context),
+                                data.toBundle()
+                            )
+                        )
+                    } else if (currentCall != null && context != null) {
                         if(currentCall.isAccepted) {
                             context?.sendBroadcast(
                                 CallkitIncomingBroadcastReceiver.getIntentEnded(
