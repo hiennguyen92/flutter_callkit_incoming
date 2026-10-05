@@ -56,6 +56,11 @@ class CallkitConnectionService : ConnectionService() {
             return failed("Empty call id")
         }
 
+        if (CallkitConnection.takeEndedBeforeCreated(callId)) {
+            Log.d(TAG, "onCreateIncomingConnection id=$callId: already ended")
+            return failed("Call already ended")
+        }
+
         Log.d(TAG, "onCreateIncomingConnection id=$callId caller=${data.nameCaller}")
 
         val connection = CallkitConnection(applicationContext, callId, callBundle).apply {
@@ -94,6 +99,11 @@ class CallkitConnectionService : ConnectionService() {
         if (callId.isEmpty()) {
             Log.w(TAG, "onCreateOutgoingConnection: empty call id")
             return failed("Empty call id")
+        }
+
+        if (CallkitConnection.takeEndedBeforeCreated(callId)) {
+            Log.d(TAG, "onCreateOutgoingConnection id=$callId: already ended")
+            return failed("Call already ended")
         }
 
         Log.d(TAG, "onCreateOutgoingConnection id=$callId callee=${data.nameCaller}")

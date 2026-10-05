@@ -68,6 +68,25 @@ class CallkitConnection(
         }
 
         fun activeCount(): Int = activeConnections.size
+
+        /**
+         * Calls ended (declined, hung up, timed out) before Telecom created
+         * their connection. Telecom creates it a few hundred ms after
+         * addNewIncomingCall / placeCall; an end arriving in between found no
+         * connection and was dropped, and the connection then rang (or
+         * dialled) for good, holding the phone in ringtone mode.
+         */
+        private val endedBeforeCreated = ConcurrentHashMap.newKeySet<String>()
+
+        fun markEndedBeforeCreated(callId: String) {
+            // Also reached for calls whose connection already finished; those
+            // ids are never taken, so keep the set small.
+            if (endedBeforeCreated.size > 50) endedBeforeCreated.clear()
+            endedBeforeCreated.add(callId)
+        }
+
+        /** True once for a call ended before its connection was created. */
+        fun takeEndedBeforeCreated(callId: String): Boolean = endedBeforeCreated.remove(callId)
     }
 
     init {
