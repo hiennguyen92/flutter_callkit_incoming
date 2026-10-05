@@ -59,11 +59,10 @@ class CallkitIncomingActivity : Activity() {
         fun getIntentEnded(context: Context, isAccepted: Boolean): Intent {
             val intent = Intent("${context.packageName}.${ACTION_ENDED_CALL_INCOMING}")
             intent.putExtra("ACCEPTED", isAccepted)
+            // Package only: a broadcast that names a class is delivered to that
+            // component alone, and an Activity is not a receiver, so the
+            // receiver this screen registers at runtime never got it.
             intent.setPackage(context.packageName)
-            intent.setClassName(
-                context.packageName,
-                "com.hiennv.flutter_callkit_incoming.CallkitIncomingActivity"
-            )
             return intent
         }
     }
