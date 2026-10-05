@@ -231,6 +231,17 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("canUseFullScreenIntent");
   }
 
+  /// Only Android: whether an incoming call can ring outside the app
+  /// (notifications allowed, the incoming-call channel not turned off).
+  static Future<bool> canRingIncoming() async {
+    return await _channel.invokeMethod("canRingIncoming");
+  }
+
+  /// Only Android: the settings page that turns incoming calls back on.
+  static Future<void> openIncomingCallSettings() async {
+    await _channel.invokeMethod("openIncomingCallSettings");
+  }
+
   static CallEvent? _receiveCallEvent(dynamic data) {
     if (data is! Map) {
       return null;

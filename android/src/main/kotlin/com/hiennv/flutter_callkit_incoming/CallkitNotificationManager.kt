@@ -1085,6 +1085,32 @@ class CallkitNotificationManager(
         }
     }
 
+    // Whether an incoming call can ring outside the app: notifications allowed
+    // and the incoming-call channel not turned off. A channel not created yet
+    // (no call so far) is created on, so it counts as on.
+    fun canRingIncoming(): Boolean = getNotificationManager().run {
+        if (!areNotificationsEnabled()) return false
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return true
+        val channel = getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING) ?: return true
+        return channel.importance != NotificationManagerCompat.IMPORTANCE_NONE
+    }
+
+    // The settings page that turns incoming calls back on: the app's
+    // notifications when they are all off, else the incoming-call channel.
+    fun openIncomingCallSettings(activity: Activity?) {
+        val context = activity ?: this.context
+        val intent = if (!getNotificationManager().areNotificationsEnabled() ||
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.O
+        ) {
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        } else {
+            Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_CHANNEL_ID, NOTIFICATION_CHANNEL_ID_INCOMING)
+        }.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        if (activity == null) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    }
+
     fun canUseFullScreenIntent(): Boolean {
         val canUseFullScreenIntent = getNotificationManager().canUseFullScreenIntent()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {

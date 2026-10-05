@@ -212,6 +212,17 @@ await FlutterCallkitIncoming.canUseFullScreenIntent();
 await FlutterCallkitIncoming.requestFullIntentPermission();
 ```
 
+#### Check that incoming calls can ring (Android)
+
+If the user turned off the app's notifications, or only its incoming-call channel, an incoming call shows nothing and plays no ringtone. Check it and send the user to the right settings page:
+
+```dart
+if (!await FlutterCallkitIncoming.canRingIncoming()) {
+  // The app's notification settings, or the incoming-call channel's page.
+  await FlutterCallkitIncoming.openIncomingCallSettings();
+}
+```
+
 #### Show Missed Call Notification
 ```dart
 this._currentUuid = _uuid.v4();
