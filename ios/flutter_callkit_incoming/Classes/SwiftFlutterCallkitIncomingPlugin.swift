@@ -136,8 +136,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 self.endCall(self.data!)
             }else{
                 if let getArgs = args as? [String: Any] {
-                    self.data = Data(args: getArgs)
-                    self.endCall(self.data!)
+                    self.endCall(self.dataFor(Data(args: getArgs)))
                 }
             }
             result(true)
@@ -184,10 +183,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             if(self.isFromPushKit){
                 self.connectedCall(self.data!)
             }else{
-                    if let getArgs = args as? [String: Any] {
-                    self.data = Data(args: getArgs)
-                    self.connectedCall(self.data!)
-                    }
+                if let getArgs = args as? [String: Any] {
+                    self.connectedCall(self.dataFor(Data(args: getArgs)))
+                }
             }
             result(true)
             break
@@ -439,6 +437,19 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.callManager.connectedCall(call: call)
     }
     
+    /// `endCall` and `callConnected` receive only `{id}` from Dart. For the
+    /// call already stored, keep its full parameters: `configureAudioSession()`
+    /// reads them again (1.2 s after an answer and on every `didActivate`), and
+    /// an id-only `Data` has the defaults (`configureAudioSession` true, mode
+    /// `default`). Another call's id replaces them, as before.
+    private func dataFor(_ data: Data) -> Data {
+        if let stored = self.data, stored.uuid.lowercased() == data.uuid.lowercased() {
+            return stored
+        }
+        self.data = data
+        return data
+    }
+
     @objc public func activeCalls() -> [[String: Any]] {
         return self.callManager.activeCalls()
     }
