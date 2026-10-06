@@ -109,6 +109,11 @@ class CallkitConnectionService : ConnectionService() {
             )
             setDialing()
         }
+        // The app may now start its call: Telecom took it (and held any other
+        // call it had to).
+        applicationContext.sendBroadcast(
+            CallkitIncomingBroadcastReceiver.getIntentPlaced(applicationContext, callBundle),
+        )
         return connection
     }
 

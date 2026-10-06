@@ -257,6 +257,8 @@ class HomePageState extends State<HomePage> {
           case CallEventActionCallEnded():
             NavigationService.instance.popUntil(AppRoute.homePage);
             break;
+          case CallEventActionCallPlaced():
+            break;
           case CallEventActionCallConnected():
             break;
           case CallEventActionCallTimeout():

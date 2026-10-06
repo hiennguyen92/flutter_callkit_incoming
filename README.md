@@ -352,6 +352,9 @@ FlutterCallkitIncoming.onEvent.listen((CallEvent event) {
     case Event.actionCallTimeout:
       // TODO: missed an incoming call
       break;
+    case Event.actionCallPlaced:
+      // TODO: only Android: Telecom took the outgoing call; start it now
+      break;
     case Event.actionCallCallback:
       // TODO: click action `Call back` from missed call notification
       break;

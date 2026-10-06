@@ -19,6 +19,8 @@ abstract class CallEventConstants {
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT';
   static const String actionCallConnected =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CONNECTED';
+  static const String actionCallPlaced =
+      'com.hiennv.flutter_callkit_incoming.ACTION_CALL_PLACED';
   static const String actionCallCallback =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK';
   static const String actionCallToggleHold =
@@ -116,6 +118,24 @@ class CallEventActionCallEnded extends CallEvent {
   @override
   String toString() =>
       'CallEventActionCallEnded(callKitParams: $callKitParams)';
+}
+
+/// Android: an outgoing call started with `startCall` may go out now. Telecom
+/// took it (holding another app's call if it had to), or Telecom isn't used
+/// for it (no MANAGE_OWN_CALLS, Android < 8). Apps that wait for it start
+/// their own call only once the system has agreed, as Android asks of
+/// self-managed calling apps.
+class CallEventActionCallPlaced extends CallEvent {
+  const CallEventActionCallPlaced(this.callKitParams);
+
+  @override
+  String get eventName => CallEventConstants.actionCallPlaced;
+
+  final CallKitParams callKitParams;
+
+  @override
+  String toString() =>
+      'CallEventActionCallPlaced(callKitParams: $callKitParams)';
 }
 
 class CallEventActionCallTimeout extends CallEvent {

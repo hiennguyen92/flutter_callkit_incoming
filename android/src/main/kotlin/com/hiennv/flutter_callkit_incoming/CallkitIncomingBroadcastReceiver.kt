@@ -99,6 +99,15 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 `package` = context.packageName
             }
 
+        /** The outgoing call may go out: Telecom took it, or isn't used for it. */
+        fun getIntentPlaced(context: Context, data: Bundle?) =
+            Intent().apply {
+                setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
+                action = "${context.packageName}.${CallkitConstants.ACTION_CALL_PLACED}"
+                putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
+                `package` = context.packageName
+            }
+
         fun getIntentConnected(context: Context, data: Bundle?) =
             Intent().apply {
                 setClassName(context.packageName, "com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver")
@@ -162,24 +171,34 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
      */
     @SuppressLint("MissingPermission")
     private fun registerTelecomOutgoingCall(context: Context, data: Bundle) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val parsed = try {
             Data.fromBundle(data)
         } catch (e: Exception) {
             null
         } ?: return
         if (parsed.id.isEmpty()) return
+        // A call Telecom isn't asked about may go out at once; one it is asked
+        // about waits for CallkitConnectionService (placed or refused).
+        if (!placeWithTelecom(context, data, parsed)) {
+            context.sendBroadcast(getIntentPlaced(context, data))
+        }
+    }
+
+    /** True when Telecom was asked to place the call. */
+    @SuppressLint("MissingPermission")
+    private fun placeWithTelecom(context: Context, data: Bundle, parsed: Data): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
         if (CallkitConnection.find(parsed.id) != null) {
             Log.d(TAG, "Telecom call already registered id=${parsed.id} — skip")
-            return
+            return false
         }
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.MANAGE_OWN_CALLS)
             != PackageManager.PERMISSION_GRANTED
         ) {
             Log.w(TAG, "MANAGE_OWN_CALLS not granted — Telecom outgoing skipped")
-            return
+            return false
         }
-        val telecom = context.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return
+        val telecom = context.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false
         val manager = InAppCallManager(context.applicationContext)
         val handle = manager.getPhoneAccountHandle()
         val outgoingExtras = Bundle().apply {
@@ -190,13 +209,16 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, outgoingExtras)
         }
         val address = parsed.handle.ifEmpty { parsed.id }
-        try {
+        return try {
             telecom.placeCall(Uri.fromParts("tel", address, null), extras)
             Log.d(TAG, "Telecom placeCall id=${parsed.id}")
+            true
         } catch (e: SecurityException) {
             Log.w(TAG, "Telecom placeCall rejected: ${e.message}")
+            false
         } catch (e: Exception) {
             Log.w(TAG, "Telecom placeCall error: ${e.message}")
+            false
         }
     }
 
@@ -315,6 +337,14 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     notificationManager?.showMissCallNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_TIMEOUT, data)
                     removeCall(context, Data.fromBundle(data))
+                } catch (error: Exception) {
+                    Log.e(TAG, null, error)
+                }
+            }
+
+            "${context.packageName}.${CallkitConstants.ACTION_CALL_PLACED}" -> {
+                try {
+                    sendEventFlutter(CallkitConstants.ACTION_CALL_PLACED, data)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
