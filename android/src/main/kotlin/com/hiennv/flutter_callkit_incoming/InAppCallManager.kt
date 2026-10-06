@@ -3,6 +3,7 @@ package com.hiennv.flutter_callkit_incoming
 import android.content.ComponentName
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.telecom.PhoneAccount
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
@@ -29,8 +30,21 @@ class InAppCallManager(private val context: Context) {
             val componentName = ComponentName(context, CallkitConnectionService::class.java)
             val handle = PhoneAccountHandle(componentName, ACCOUNT_ID)
 
-            val phoneAccount = PhoneAccount.builder(handle, "Callkit Incoming In-App Call")
+            // The account's name in Telecom (what getPhoneAccount().label
+            // returns to the system and other apps): the app's own, not the
+            // plugin's.
+            val label = context.applicationInfo.loadLabel(context.packageManager)
+            val phoneAccount = PhoneAccount.builder(handle, label)
                 .setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED)
+                .apply {
+                    // The app's calls are its own, not the phone app's call
+                    // history: Android's documented default, stated explicitly.
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        setExtras(Bundle().apply {
+                            putBoolean(PhoneAccount.EXTRA_LOG_SELF_MANAGED_CALLS, false)
+                        })
+                    }
+                }
                 .build()
 
             telecomManager.registerPhoneAccount(phoneAccount)
