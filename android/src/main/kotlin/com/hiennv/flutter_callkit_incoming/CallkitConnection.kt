@@ -163,6 +163,19 @@ class CallkitConnection(
         )
     }
 
+    /**
+     * The app resumed the call itself (`holdCall(isOnHold: false)`) while
+     * Telecom still had it on hold from another call. Telecom never hears of
+     * an app's resume otherwise, so the connection stayed ON_HOLD: no
+     * audio-route updates reached it and Telecom kept treating it as held.
+     * Not reported back to the app: the resume was its own.
+     */
+    fun resumedByApp() {
+        if (state != STATE_HOLDING) return
+        stopResumeWatcher()
+        setActive()
+    }
+
     // -------------------------------------------------------------------------
     // Self-resume watcher
     // -------------------------------------------------------------------------

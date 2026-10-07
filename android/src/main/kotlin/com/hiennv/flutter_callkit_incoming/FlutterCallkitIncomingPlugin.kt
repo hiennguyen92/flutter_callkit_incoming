@@ -325,6 +325,9 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                         }
                     }
                     sendEvent(CallkitConstants.ACTION_CALL_TOGGLE_HOLD, map)
+                    if (map["isOnHold"] == false && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        (map["id"] as? String)?.let { CallkitConnection.find(it)?.resumedByApp() }
+                    }
 
                     reply.success(true)
                 }
