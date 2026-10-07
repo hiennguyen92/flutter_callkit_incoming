@@ -50,6 +50,13 @@ class CallkitConnection(
         /** Bundle key — pass the full call Data bundle through Telecom extras. */
         const val EXTRA_CALL_BUNDLE = "com.hiennv.flutter_callkit_incoming.CALL_BUNDLE"
 
+        /**
+         * Set on the receiver's broadcast when Telecom itself answered,
+         * rejected or ended the call: the connection is already in that state,
+         * so the receiver must not drive it again.
+         */
+        const val EXTRA_FROM_TELECOM = "com.hiennv.flutter_callkit_incoming.FROM_TELECOM"
+
         private val activeConnections = ConcurrentHashMap<String, CallkitConnection>()
 
         fun find(callId: String): CallkitConnection? = activeConnections[callId]
@@ -89,31 +96,47 @@ class CallkitConnection(
     // These fire when the user interacts with the OS-level call UI (system
     // dialer, car Bluetooth, watch, etc.). In our app-driven model we still
     // handle the primary Accept/Decline via our own notification buttons, but
-    // the OS can also trigger these — we must honor both paths.
+    // the OS can also trigger these — we must honor both paths. Each one
+    // reaches the app through the receiver, as the notification's buttons do,
+    // so the app answers, declines or ends its own call and the receiver
+    // clears the notification, ringtone, stored call and call service.
     // -------------------------------------------------------------------------
 
     override fun onAnswer() {
         super.onAnswer()
         Log.d(TAG, "onAnswer id=$callId")
         setActive()
+        tellApp { context, data -> CallkitIncomingBroadcastReceiver.getIntentAccept(context, data) }
     }
 
     override fun onReject() {
         super.onReject()
         Log.d(TAG, "onReject id=$callId")
         finishWithCause(DisconnectCause.REJECTED)
+        tellApp { context, data -> CallkitIncomingBroadcastReceiver.getIntentDecline(context, data) }
     }
 
     override fun onDisconnect() {
         super.onDisconnect()
         Log.d(TAG, "onDisconnect id=$callId")
         finishWithCause(DisconnectCause.LOCAL)
+        tellApp { context, data -> CallkitIncomingBroadcastReceiver.getIntentEnded(context, data) }
     }
 
     override fun onAbort() {
         super.onAbort()
         Log.d(TAG, "onAbort id=$callId")
         finishWithCause(DisconnectCause.UNKNOWN)
+        tellApp { context, data -> CallkitIncomingBroadcastReceiver.getIntentEnded(context, data) }
+    }
+
+    private fun tellApp(intent: (Context, Bundle) -> Intent) {
+        try {
+            val data = Bundle(bundle).apply { putBoolean(EXTRA_FROM_TELECOM, true) }
+            appContext.sendBroadcast(intent(appContext, data))
+        } catch (e: Exception) {
+            Log.w(TAG, "tellApp failed id=$callId: ${e.message}")
+        }
     }
 
     // Telecom holds this self-managed connection when another call takes over

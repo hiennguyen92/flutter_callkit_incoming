@@ -207,6 +207,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         } catch (e: Exception) {
             null
         } ?: return
+        // Telecom itself answered or ended it: the connection is already there.
+        if (data.getBoolean(CallkitConnection.EXTRA_FROM_TELECOM)) return
         val conn = CallkitConnection.find(parsed.id) ?: return
         when (action) {
             CallkitConstants.ACTION_CALL_ACCEPT -> conn.markAccepted()
