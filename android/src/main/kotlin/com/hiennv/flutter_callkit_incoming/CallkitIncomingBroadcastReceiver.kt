@@ -323,6 +323,19 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_CONNECTED}" -> {
                 try {
                     driveTelecomConnection(context, data, CallkitConstants.ACTION_CALL_CONNECTED)
+                    // An incoming call answered in the app (not from the
+                    // notification) has no ongoing-call service yet: start it
+                    // as Accept does, shown connected at once.
+                    val connectedData = Data.fromBundle(data)
+                    val running = getDataActiveCalls(context).any { it.id == connectedData.id && it.isAccepted }
+                    if (!running) {
+                        addCall(context, connectedData, true)
+                        CallkitNotificationService.startServiceWithAction(
+                            context,
+                            CallkitConstants.ACTION_CALL_ACCEPT,
+                            Bundle(data).apply { putBoolean(CallkitNotificationService.EXTRA_CONNECTED, true) },
+                        )
+                    }
                     // update notification on going connected
                     getCallkitNotificationManager()?.showOngoingCallNotification(data, true)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_CONNECTED, data)

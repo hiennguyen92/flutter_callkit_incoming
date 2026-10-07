@@ -22,6 +22,9 @@ class CallkitNotificationService : Service() {
 
         private const val TAG = "CallkitNotificationService"
 
+        /** Show the ongoing call as connected at once. */
+        const val EXTRA_CONNECTED = "com.hiennv.flutter_callkit_incoming.CONNECTED"
+
         private val ActionForeground = listOf(
             CallkitConstants.ACTION_CALL_START,
             CallkitConstants.ACTION_CALL_ACCEPT
@@ -143,7 +146,10 @@ class CallkitNotificationService : Service() {
     private fun showOngoingCallNotification(bundle: Bundle) {
 
         val callkitNotification =
-            getCallkitNotificationManager()?.getOnGoingCallNotification(bundle, false)
+            getCallkitNotificationManager()?.getOnGoingCallNotification(
+                bundle,
+                bundle.getBoolean(EXTRA_CONNECTED, false),
+            )
         if (callkitNotification != null) {
             val typeCall = bundle.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
             startForeground(
