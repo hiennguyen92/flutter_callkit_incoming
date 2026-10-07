@@ -257,6 +257,10 @@ class HomePageState extends State<HomePage> {
           case CallEventActionCallEnded():
             NavigationService.instance.popUntil(AppRoute.homePage);
             break;
+          case CallEventActionCallRefused():
+            // Android: the system refused the call; end it here too.
+            NavigationService.instance.popUntil(AppRoute.homePage);
+            break;
           case CallEventActionCallConnected():
             break;
           case CallEventActionCallTimeout():

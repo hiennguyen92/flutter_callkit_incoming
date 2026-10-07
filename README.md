@@ -352,6 +352,10 @@ FlutterCallkitIncoming.onEvent.listen((CallEvent event) {
     case Event.actionCallTimeout:
       // TODO: missed an incoming call
       break;
+    case Event.actionCallRefused:
+      // TODO: only Android: the system refused the call (another app's call
+      // came first); end it in your app
+      break;
     case Event.actionCallCallback:
       // TODO: click action `Call back` from missed call notification
       break;

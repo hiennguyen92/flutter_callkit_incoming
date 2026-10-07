@@ -19,6 +19,8 @@ abstract class CallEventConstants {
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT';
   static const String actionCallConnected =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CONNECTED';
+  static const String actionCallRefused =
+      'com.hiennv.flutter_callkit_incoming.ACTION_CALL_REFUSED';
   static const String actionCallCallback =
       'com.hiennv.flutter_callkit_incoming.ACTION_CALL_CALLBACK';
   static const String actionCallToggleHold =
@@ -116,6 +118,22 @@ class CallEventActionCallEnded extends CallEvent {
   @override
   String toString() =>
       'CallEventActionCallEnded(callKitParams: $callKitParams)';
+}
+
+/// Android: Telecom refused the call (for example another app's call is
+/// ringing, or can't be held for an outgoing one). The plugin has stopped its
+/// own ringing and notification; the app should end the call on its side.
+class CallEventActionCallRefused extends CallEvent {
+  const CallEventActionCallRefused(this.callKitParams);
+
+  @override
+  String get eventName => CallEventConstants.actionCallRefused;
+
+  final CallKitParams callKitParams;
+
+  @override
+  String toString() =>
+      'CallEventActionCallRefused(callKitParams: $callKitParams)';
 }
 
 class CallEventActionCallTimeout extends CallEvent {

@@ -25,6 +25,7 @@ object CallkitConstants {
     const val ACTION_CALL_HELD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_HELD"
     const val ACTION_CALL_UNHELD = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_UNHELD"
     const val ACTION_CALL_CONNECTED = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_CONNECTED"
+    const val ACTION_CALL_REFUSED = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_REFUSED"
 
 
     const val EXTRA_CALLKIT_INCOMING_DATA = "EXTRA_CALLKIT_INCOMING_DATA"

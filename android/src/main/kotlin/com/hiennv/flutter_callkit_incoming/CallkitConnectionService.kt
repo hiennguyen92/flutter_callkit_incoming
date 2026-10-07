@@ -38,6 +38,17 @@ class CallkitConnectionService : ConnectionService() {
 
     companion object {
         private const val TAG = "CallkitConnectionSvc"
+
+        /**
+         * The calls handed to Telecom each way, oldest first, until their
+         * connection is created or refused. A refused request no longer
+         * carries the call's extras (seen on Android 10), so this is how the
+         * refusal finds its call: Telecom answers requests in order, so it is
+         * the oldest one still waiting.
+         */
+        val pendingIncoming = PendingCalls()
+
+        val pendingOutgoing = PendingCalls()
     }
 
     override fun onCreateIncomingConnection(
@@ -57,6 +68,7 @@ class CallkitConnectionService : ConnectionService() {
         }
 
         Log.d(TAG, "onCreateIncomingConnection id=$callId caller=${data.nameCaller}")
+        pendingIncoming.remove(callId)
 
         val connection = CallkitConnection(applicationContext, callId, callBundle).apply {
             if (data.nameCaller.isNotEmpty()) {
@@ -78,6 +90,7 @@ class CallkitConnectionService : ConnectionService() {
     ) {
         super.onCreateIncomingConnectionFailed(connectionManagerPhoneAccount, request)
         Log.w(TAG, "onCreateIncomingConnectionFailed")
+        refused(request, pendingIncoming)
     }
 
     override fun onCreateOutgoingConnection(
@@ -97,6 +110,7 @@ class CallkitConnectionService : ConnectionService() {
         }
 
         Log.d(TAG, "onCreateOutgoingConnection id=$callId callee=${data.nameCaller}")
+        pendingOutgoing.remove(callId)
 
         val connection = CallkitConnection(applicationContext, callId, callBundle).apply {
             if (data.nameCaller.isNotEmpty()) {
@@ -118,6 +132,7 @@ class CallkitConnectionService : ConnectionService() {
     ) {
         super.onCreateOutgoingConnectionFailed(connectionManagerPhoneAccount, request)
         Log.w(TAG, "onCreateOutgoingConnectionFailed")
+        refused(request, pendingOutgoing)
     }
 
     private fun extractCallBundle(extras: Bundle?): Bundle? {
@@ -133,9 +148,46 @@ class CallkitConnectionService : ConnectionService() {
         return if (extras.containsKey("id")) extras else null
     }
 
+    /**
+     * Telecom refused the call (e.g. another app's call is ringing, or can't be
+     * held for an outgoing one). The plugin's own notification would ring on
+     * and the app would carry on with the call: end the UI and tell the app.
+     */
+    private fun refused(request: ConnectionRequest?, pending: PendingCalls) {
+        val named = extractCallBundle(request?.extras)
+        val data = named?.also { pending.remove(Data.fromBundle(it).id) } ?: pending.takeOldest() ?: run {
+            Log.w(TAG, "refused: no call data")
+            return
+        }
+        applicationContext.sendBroadcast(
+            CallkitIncomingBroadcastReceiver.getIntentRefused(applicationContext, data),
+        )
+    }
+
     private fun failed(reason: String): Connection {
         return Connection.createFailedConnection(
             DisconnectCause(DisconnectCause.ERROR, reason),
         )
     }
+}
+
+/** Calls waiting for Telecom's answer, oldest first, by id. */
+class PendingCalls {
+    private val calls = LinkedHashMap<String, Bundle>()
+
+    @Synchronized
+    fun add(id: String, data: Bundle) {
+        calls.remove(id)
+        calls[id] = data
+        // Never more than a few in flight; never grows without end.
+        while (calls.size > 8) calls.remove(calls.keys.first())
+    }
+
+    @Synchronized
+    fun remove(id: String) {
+        calls.remove(id)
+    }
+
+    @Synchronized
+    fun takeOldest(): Bundle? = calls.keys.firstOrNull()?.let { calls.remove(it) }
 }

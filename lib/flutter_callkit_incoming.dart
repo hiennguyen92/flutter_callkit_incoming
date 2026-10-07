@@ -270,6 +270,12 @@ class FlutterCallkitIncoming {
           throw const FormatException('[ACTION_CALL_ENDED] id is null.');
         }
         return CallEventActionCallEnded(callkitParams);
+      case CallEventConstants.actionCallRefused:
+        final callkitParams = toCallkitParams(data);
+        if (callkitParams == null) {
+          throw const FormatException('[ACTION_CALL_REFUSED] id is null.');
+        }
+        return CallEventActionCallRefused(callkitParams);
       case CallEventConstants.actionCallTimeout:
         final callkitParams = toCallkitParams(data);
         if (callkitParams == null) {
