@@ -220,6 +220,19 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
     }
 
 
+    /**
+     * Whether another accepted call still needs the ongoing-call service.
+     * A stored call counts only with a live Telecom connection: the stored
+     * list outlives the process, a connection doesn't, so a left-over entry
+     * never keeps the service up.
+     */
+    private fun otherCallRunning(context: Context, endedId: String): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false
+        return getDataActiveCalls(context).any {
+            it.id != endedId && it.isAccepted && CallkitConnection.find(it.id) != null
+        }
+    }
+
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action ?: return
@@ -298,7 +311,9 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     FlutterCallkitIncomingPlugin.notifyEventCallbacks(CallkitEventCallback.CallEvent.END, data)
                     // clear notification and stop service
                     getCallkitNotificationManager()?.clearIncomingNotification(data, false)
-                    CallkitNotificationService.stopService(context)
+                    if (!otherCallRunning(context, Data.fromBundle(data).id)) {
+                        CallkitNotificationService.stopService(context)
+                    }
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ENDED, data)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
