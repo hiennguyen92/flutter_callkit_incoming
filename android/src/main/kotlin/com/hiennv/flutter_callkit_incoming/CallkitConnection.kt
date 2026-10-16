@@ -108,6 +108,13 @@ class CallkitConnection(
         super.onDisconnect()
         Log.d(TAG, "onDisconnect id=$callId")
         finishWithCause(DisconnectCause.LOCAL)
+        // Telecom ended the call (e.g. "end & answer" for another call): end it
+        // in the app too, through the plugin's usual end path.
+        try {
+            appContext.sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentEnded(appContext, bundle))
+        } catch (e: Exception) {
+            Log.w(TAG, "end broadcast failed: ${e.message}")
+        }
     }
 
     override fun onAbort() {
@@ -161,6 +168,13 @@ class CallkitConnection(
             CallkitConstants.ACTION_CALL_TOGGLE_HOLD,
             mapOf("id" to callId, "isOnHold" to false),
         )
+    }
+
+    /** Hold or resume the Telecom call from the app (holdCall). */
+    fun setHeld(isOnHold: Boolean) {
+        Log.d(TAG, "setHeld id=$callId hold=$isOnHold")
+        stopResumeWatcher()
+        if (isOnHold) setOnHold() else setActive()
     }
 
     // -------------------------------------------------------------------------

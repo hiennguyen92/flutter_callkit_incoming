@@ -120,6 +120,13 @@ class CallkitConnectionService : ConnectionService() {
         Log.w(TAG, "onCreateOutgoingConnectionFailed")
     }
 
+    // Another call took over: Telecom holds ours, release the call focus.
+    override fun onConnectionServiceFocusLost() {
+        super.onConnectionServiceFocusLost()
+        Log.d(TAG, "onConnectionServiceFocusLost")
+        connectionServiceFocusReleased()
+    }
+
     private fun extractCallBundle(extras: Bundle?): Bundle? {
         if (extras == null) return null
         // Primary path — our helper nests the full plugin Data under the
