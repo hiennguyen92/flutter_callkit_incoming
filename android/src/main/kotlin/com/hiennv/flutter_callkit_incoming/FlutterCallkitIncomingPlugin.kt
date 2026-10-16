@@ -324,6 +324,14 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                             putAll(args as Map<String, Any>)
                         }
                     }
+                    // Keep the Telecom connection in sync, as CallKit does on iOS.
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        val id = map["id"] as? String
+                        val isOnHold = map["isOnHold"] as? Boolean
+                        if (id != null && isOnHold != null) {
+                            CallkitConnection.find(id)?.setHeld(isOnHold)
+                        }
+                    }
                     sendEvent(CallkitConstants.ACTION_CALL_TOGGLE_HOLD, map)
 
                     reply.success(true)
