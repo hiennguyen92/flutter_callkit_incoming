@@ -207,16 +207,16 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         } catch (e: Exception) {
             null
         } ?: return
-        val conn = CallkitConnection.find(parsed.id) ?: return
-        when (action) {
-            CallkitConstants.ACTION_CALL_ACCEPT -> conn.markAccepted()
-            // Outgoing call answered by the remote side — drive the dialing
-            // connection to active so Telecom treats it as an ongoing call.
-            CallkitConstants.ACTION_CALL_CONNECTED -> conn.markAccepted()
-            CallkitConstants.ACTION_CALL_DECLINE -> conn.markDeclined(context)
-            CallkitConstants.ACTION_CALL_ENDED -> conn.markEnded()
-            CallkitConstants.ACTION_CALL_TIMEOUT -> conn.markMissed()
+        if (parsed.id.isEmpty()) return
+        val conn = CallkitConnection.find(parsed.id)
+        if (conn == null) {
+            // Telecom has not created the Connection yet (placeCall /
+            // addNewIncomingCall are asynchronous). Keep the action and apply
+            // it when the Connection appears, instead of losing it (#893).
+            CallkitConnection.deferAction(parsed.id, action)
+            return
         }
+        conn.applyAction(context, action)
     }
 
 
