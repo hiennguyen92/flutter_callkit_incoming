@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.telecom.Connection
 import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
@@ -68,6 +69,64 @@ class CallkitConnection(
         }
 
         fun activeCount(): Int = activeConnections.size
+
+        // ---------------------------------------------------------------------
+        // Actions that arrive before the Connection exists (issue #893)
+        //
+        // The app can report a state change (e.g. ACTION_CALL_CONNECTED right
+        // after startCall) before Telecom has called onCreateOutgoingConnection /
+        // onCreateIncomingConnection. Dropping it leaves an outgoing call stuck
+        // in DIALING: Telecom keeps the earpiece route (setSpeakerphoneOn is
+        // ignored) until its 120 s STATE_TIMEOUT disconnects the call. Instead
+        // the action is remembered here and applied once the Connection is
+        // created (see CallkitConnectionService.applyPendingActionLater).
+        // ---------------------------------------------------------------------
+
+        private const val PENDING_ACTION_TTL_MS = 30_000L
+
+        private class PendingAction(val action: String, val atMs: Long)
+
+        private val pendingActions = ConcurrentHashMap<String, PendingAction>()
+
+        private fun isTerminal(action: String): Boolean =
+            action == CallkitConstants.ACTION_CALL_DECLINE ||
+                action == CallkitConstants.ACTION_CALL_ENDED ||
+                action == CallkitConstants.ACTION_CALL_TIMEOUT
+
+        /** Remember [action] for a call whose Connection does not exist yet. */
+        fun deferAction(callId: String, action: String) {
+            val now = SystemClock.elapsedRealtime()
+            pendingActions.entries.removeIf { now - it.value.atMs > PENDING_ACTION_TTL_MS }
+            val existing = pendingActions[callId]
+            // An end/decline/timeout must not be overwritten by a late connect.
+            if (existing != null && isTerminal(existing.action) && !isTerminal(action)) return
+            pendingActions[callId] = PendingAction(action, now)
+            Log.d(TAG, "deferred $action id=$callId (no Connection yet)")
+        }
+
+        /** Take the remembered action for [callId], if any and not expired. */
+        fun takePendingAction(callId: String): String? {
+            val pending = pendingActions.remove(callId) ?: return null
+            if (SystemClock.elapsedRealtime() - pending.atMs > PENDING_ACTION_TTL_MS) return null
+            return pending.action
+        }
+
+        fun clearPendingAction(callId: String) {
+            pendingActions.remove(callId)
+        }
+    }
+
+    /** Apply an app-reported call action to this Connection. */
+    fun applyAction(context: Context, action: String) {
+        when (action) {
+            CallkitConstants.ACTION_CALL_ACCEPT -> markAccepted()
+            // Outgoing call answered by the remote side — drive the dialing
+            // connection to active so Telecom treats it as an ongoing call.
+            CallkitConstants.ACTION_CALL_CONNECTED -> markAccepted()
+            CallkitConstants.ACTION_CALL_DECLINE -> markDeclined(context)
+            CallkitConstants.ACTION_CALL_ENDED -> markEnded()
+            CallkitConstants.ACTION_CALL_TIMEOUT -> markMissed()
+        }
     }
 
     init {
@@ -313,6 +372,7 @@ class CallkitConnection(
             Log.w(TAG, "setDisconnected failed: ${e.message}")
         }
         unregister(callId)
+        clearPendingAction(callId)
         try {
             destroy()
         } catch (e: Exception) {

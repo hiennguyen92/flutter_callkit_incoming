@@ -3,6 +3,8 @@ package com.hiennv.flutter_callkit_incoming
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.telecom.Connection
 import android.telecom.ConnectionRequest
 import android.telecom.ConnectionService
@@ -40,6 +42,22 @@ class CallkitConnectionService : ConnectionService() {
         private const val TAG = "CallkitConnectionSvc"
     }
 
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    /**
+     * Apply an action the app reported before this Connection existed (#893).
+     * Posted, so it runs after the Connection has been returned to Telecom and
+     * the state change is reported like any other.
+     */
+    private fun applyPendingActionLater(connection: CallkitConnection) {
+        mainHandler.post {
+            if (CallkitConnection.find(connection.callId) !== connection) return@post
+            val action = CallkitConnection.takePendingAction(connection.callId) ?: return@post
+            Log.d(TAG, "applying deferred $action id=${connection.callId}")
+            connection.applyAction(applicationContext, action)
+        }
+    }
+
     override fun onCreateIncomingConnection(
         connectionManagerPhoneAccount: PhoneAccountHandle?,
         request: ConnectionRequest?,
@@ -69,6 +87,7 @@ class CallkitConnectionService : ConnectionService() {
             )
             setRinging()
         }
+        applyPendingActionLater(connection)
         return connection
     }
 
@@ -109,6 +128,7 @@ class CallkitConnectionService : ConnectionService() {
             )
             setDialing()
         }
+        applyPendingActionLater(connection)
         return connection
     }
 
