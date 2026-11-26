@@ -1,6 +1,15 @@
 plugins {
     id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
+}
+
+// AGP 9+ ships Built-in Kotlin (enabled unless android.builtInKotlin=false) and
+// rejects the standalone Kotlin Android plugin. Apply it only when it is needed.
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+def builtInKotlinActive = agpMajor >= 9 &&
+        (!project.hasProperty('android.builtInKotlin') ||
+                Boolean.parseBoolean(project.property('android.builtInKotlin').toString()))
+if (!builtInKotlinActive) {
+    apply plugin: 'org.jetbrains.kotlin.android'
 }
 
 group = "com.example.flutter_callkit_incoming"
@@ -24,8 +33,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+}
 
-    kotlinOptions {
+// android.kotlinOptions is removed with Built-in Kotlin; prefer compilerOptions when available.
+def kotlinExtension = project.extensions.findByName('kotlin')
+if (kotlinExtension != null && kotlinExtension.hasProperty('compilerOptions')) {
+    kotlinExtension.compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+} else {
+    android.kotlinOptions {
         jvmTarget = "1.8"
     }
 }
